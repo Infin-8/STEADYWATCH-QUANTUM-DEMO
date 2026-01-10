@@ -191,11 +191,68 @@ cd STEADYWATCH-QUANTUM-DEMO
 # Install dependencies
 pip install -r requirements.txt
 
-# Configure IBM Quantum (optional)
+# Configure IBM Quantum (optional, for real hardware)
 # See ibm_quantum/setup_ibm_quantum.py
 ```
 
-### Running Discovery Validation Tests
+### 📖 Read the Research Paper
+
+**Start here to understand the QKD milestone achievement:**
+
+```bash
+# View the complete research paper
+cat docs/QKD_MILESTONE_RESEARCH_PAPER.md
+
+# Or open in your browser:
+# https://github.com/Infin-8/STEADYWATCH-QUANTUM-DEMO/blob/main/docs/QKD_MILESTONE_RESEARCH_PAPER.md
+```
+
+**Key documents:**
+- **Main Paper:** `docs/QKD_MILESTONE_RESEARCH_PAPER.md` - Complete research paper
+- **Appendices:** `docs/QKD_PAPER_APPENDICES.md` - Technical details and code
+- **Figures:** `docs/QKD_PAPER_FIGURES.md` - Diagrams and data tables
+- **References:** `docs/QKD_PAPER_REFERENCES.md` - Bibliography
+
+### 🧪 Testing the Hybrid QKD System
+
+**Test the hybrid system (Discovery 37) - Production-ready QKD:**
+
+```bash
+# Test hybrid system on simulator (fast)
+python3 quantum_computing/test_hybrid_system_complete.py
+
+# Test hybrid system on real hardware (requires IBM Quantum account)
+python3 quantum_computing/test_hybrid_system_hardware.py
+
+# Test GHZ + Echo Resonance hybrid encryption
+python3 quantum_computing/test_ghz_echo_hybrid.py
+```
+
+**Expected Results:**
+- Simulator: <0.1 seconds, 100% fidelity
+- Hardware: 7.69 seconds, 69% fidelity (12-qubit GHZ)
+- Job ID: Documented for verification
+
+### ⚛️ Testing GHZ State Generation
+
+**Test GHZ scaling (2-28 qubits validated):**
+
+```bash
+# Test GHZ state generation
+python3 quantum_computing/test_hardware_multi_qubit.py
+
+# View GHZ validation results
+cat quantum_computing/ghz_validation_tests.md
+```
+
+**Results:**
+- 2-4 qubits: 90-94% fidelity
+- 12 qubits: 69-75% fidelity
+- 28 qubits: 35% fidelity (record depth)
+
+### 🔬 Testing Discovery Validation
+
+**Run discovery validation tests:**
 
 ```bash
 # Run all discovery tests
@@ -203,25 +260,45 @@ cd discoveries
 python test_all_discoveries_validation.py
 
 # Or run individual tests
-python test_discovery_26_caching.py
-python test_discovery_27_tesla_math.py
-python test_discovery_28_coordinate_patterns.py
-python test_discovery_29_yin_yang.py
+python test_discovery_26_caching.py    # Quantum caching (6,796× speedup)
+python test_discovery_27_tesla_math.py # Tesla math patterns
+python test_discovery_28_coordinate_patterns.py # Coordinate patterns
+python test_discovery_29_yin_yang.py   # Yin/Yang balance
 ```
 
-### Testing IBM Quantum Connection
+### 🔌 Testing IBM Quantum Connection
 
 ```bash
 cd ibm_quantum
 python test_ibm_quantum_connection.py
 ```
 
-### Testing Agent Quantum Integration
+### 🤖 Testing Agent Quantum Integration
 
 ```bash
 cd agent_quantum
 python test_agent_quantum_demo.py
 ```
+
+### 📊 Viewing Validation Results
+
+**Check hardware validation results:**
+
+```bash
+# Hybrid system validation (Discovery 37)
+cat quantum_computing/HYBRID_SYSTEM_HARDWARE_VALIDATION.md
+
+# GHZ scaling results (2-28 qubits)
+cat quantum_computing/ghz_validation_tests.md
+
+# All discovery results
+cat quantum_computing/HYBRID_SYSTEM_TEST_RESULTS.md
+```
+
+**Verification:**
+- All job IDs are documented and verifiable on IBM Quantum platform
+- Example: Job ID `d5gs5mkpe0pc73alki40` (Hybrid System validation)
+- View at: https://quantum.ibm.com/jobs/d5gs5mkpe0pc73alki40
 
 ---
 
