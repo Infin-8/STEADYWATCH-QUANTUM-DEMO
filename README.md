@@ -314,7 +314,6 @@ cat quantum_computing/HYBRID_SYSTEM_TEST_RESULTS.md
 - ✅ Information-theoretic security proven on hardware
 - ✅ Production-ready performance (7.69 seconds)
 - ✅ Quantum observer effect demonstrated
-- ✅ Real-time quantum decision-making confirmed
 
 ---
 
