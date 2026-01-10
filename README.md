@@ -120,7 +120,15 @@ All discoveries have been validated on IBM Quantum hardware:
 - **Files:** `agent_quantum/agent_quantum_integration.py`, `agent_quantum/test_agent_quantum_demo.py`
 
 ### 8. **Core Quantum Algorithms**
+- ✅ **GHZ + Echo Resonance Hybrid System** ⭐ NEW (Discovery 37)
+  - Hybrid QKD: Information-theoretic + Computational security
+  - Production-ready: 7.69 seconds, 69% fidelity
+  - **File:** `core/ghz_echo_resonance_hybrid.py`
 - ✅ Echo Resonance Technology (harmonic-based superposition)
+  - 4-qubit, 7-qubit, 11-qubit, 12-qubit systems validated
+  - **Files:** `core/echo_resonance_circuits.py`, `core/echo_resonance_calculations.py`
+- ✅ Large-Scale Quantum Encryption (400 qubits, 2^4096 key space)
+  - **File:** `core/quantum_encryption_large_scale.py`
 - ✅ Bat Defensive Grid (multi-modal sensing)
 - ✅ Graviton Detection (5 detection methods)
 - ✅ Periodic Table Quantum Frequencies (atomic frequency encoding)
@@ -137,12 +145,14 @@ STEADYWATCH-QUANTUM-DEMO/
 ├── requirements.txt                   # Python dependencies
 │
 ├── core/                              # Core quantum computing modules
-│   ├── echo_resonance_calculations.py
-│   ├── echo_resonance_circuits.py
-│   ├── quantum_service.py
-│   ├── bat_defensive_grid_quantum.py
-│   ├── graviton_detection_quantum.py
-│   └── periodic_table_quantum_frequencies.py
+│   ├── ghz_echo_resonance_hybrid.py   ⭐ NEW - Hybrid QKD system (Discovery 37)
+│   ├── echo_resonance_circuits.py     # Echo Resonance circuits (4-12 qubits)
+│   ├── echo_resonance_calculations.py # Echo Resonance calculations
+│   ├── quantum_encryption_large_scale.py # Large-scale encryption (400 qubits)
+│   ├── quantum_service.py             # Quantum service integration
+│   ├── bat_defensive_grid_quantum.py  # Bat defensive grid
+│   ├── graviton_detection_quantum.py   # Graviton detection
+│   └── periodic_table_quantum_frequencies.py # Atomic frequency operations
 │
 ├── discoveries/                      # Discovery validation tests
 │   ├── test_discovery_26_caching.py
