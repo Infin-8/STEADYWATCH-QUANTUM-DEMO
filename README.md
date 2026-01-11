@@ -1,4 +1,4 @@
-# SteadyWatch Quantum Computing Research - Public Demo
+# STEADYWATCH Quantum Computing Research - Public Demo
 
 **Repository:** STEADYWATCH-QUANTUM-DEMO  
 **Institution:** Quantum V^ LLC  
