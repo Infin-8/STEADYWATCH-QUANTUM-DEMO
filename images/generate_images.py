@@ -383,6 +383,125 @@ def create_fidelity_chart():
     print(f"✅ Created: {output_path}")
     return True
 
+def create_ibm_heron_chip():
+    """Create IBM Heron R2 chip visualization"""
+    fig, ax = plt.subplots(figsize=(12, 8))
+    ax.set_xlim(-1, 11)
+    ax.set_ylim(-1, 7)
+    ax.axis('off')
+    
+    # Draw chip outline
+    chip = FancyBboxPatch((1, 1), 9, 5, boxstyle="round,pad=0.2",
+                         facecolor='#1a1a1a', edgecolor='#00d4ff', linewidth=3)
+    ax.add_patch(chip)
+    
+    # Draw qubit grid (156 qubits in a grid pattern)
+    num_qubits = 156
+    rows, cols = 12, 13  # Approximate grid for 156 qubits
+    
+    qubit_size = 0.15
+    spacing_x = 8.5 / cols
+    spacing_y = 4.5 / rows
+    
+    qubits_drawn = 0
+    for row in range(rows):
+        for col in range(cols):
+            if qubits_drawn >= num_qubits:
+                break
+            x = 1.5 + col * spacing_x
+            y = 1.5 + row * spacing_y
+            
+            # Draw qubit
+            circle = Circle((x, y), qubit_size, color='#00d4ff', 
+                          ec='#00a8cc', linewidth=0.5, alpha=0.8)
+            ax.add_patch(circle)
+            qubits_drawn += 1
+        if qubits_drawn >= num_qubits:
+            break
+    
+    # Add chip label
+    ax.text(5.5, 6.2, 'IBM Heron R2 Quantum Processor', 
+           ha='center', va='center', fontsize=16, fontweight='bold', color='#00d4ff')
+    ax.text(5.5, 5.7, '156 Qubits | ibm_fez', 
+           ha='center', va='center', fontsize=12, color='#00d4ff', style='italic')
+    
+    # Add IBM logo area
+    logo_box = FancyBboxPatch((8.5, 5.5), 1.2, 0.4, boxstyle="round,pad=0.05",
+                             facecolor='white', edgecolor='#00d4ff', linewidth=2)
+    ax.add_patch(logo_box)
+    ax.text(9.1, 5.7, 'IBM', ha='center', va='center', 
+           fontsize=14, fontweight='bold', color='#006699')
+    
+    # Add specifications
+    specs = [
+        'Architecture: Heron R2',
+        'Qubits: 156',
+        'Coherence Time: ~100μs',
+        'Gate Fidelity: >99%'
+    ]
+    y_start = 0.3
+    for i, spec in enumerate(specs):
+        ax.text(0.2, y_start - i*0.3, spec, fontsize=9, color='#666666')
+    
+    output_path = os.path.join(OUTPUT_DIR, 'ibm-heron-r2-chip.png')
+    plt.savefig(output_path, dpi=300, bbox_inches='tight', facecolor='white')
+    plt.close()
+    print(f"✅ Created: {output_path}")
+    return True
+
+def create_dilution_refrigerator():
+    """Create dilution refrigerator visualization"""
+    fig, ax = plt.subplots(figsize=(10, 12))
+    ax.set_xlim(-1, 9)
+    ax.set_ylim(-1, 11)
+    ax.axis('off')
+    
+    # Draw refrigerator structure (cylindrical)
+    # Outer shell
+    outer = FancyBboxPatch((1, 0.5), 7, 9.5, boxstyle="round,pad=0.3",
+                          facecolor='#e0e0e0', edgecolor='#333333', linewidth=3)
+    ax.add_patch(outer)
+    
+    # Inner layers (showing cooling stages)
+    stages = [
+        (1.3, 1, 6.4, 1.5, '#ffcccc', '50K - First Stage'),
+        (1.6, 2.8, 5.8, 1.5, '#ff9999', '4K - Second Stage'),
+        (1.9, 4.6, 5.2, 1.5, '#ff6666', '1K - Third Stage'),
+        (2.2, 6.4, 4.6, 1.5, '#ff0000', '100mK - Fourth Stage'),
+        (2.5, 8.2, 4.0, 1.2, '#0000ff', '15mK - Dilution Stage')
+    ]
+    
+    for x, y, w, h, color, label in stages:
+        stage = FancyBboxPatch((x, y), w, h, boxstyle="round,pad=0.1",
+                              facecolor=color, edgecolor='black', linewidth=1.5, alpha=0.7)
+        ax.add_patch(stage)
+        ax.text(x + w/2, y + h/2, label, ha='center', va='center', 
+               fontsize=8, fontweight='bold')
+    
+    # Add quantum processor at bottom (coldest point)
+    processor = Circle((4.5, 9.5), 0.8, color='#00d4ff', ec='#006699', linewidth=2)
+    ax.add_patch(processor)
+    ax.text(4.5, 9.5, 'Qubits', ha='center', va='center', 
+           fontsize=9, fontweight='bold', color='white')
+    ax.text(4.5, 10.5, '15mK\n(-273.135°C)', ha='center', va='center',
+           fontsize=10, fontweight='bold', color='#0000ff')
+    
+    # Add title
+    ax.text(4.5, 11.5, 'Dilution Refrigerator', 
+           ha='center', va='center', fontsize=16, fontweight='bold')
+    ax.text(4.5, 11.1, 'Cooling Quantum Processors to Near Absolute Zero', 
+           ha='center', va='center', fontsize=11, style='italic', color='#666666')
+    
+    # Add cooling stages label
+    ax.text(0.2, 5, 'Cooling\nStages\n↓', ha='center', va='center',
+           fontsize=10, fontweight='bold', color='#666666', rotation=90)
+    
+    output_path = os.path.join(OUTPUT_DIR, 'dilution-refrigerator.png')
+    plt.savefig(output_path, dpi=300, bbox_inches='tight', facecolor='white')
+    plt.close()
+    print(f"✅ Created: {output_path}")
+    return True
+
 def main():
     """Generate all images"""
     print("=" * 60)
@@ -392,27 +511,35 @@ def main():
     
     results = []
     
-    print("1. Creating 12-qubit GHZ circuit diagram...")
+    print("1. Creating IBM Heron R2 chip visualization...")
+    results.append(("IBM Heron chip", create_ibm_heron_chip()))
+    print()
+    
+    print("2. Creating dilution refrigerator visualization...")
+    results.append(("Dilution refrigerator", create_dilution_refrigerator()))
+    print()
+    
+    print("3. Creating 12-qubit GHZ circuit diagram...")
     results.append(("12-qubit circuit", create_12qubit_circuit()))
     print()
     
-    print("2. Creating 3-6 qubit GHZ circuit diagram...")
+    print("4. Creating 3-6 qubit GHZ circuit diagram...")
     results.append(("3-6 qubit circuit", create_3_6qubit_circuit()))
     print()
     
-    print("3. Creating GHZ entanglement visualization...")
+    print("5. Creating GHZ entanglement visualization...")
     results.append(("Entanglement viz", create_entanglement_visualization()))
     print()
     
-    print("4. Creating multipartite GHZ illustration...")
+    print("6. Creating multipartite GHZ illustration...")
     results.append(("Multipartite GHZ", create_multipartite_ghz()))
     print()
     
-    print("5. Creating long-range GHZ network diagram...")
+    print("7. Creating long-range GHZ network diagram...")
     results.append(("Network diagram", create_network_diagram()))
     print()
     
-    print("6. Creating fidelity bar chart...")
+    print("8. Creating fidelity bar chart...")
     results.append(("Fidelity chart", create_fidelity_chart()))
     print()
     

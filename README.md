@@ -37,10 +37,10 @@ This repository contains quantum computing research for **Echo Resonance Technol
 - **Total Time:** 202.28 seconds (includes queue time; actual execution ~12 seconds)
 
 **Hardware Visualization:**
-![IBM Heron R2 Quantum Processor](https://www.ibm.com/quantum/blog/wp-content/uploads/2024/10/heron-r2-chip.jpg)
+![IBM Heron R2 Quantum Processor](https://raw.githubusercontent.com/Infin-8/STEADYWATCH-QUANTUM-DEMO/main/images/ibm-heron-r2-chip.png)
 *The IBM Heron R2 quantum processor chip (156 qubits) used for QKD validation*
 
-![Dilution Refrigerator](https://www.ibm.com/quantum/blog/wp-content/uploads/2024/10/dilution-refrigerator.jpg)
+![Dilution Refrigerator](https://raw.githubusercontent.com/Infin-8/STEADYWATCH-QUANTUM-DEMO/main/images/dilution-refrigerator.png)
 *Dilution refrigerator system maintaining qubits at near-absolute zero (-273°C)*
 
 **Significance:**
@@ -520,11 +520,11 @@ python qkd_api_integration.py
 ### Hardware: IBM Quantum ibm_fez
 
 **Physical Quantum Processor:**
-![IBM Heron R2 Chip](https://www.ibm.com/quantum/blog/wp-content/uploads/2024/10/heron-r2-chip.jpg)
+![IBM Heron R2 Chip](https://raw.githubusercontent.com/Infin-8/STEADYWATCH-QUANTUM-DEMO/main/images/ibm-heron-r2-chip.png)
 *The IBM Heron R2 quantum processor chip (156 qubits) used for QKD validation*
 
 **Cooling Infrastructure:**
-![Dilution Refrigerator](https://www.ibm.com/quantum/blog/wp-content/uploads/2024/10/dilution-refrigerator.jpg)
+![Dilution Refrigerator](https://raw.githubusercontent.com/Infin-8/STEADYWATCH-QUANTUM-DEMO/main/images/dilution-refrigerator.png)
 *Dilution refrigerator maintaining qubits at near-absolute zero (-273°C)*
 
 **Hardware Specifications:**
