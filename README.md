@@ -44,6 +44,16 @@ This repository contains quantum computing research for **Echo Resonance Technol
 - Error mitigation proven essential for fundamental research
 - Publication-quality results resistant to classical critiques
 
+**Visualization:**
+![Quantum Randomness Flow](https://raw.githubusercontent.com/Infin-8/STEADYWATCH-QUANTUM-DEMO/main/images/quantum-randomness-flow.png)
+*Quantum random number generation closing the freedom-of-choice loophole*
+
+![Error Mitigation Pipeline](https://raw.githubusercontent.com/Infin-8/STEADYWATCH-QUANTUM-DEMO/main/images/error-mitigation-pipeline.png)
+*Error mitigation pipeline improving Mermin parameter by 51.83%*
+
+![Mermin Parameter Comparison](https://raw.githubusercontent.com/Infin-8/STEADYWATCH-QUANTUM-DEMO/main/images/mermin-parameter-comparison.png)
+*Raw vs mitigated results showing clear Bell inequality violation*
+
 **Documentation:**
 - **Research Paper:** [`docs/research/BELL_INEQUALITY_BREAKTHROUGH.md`](docs/research/BELL_INEQUALITY_BREAKTHROUGH.md) ⭐ NEW
 - **Loophole Closure:** [`docs/research/FREEDOM_OF_CHOICE_LOOPHOLE_CLOSED.md`](docs/research/FREEDOM_OF_CHOICE_LOOPHOLE_CLOSED.md) ⭐ NEW

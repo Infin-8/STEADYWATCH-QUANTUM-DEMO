@@ -140,12 +140,39 @@ Measurement bases are randomly selected using quantum randomness:
 - Random seed logged for reproducibility
 - Independence from state preparation guaranteed
 
-### Error Mitigation
-Multiple techniques applied:
+**Quantum Randomness Flow:**
+![Quantum Randomness Flow](https://raw.githubusercontent.com/Infin-8/STEADYWATCH-QUANTUM-DEMO/main/images/quantum-randomness-flow.png)
+*Quantum random number generation process closing the freedom-of-choice loophole*
+
+### Mermin Measurement Circuits
+The Mermin inequality requires measuring four specific observables: XXX, XYY, YXY, and YYX.
+
+**XXX Observable Circuit:**
+![XXX Measurement Circuit](https://raw.githubusercontent.com/Infin-8/STEADYWATCH-QUANTUM-DEMO/main/images/mermin-measurement-circuit-xxx.png)
+*GHZ preparation + X-basis measurement on all qubits*
+
+**XYY Observable Circuit:**
+![XYY Measurement Circuit](https://raw.githubusercontent.com/Infin-8/STEADYWATCH-QUANTUM-DEMO/main/images/mermin-measurement-circuit-xyy.png)
+*GHZ preparation + X-basis on q0, Y-basis on q1 and q2*
+
+**YXY and YYX Circuits:**
+Similar structure with Y-basis rotations (S†H gates) applied to different qubits.
+
+### Error Mitigation Pipeline
+Multiple techniques applied to improve fidelity:
 - **Zero Noise Extrapolation (ZNE):** Extrapolates to zero-noise limit
 - **Measurement Error Mitigation (MEM):** Corrects readout errors
 - **Symmetry Verification:** Validates GHZ state symmetry
 - **Post-Selection:** Filters invalid states
+
+**Error Mitigation Flow:**
+![Error Mitigation Pipeline](https://raw.githubusercontent.com/Infin-8/STEADYWATCH-QUANTUM-DEMO/main/images/error-mitigation-pipeline.png)
+*Error mitigation pipeline improving |M| from 2.4512 to 3.7216 (+51.83%)*
+
+### Results Comparison
+**Raw vs Mitigated Mermin Parameters:**
+![Mermin Parameter Comparison](https://raw.githubusercontent.com/Infin-8/STEADYWATCH-QUANTUM-DEMO/main/images/mermin-parameter-comparison.png)
+*Comparison showing raw (|M| = 2.4512) vs mitigated (|M| = 3.7216) results*
 
 ### Hardware
 - **Backend:** IBM Quantum ibm_fez (156-qubit Heron r2)
