@@ -394,30 +394,32 @@
         
         /* Responsive */
         @media (max-width: 768px) {
-            header h1 {
+             header h1 {
                 font-size: 2em;
-            }
-            
-            header p {
-                font-size: 1.1em;
-            }
-            
-            .section-title {
-                font-size: 2em;
-            }
-            
-            .stats-grid {
-                grid-template-columns: repeat(2, 1fr);
-            }
-             .stats-grid > div[style*="grid-column"] {
-                grid-column: span 1;
-                display: block;
-    }
-    
-    .stats-grid > div[style*="grid-column"] .stat-card {
-        max-width: 100%;
-    }
         }
+    
+            header p {
+            font-size: 1.1em;
+        }
+    
+            .section-title {
+            font-size: 2em;
+        }
+    
+            .stats-grid {
+            grid-template-columns: repeat(2, 1fr);
+        }
+    
+            .centered-stat-wrapper {
+            grid-column: span 1 !important;
+            display: block !important;
+        }
+    
+        .centered-stat-wrapper .stat-card {
+            max-width: 100% !important;
+            width: 100% !important;
+        }
+            }
         
     </style>
 </head>
@@ -506,10 +508,11 @@
                 <span style="font-size: 0.7em; color: #666;">IBM Quantum + AWS Braket</span>
                 </div>
                 </div>
-             <div style="grid-column: 1 / -1; display: flex; justify-content: center;">
-                <div class="stat-card" style="max-width: 300px;">
-                    <div class="number">7.69s</div>
-                    <div class="label">Protocol Execution Time</div>
+                <div class="centered-stat-wrapper" style="grid-column: 1 / -1; display: flex; justify-content: center;">
+                    <div class="stat-card" style="max-width: 300px;">
+                        <div class="number">7.69s</div>
+                        <div class="label">Protocol Execution Time</div>
+                    </div>
                 </div>
             </div>
             </div>
