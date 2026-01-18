@@ -409,12 +409,14 @@
             .stats-grid {
                 grid-template-columns: repeat(2, 1fr);
             }
-            .stats-grid .stat-card.centered,
-            .stats-grid > div[style*="grid-column"] .stat-card {
-            grid-column: span 1;
-            max-width: 100%;
-            margin: 0;
-            }
+             .stats-grid > div[style*="grid-column"] {
+                grid-column: span 1;
+                display: block;
+    }
+    
+    .stats-grid > div[style*="grid-column"] .stat-card {
+        max-width: 100%;
+    }
         }
         
     </style>
