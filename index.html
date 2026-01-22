@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SteadyWatch Quantum Computing Research | QKD API v1.0.0 | Production Ready</title>
+    <title>STEADYWATCH | QKD API v1.0.0 |</title>
     <meta name="description" content="First complete end-to-end QKD protocol validated on real quantum hardware. Production-ready QKD API v1.0.0 with 14 operational endpoints. Hardware validated on IBM Quantum ibm_fez (156 qubits).">
     <style>
         * {
@@ -371,55 +371,149 @@
             color: white;
             text-decoration: underline;
         }
-        
-        /* Responsive */
-        @media (max-width: 768px) {
-            header h1 {
-                font-size: 2em;
-            }
-            
-            header p {
-                font-size: 1.1em;
-            }
-            
-            .section-title {
-                font-size: 2em;
-            }
-            
-            .stats-grid {
-                grid-template-columns: repeat(2, 1fr);
-            }
+        .tagline {
+            font-size: 1.0em;
+            font-weight: 100;
+            font-style: italic;
+            opacity: 0.85;
+            margin: -5px 0 15px 0;
+            letter-spacing: 2px;
+            color: rgba(255, 255, 255, 0.9);
+}
+        #copyR {
+            background: #333;
+            color: white;
+            text-align: center;
+            width: 100%;
         }
+        .stat-card.centered {
+            grid-column: 1 / -1;
+            max-width: 300px;
+            margin: 0 auto;
+        }
+        
+@media (max-width: 768px) {
+    header h1 {
+        font-size: 2em;
+    }
+    
+    header p {
+        font-size: 1.1em;
+    }
+    
+    .section-title {
+        font-size: 2em;
+    }
+    
+    .stats-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+    
+    .centered-stat-wrapper {
+        grid-column: span 1 !important;
+        display: block !important;
+    }
+    
+    .centered-stat-wrapper .stat-card {
+        max-width: 100% !important;
+        width: 100% !important;
+    }
+}
+
+ @media (max-width: 1024px) {
+       header h1 {
+        font-size: 2em;
+    }
+    
+    header p {
+        font-size: 1.1em;
+    }
+    
+    .section-title {
+        font-size: 2em;
+    }
+    
+    .stats-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+    
+    .centered-stat-wrapper {
+        grid-column: span 1 !important;
+        display: block !important;
+    }
+    
+    .centered-stat-wrapper .stat-card {
+        max-width: 100% !important;
+        width: 100% !important;
+    }
+}
+
+@media (max-width: 1280px) {
+           header h1 {
+        font-size: 2em;
+    }
+    
+    header p {
+        font-size: 1.1em;
+    }
+    
+    .section-title {
+        font-size: 2em;
+    }
+    
+    .stats-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+    
+    .centered-stat-wrapper {
+        grid-column: span 1 !important;
+        display: block !important;
+    }
+    
+    .centered-stat-wrapper .stat-card {
+        max-width: 100% !important;
+        width: 100% !important;
+    }
+ 
+}
+        
     </style>
 </head>
 <body>
     <nav>
         <div class="container">
-            <a href="index.html" class="nav-brand">
-                <img src="images/logo.png" alt="SteadyWatch Logo">
-                <span>STEADYWATCH™</span>
+            <a href="https://apps.apple.com/us/app/steadywatch-handheld/id6755752518" class="nav-brand">
+                <img src="images/logo.png" alt="STEADYWATCH Logo">
+                <span><u>STEADYWATCH™</u></span>
             </a>
             <button class="mobile-menu-toggle" onclick="toggleMobileMenu()">☰</button>
             <ul class="nav-links" id="navLinks">
                 <li><a href="index.html">Home</a></li>
+                <li><a href="consulting-services.html">Consulting</a></li>
                 <li><a href="docs/research/QKD_MILESTONE_RESEARCH_PAPER.md">Research</a></li>
                 <li><a href="docs/qkd/QKD_PROTOCOL_QUICK_START.md">Documentation</a></li>
-                <li><a href="consulting-services.html">Consulting</a></li>
                 <li><a href="https://github.com/Infin-8/STEADYWATCH-QUANTUM-DEMO">Repository</a></li>
-                <li><a href="mailto:nate_vazquez@icloud.com" class="nav-cta">Contact</a></li>
+                <li><a href="mailto:nate_vazquez@icloud.com" class="nav-cta" style="color: black; font-size: small;, width: 15px;">Email</a></li>
             </ul>
         </div>
     </nav>
     
     <header>
-        <div class="container">
-            <h1>SteadyWatch Quantum Computing Research</h1>
-            <p>First Complete QKD Protocol Validated on Real Quantum Hardware</p>
+        <div class="container" class="nav-brand">
+            <h1><u>STEADYWATCH™</u></h1>
+            <p class="subtitle">Precision Monitoring</p>
+            <h2><span>Quantum Computing Research</span></h2>
+            <h3>First Complete QKD Protocol Validated on Real Quantum Hardware</h3>
             <div style="margin-top: 30px;">
                 <span class="badge">✅ Production Ready</span>
                 <span class="badge">✅ Hardware Validated</span>
                 <span class="badge">✅ QKD API v1.0.0</span>
+                <a href="https://quantum.ibm.com/" target="_blank" style="text-decoration: none;">
                 <span class="badge">✅ IBM Quantum</span>
+                </a>
+                <a href="https://console.aws.amazon.com/braket/" target="_blank" style="text-decoration: none;">
+                    <span class="badge">✅ AWS Braket</span>
+                </a>
             </div>
             <div style="margin-top: 30px;">
                 <a href="https://github.com/Infin-8/STEADYWATCH-QUANTUM-DEMO/releases/tag/v1.0.0" class="cta-button">View Release Notes</a>
@@ -447,15 +541,102 @@
                 </div>
                 <div class="stat-card">
                     <div class="number">156</div>
-                    <div class="label">Qubits (IBM Quantum ibm_fez)</div>
+                        <div class="label">Qubits (IBM Quantum ibm_fez)
+                        <br>
+                        <a href="https://quantum.ibm.com/jobs/d5gs5mkpe0pc73alki40" target="_blank" style="color: #667eea; font-size: 0.8em; text-decoration: none;">View Job →</a>
+                        </div>
                 </div>
                 <div class="stat-card">
-                    <div class="number">7.69s</div>
-                    <div class="label">Protocol Execution Time</div>
+                    <div class="number">783</div>
+                    <div class="label">Qubits (Cross-Platform)
+                    <br>
+                    <span style="font-size: 0.7em; color: #666;"><b>IBM Quantum + AWS Braket</b></span>
+                    <br>
+                        <a href="docs/research/CROSS_PLATFORM_QUBIT_AGGREGATION.md" target="_blank" style="color: #667eea; font-size: 0.8em; text-decoration: none;">View Research →</a>
+                    </div>
+                </div>
+         
+                <div class="stat-card">
+                <div class="number">2-28</div>
+                <div class="label">Qubits (GHZ Scaling)
+                <br>
+                    <span style="font-size: 0.7em; color: #666;">35-94% fidelity</span>
+                <br>
+                <span style="font-size: 0.7em; color: #666;">IBM Quantum + AWS Braket</span>
+                </div>
+                </div>
+
+                <div class="centered-stat-wrapper" style="grid-column: 1 / -1; display: flex; justify-content: center;">
+                    <div class="stat-card" style="max-width: 275px;">
+                        <div class="number">7.69s</div>
+                        <div class="label">Protocol Execution Time</div>
+                    </div>
+                </div>
+            </div>
+            </div>
+        </div>
+    </div>
+
+<!-- Quantum Hardware Partners -->
+<div class="section white">
+    <div class="container">
+        <h2 class="section-title">🔬 Quantum Hardware Partners</h2>
+        <p class="section-subtitle">
+            Our QKD protocol and research are validated on multiple quantum platforms, 
+            enabling cross-platform qubit aggregation and hardware-agnostic solutions.
+        </p>
+        
+        <div class="feature-grid">
+            <!-- IBM Quantum Card -->
+            <div class="feature-card">
+                <h3>IBM Quantum</h3>
+                <ul>
+                    <li><strong>Backend:</strong> IBM Quantum ibm_fez</li>
+                    <li><strong>Processor:</strong> Heron R2 (156 qubits)</li>
+                    <li><strong>Fidelity:</strong> 69% (12-qubit GHZ state)</li>
+                    <li><strong>Job ID:</strong> <a href="https://quantum.ibm.com/jobs/d5gs5mkpe0pc73alki40" target="_blank" style="color: #667eea;">d5gs5mkpe0pc73alki40</a> (verifiable)</li>
+                </ul>
+                <div style="margin-top: 15px;">
+                    <a href="https://quantum.ibm.com/jobs/d5gs5mkpe0pc73alki40" target="_blank" class="cta-button" style="display: inline-block;">View Job on IBM Quantum</a>
+                </div>
+                <div style="margin-top: 10px;">
+                    <a href="https://quantum.ibm.com/" target="_blank" style="color: #667eea; font-size: 0.9em;">IBM Quantum Platform →</a>
+                </div>
+            </div>
+            
+            <!-- AWS Braket Card -->
+            <div class="feature-card">
+                <h3>AWS Braket</h3>
+                <ul>
+                    <li><strong>Device:</strong> Rigetti Ankaa-3 (82 qubits)</li>
+                    <li><strong>Validated:</strong> 4 discoveries on real hardware</li>
+                    <li><strong>Task IDs:</strong> Documented ARNs</li>
+                    <li><strong>Status:</strong> Hardware execution confirmed</li>
+                </ul>
+                <div style="margin-top: 15px;">
+                    <a href="https://console.aws.amazon.com/braket/" target="_blank" class="cta-button" style="display: inline-block;">AWS Braket Console</a>
+                </div>
+                <div style="margin-top: 10px;">
+                    <a href="https://docs.aws.amazon.com/braket/" target="_blank" style="color: #667eea; font-size: 0.9em;">AWS Braket Docs →</a>
+                </div>
+            </div>
+            
+            <!-- Cross-Platform Achievement Card -->
+            <div class="feature-card">
+                <h3>Cross-Platform Aggregation</h3>
+                <ul>
+                    <li><strong>Total Qubits:</strong> 783 qubits</li>
+                    <li><strong>Platforms:</strong> IBM Quantum + AWS Braket</li>
+                    <li><strong>Achievement:</strong> First cross-platform aggregation</li>
+                    <li><strong>Algorithms:</strong> Shor's (750 qubits) & Grover's (258 qubits) feasible</li>
+                </ul>
+                <div style="margin-top: 15px;">
+                    <a href="docs/research/CROSS_PLATFORM_QUBIT_AGGREGATION.md" class="cta-button" style="display: inline-block;">View Research Paper</a>
                 </div>
             </div>
         </div>
     </div>
+</div>
 
     <!-- Key Features -->
     <div class="section white">
@@ -497,9 +678,73 @@
                         <li>Live API: quantum.local:5002</li>
                     </ul>
                 </div>
+                <div class="feature-card">
+                    <h3>GHZ State Scaling</h3>
+                    <ul>
+                        <li>Validated 2-28 qubit GHZ states</li>
+                        <li>35-94% fidelity range</li>
+                        <li>Cross-platform validation (IBM + AWS)</li>
+                        <li>16-qubit GHZ on Rigetti Ankaa-3</li>
+                        <li>Record depth: 28 qubits (35% fidelity)</li>
+                    </ul>
+                </div>
             </div>
         </div>
     </div>
+
+    <!-- GHZ Scaling Validation -->
+<div class="section">
+    <div class="container">
+        <h2 class="section-title">📊 GHZ State Scaling: 2-28 Qubits Validated</h2>
+        <p class="section-subtitle">
+            Comprehensive validation of GHZ entangled states across multiple qubit counts, 
+            demonstrating scalability and cross-platform compatibility.
+        </p>
+        
+        <div class="feature-grid">
+            <div class="feature-card">
+                <h3>Scaling Range</h3>
+                <ul>
+                    <li><strong>Range:</strong> 2 to 28 qubits</li>
+                    <li><strong>Fidelity:</strong> 35% to 94%</li>
+                    <li><strong>Platforms:</strong> IBM Quantum + AWS Braket</li>
+                    <li><strong>Peak Fidelity:</strong> 94% (4-qubit GHZ)</li>
+                    <li><strong>Record Depth:</strong> 28 qubits (35% fidelity)</li>
+                </ul>
+            </div>
+            
+            <div class="feature-card">
+                <h3>Cross-Platform Validation</h3>
+                <ul>
+                    <li><strong>IBM Quantum:</strong> 2-28 qubits (ibm_fez)</li>
+                    <li><strong>AWS Braket:</strong> 2-16 qubits (Rigetti Ankaa-3)</li>
+                    <li><strong>16-Qubit GHZ:</strong> Validated on Rigetti Ankaa-3</li>
+                    <li><strong>Task ID:</strong> arn:...0a04af75-3456-4474-8b27-caa509697785</li>
+                    <li><strong>Status:</strong> Hardware-agnostic scaling proven</li>
+                </ul>
+                <div style="margin-top: 15px;">
+                    <a href="https://console.aws.amazon.com/braket/" target="_blank" class="cta-button" style="display: inline-block;">AWS Braket Console</a>
+                </div>
+            </div>
+            
+            <div class="feature-card">
+                <h3>Key Results</h3>
+                <ul>
+                    <li><strong>2-qubit (Bell):</strong> 90-92% fidelity</li>
+                    <li><strong>3-qubit (GHZ):</strong> 91% fidelity</li>
+                    <li><strong>4-qubit (GHZ):</strong> 94% fidelity ⭐ Peak</li>
+                    <li><strong>12-qubit (GHZ):</strong> 69-75% fidelity</li>
+                    <li><strong>16-qubit (GHZ):</strong> ~20-25% (Rigetti Ankaa-3)</li>
+                    <li><strong>28-qubit (GHZ):</strong> 35% fidelity (Record depth)</li>
+                </ul>
+            </div>
+        </div>
+        
+        <div style="margin-top: 30px; text-align: center;">
+            <a href="docs/research/QKD_MILESTONE_RESEARCH_PAPER.md" class="cta-button">View Complete Results</a>
+        </div>
+    </div>
+</div>
 
     <!-- Research Papers -->
     <div class="section">
@@ -515,12 +760,28 @@
                     <p>Formal security analysis ready for academic submission</p>
                 </li>
                 <li>
-                    <a href="docs/research/CROSS_PLATFORM_QUBIT_AGGREGATION.md">Cross-Platform Qubit Aggregation</a>
+                    <a href="docs/research/CROSS_PLATFORM_QUBIT_AGGREGATION.md">Cross-Platform Qubit Aggregation Pipeline (CPQAP)</a>
                     <p>First cross-platform qubit aggregation system (783 qubits)</p>
                 </li>
                 <li>
                     <a href="docs/research/BELL_INEQUALITY_BREAKTHROUGH.md">Bell Inequality Breakthrough</a>
                     <p>First Bell inequality violation with quantum randomness</p>
+                </li>
+                <li>
+                    <a href="docs/research/RESEARCH_PAPER_ENTROPY_HASH_MAPS.md">Entropy-Based Hash Map Optimization</a>
+                    <p>A Novel Application of Quantum Key Distribution Information-Theoretic Bounds</p>
+                </li>
+                <li>
+                    <a href="docs/research/RESEARCH_PAPER_ENTROPY_TRANSACTION_QUEUE.md">Entropy-Based Transaction Queue Optimization</a>
+                    <p>A Higher-Order Extension of Quantum Key Distribution Information-Theoretic Bounds</p>
+                </li>
+                <li>
+                    <a href="docs/research/RESEARCH_PAPER_QKD_HARDWARE_VALIDATION.md">Quantum Key Distribution: Complete Protocol Validation (SHQKD)</a>
+                    <p>Perfect Key Matching on IBM Quantum & AWS Braket</p>
+                </li>
+                <li>
+                    <a href="docs/QUANTUM_COMMUNICATION_EXPLANATION.md">STEADYWATCH Hybrid Quantum Communication (SHQC)</a>
+                    <p>Why It's Needed for Cross-Platform Entanglement</p>
                 </li>
             </ul>
         </div>
@@ -532,22 +793,30 @@
             <h2 class="section-title">🚀 Quick Start</h2>
             <p class="section-subtitle">Get started with the QKD API in minutes:</p>
             
-            <div class="code-block"># Install dependencies
-pip install -r requirements.txt
-
-# Run examples
-cd examples
-python qkd_basic_usage.py
-python qkd_network_setup.py
-python qkd_api_integration.py</div>
+            <div class="code-block" style="padding-left: 10px">
+                <ol>
+                    <li>  
+                        <p># Install dependencies</p>
+                        <p>pip install -r requirements.txt</p>
+                    </li>
+                    <li>
+                        <p># Run examples</p>
+                        <p>cd examples</p>
+                    </li>
+                </ol>
+                <ul>
+                    <li>python qkd_basic_usage.py</li>
+                    <li>python qkd_network_setup.py</li>
+                    <li>python qkd_api_integration.py</li>
+                </ul>
+            </div>
             
             <p style="text-align: center; margin-top: 20px; font-size: 1.1em;">
                 <strong>API Endpoint:</strong> <code style="background: #f0f0f0; padding: 5px 10px; border-radius: 3px;">http://quantum.local:5002/api/qkd/</code>
             </p>
             
-            <div style="text-align: center; margin-top: 30px;">
+            <div style="display: flex; justify-content: center; align-items: center; gap: 20px; margin-top: 30px; flex-wrap: wrap;">
                 <a href="docs/qkd/QKD_PROTOCOL_QUICK_START.md" class="cta-button">Read Quick Start Guide</a>
-                <a href="examples/" class="cta-button secondary">View Example Code</a>
             </div>
         </div>
     </div>
@@ -565,6 +834,33 @@ python qkd_api_integration.py</div>
                         <li><a href="docs/qkd/QKD_PROTOCOL_SPECIFICATION.md" style="color: #667eea;">Protocol Specification</a></li>
                     </ul>
                 </div>
+
+                <div class="feature-card">
+                    <h3>IBM Quantum Integration</h3>
+                    <ul>
+                        <li><a href="docs/IBM_QUANTUM_NEXT_STEPS.md" style="color: #667eea;">IBM Quantum Setup Guide</a></li>
+                        <li><a href="https://quantum.ibm.com/jobs/d5gs5mkpe0pc73alki40" target="_blank" style="color: #667eea;">View Validated Job</a></li>
+                        <li><a href="https://quantum.ibm.com/" target="_blank" style="color: #667eea;">IBM Quantum Platform</a></li>
+                    </ul>
+                </div>
+
+          <div class="feature-card">
+                <h3>AWS Braket</h3>
+                <ul>
+                    <li><strong>Device:</strong> Rigetti Ankaa-3 (82 qubits)</li>
+                    <li><strong>Validated:</strong> 4 discoveries on real hardware</li>
+                    <li><strong>GHZ Scaling:</strong> 2-16 qubits validated</li>
+                    <li><strong>16-Qubit GHZ:</strong> ~20-25% fidelity</li>
+                    <li><strong>Task ID:</strong> arn:...0a04af75-3456-4474-8b27-caa509697785</li>
+                    <li><strong>Cross-Platform:</strong> Part of 783-qubit aggregation</li>
+                </ul>
+            <div style="margin-top: 15px;">
+            <a href="https://console.aws.amazon.com/braket/" target="_blank" class="cta-button" style="display: inline-block;">AWS Braket Console</a>
+            </div>
+            <div style="margin-top: 10px;">
+            <a href="https://docs.aws.amazon.com/braket/" target="_blank" style="color: #667eea; font-size: 0.9em;">AWS Braket Docs →</a>
+            </div>
+        </div>
                 
                 <div class="feature-card">
                     <h3>Hardware Validation</h3>
@@ -637,6 +933,10 @@ python qkd_api_integration.py</div>
             <h2 class="section-title">🔗 Repository & Links</h2>
             <ul class="link-list">
                 <li>
+                    <a href="consulting-services.html">Consulting Services</a>
+                    <p>Quantum computing and educational technology consulting</p>
+                </li>
+                <li>
                     <a href="https://github.com/Infin-8/STEADYWATCH-QUANTUM-DEMO">GitHub Repository</a>
                     <p>Complete source code, documentation, and examples</p>
                 </li>
@@ -648,24 +948,26 @@ python qkd_api_integration.py</div>
                     <a href="README.md">Repository README</a>
                     <p>Complete repository documentation</p>
                 </li>
-                <li>
-                    <a href="consulting-services.html">Consulting Services</a>
-                    <p>Quantum computing and educational technology consulting</p>
-                </li>
             </ul>
         </div>
     </div>
 
     <footer>
         <div class="container">
-            <h3>SteadyWatch Quantum Computing Research</h3>
-            <p><strong>Principal Investigator:</strong> Nate Vazquez</p>
+            <h3><u>STEADYWATCH™</u></h3>
+            <p class="subtitle">Precision Monitoring</p>
+            <h4><span>Quantum Computing Research</span></h4>
             <p><strong>Institution:</strong> Quantum V^ LLC</p>
-            <p><strong>Email:</strong> <a href="mailto:nate_vazquez@icloud.com">nate_vazquez@icloud.com</a></p>
             <p style="margin-top: 30px; opacity: 0.7; font-size: 0.9em;">
                 This release represents a significant milestone in practical quantum key distribution on NISQ hardware.<br>
-                The system is production-ready and validated on real quantum hardware.
+                The system is production-ready and validated on actual quantum hardware.
             </p>
+
+            <div class="container" id="copyR">
+            <p>&copy; 2025 Quantum V^ LLC.</p>
+            <p>480-341-7382</p>
+            <p style="margin-top: 10px; opacity: 0.8;">All rights reserved.</p>
+            </div>
         </div>
     </footer>
     
