@@ -418,6 +418,209 @@
                 grid-template-columns: 1fr;
             }
         }
+
+        x/* Extra Small Devices (phones, < 480px) */
+@media (max-width: 479px) {
+    .mobile-menu-toggle {
+        display: block;
+        font-size: 1.3em;
+    }
+    
+    .nav-links {
+        position: absolute;
+        top: 100%;
+        left: 0;
+        right: 0;
+        background: rgba(102, 126, 234, 0.98);
+        flex-direction: column;
+        padding: 15px;
+        gap: 12px;
+        display: none;
+        box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+    }
+    
+    .nav-links.active {
+        display: flex;
+    }
+    
+    body {
+        padding-top: 55px;
+    }
+    
+    .nav-brand {
+        font-size: 1.2em;
+    }
+}
+
+/* Small Devices (phones, 480px - 575px) */
+@media (min-width: 480px) and (max-width: 575px) {
+    .mobile-menu-toggle {
+        display: block;
+    }
+    
+    .nav-links {
+        position: absolute;
+        top: 100%;
+        left: 0;
+        right: 0;
+        background: rgba(102, 126, 234, 0.98);
+        flex-direction: column;
+        padding: 18px;
+        gap: 15px;
+        display: none;
+        box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+    }
+    
+    .nav-links.active {
+        display: flex;
+    }
+    
+    body {
+        padding-top: 60px;
+    }
+}
+
+/* Medium Devices (large phones/small tablets, 576px - 767px) */
+@media (min-width: 576px) and (max-width: 767px) {
+    .mobile-menu-toggle {
+        display: block;
+    }
+    
+    .nav-links {
+        position: absolute;
+        top: 100%;
+        left: 0;
+        right: 0;
+        background: rgba(102, 126, 234, 0.98);
+        flex-direction: column;
+        padding: 20px;
+        gap: 15px;
+        display: none;
+        box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+    }
+    
+    .nav-links.active {
+        display: flex;
+    }
+    
+    body {
+        padding-top: 60px;
+    }
+}
+
+/* Tablets Portrait (768px - 834px) - iPad, iPad Mini */
+@media (min-width: 768px) and (max-width: 834px) {
+    .mobile-menu-toggle {
+        display: block;
+    }
+    
+    .nav-links {
+        position: absolute;
+        top: 100%;
+        left: 0;
+        right: 0;
+        background: rgba(102, 126, 234, 0.98);
+        flex-direction: column;
+        padding: 22px;
+        gap: 18px;
+        display: none;
+        box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+    }
+    
+    .nav-links.active {
+        display: flex;
+    }
+    
+    body {
+        padding-top: 65px;
+    }
+}
+
+/* Tablets Landscape / Small Desktops (835px - 991px) - iPad Pro 10.5", etc. */
+@media (min-width: 835px) and (max-width: 991px) {
+    .mobile-menu-toggle {
+        display: none;
+    }
+    
+    .nav-links {
+        display: flex;
+        position: static;
+        flex-direction: row;
+        gap: 18px;
+    }
+    
+    .nav-links.active {
+        display: flex;
+    }
+}
+
+/* Tablets Large / Small Desktops (992px - 1023px) - iPad Pro 11", etc. */
+@media (min-width: 992px) and (max-width: 1023px) {
+    .mobile-menu-toggle {
+        display: none;
+    }
+    
+    .nav-links {
+        display: flex;
+        gap: 22px;
+    }
+}
+
+/* Tablets Extra Large / Desktops (1024px - 1199px) - iPad Pro 12.9", Small Laptops */
+@media (min-width: 1024px) and (max-width: 1199px) {
+    .mobile-menu-toggle {
+        display: none;
+    }
+    
+    .nav-links {
+        display: flex;
+        gap: 25px;
+    }
+    
+    .nav-brand {
+        font-size: 1.4em;
+    }
+}
+
+/* Medium Desktops (1200px - 1439px) */
+@media (min-width: 1200px) and (max-width: 1439px) {
+    .mobile-menu-toggle {
+        display: none;
+    }
+    
+    .nav-links {
+        display: flex;
+        gap: 28px;
+    }
+}
+
+/* Large Desktops (1440px - 1919px) */
+@media (min-width: 1440px) and (max-width: 1919px) {
+    .mobile-menu-toggle {
+        display: none;
+    }
+    
+    .nav-links {
+        display: flex;
+        gap: 30px;
+    }
+}
+
+/* Extra Large Desktops (1920px+) */
+@media (min-width: 1920px) {
+    .mobile-menu-toggle {
+        display: none;
+    }
+    
+    .nav-links {
+        display: flex;
+        gap: 35px;
+    }
+    
+    .nav-brand {
+        font-size: 1.6em;
+    }
+}
     </style>
 </head>
 <body>
