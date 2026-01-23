@@ -476,6 +476,137 @@
     }
  
 }
+
+        /* Extra Small Devices (phones, < 480px) */
+@media (max-width: 479px) {
+    .mobile-menu-toggle {
+        display: block;
+        font-size: 1.3em;
+    }
+    
+    .nav-links {
+        position: absolute;
+        top: 100%;
+        left: 0;
+        right: 0;
+        background: rgba(102, 126, 234, 0.98);
+        flex-direction: column;
+        padding: 15px;
+        gap: 12px;
+        display: none;
+        box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+    }
+    
+    .nav-links.active {
+        display: flex;
+    }
+    
+    body {
+        padding-top: 55px;
+    }
+    
+    .nav-brand {
+        font-size: 1.2em;
+    }
+}
+
+/* Small Devices (phones, 480px - 575px) */
+@media (min-width: 480px) and (max-width: 575px) {
+    .mobile-menu-toggle {
+        display: block;
+    }
+    
+    .nav-links {
+        position: absolute;
+        top: 100%;
+        left: 0;
+        right: 0;
+        background: rgba(102, 126, 234, 0.98);
+        flex-direction: column;
+        padding: 18px;
+        gap: 15px;
+        display: none;
+        box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+    }
+    
+    .nav-links.active {
+        display: flex;
+    }
+    
+    body {
+        padding-top: 60px;
+    }
+}
+
+/* Medium Devices (tablets, 576px - 767px) */
+@media (min-width: 576px) and (max-width: 767px) {
+    .mobile-menu-toggle {
+        display: block;
+    }
+    
+    .nav-links {
+        position: absolute;
+        top: 100%;
+        left: 0;
+        right: 0;
+        background: rgba(102, 126, 234, 0.98);
+        flex-direction: column;
+        padding: 20px;
+        gap: 15px;
+        display: none;
+        box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+    }
+    
+    .nav-links.active {
+        display: flex;
+    }
+    
+    body {
+        padding-top: 60px;
+    }
+}
+
+/* Large Devices (tablets, 768px - 991px) */
+@media (min-width: 768px) and (max-width: 991px) {
+    .mobile-menu-toggle {
+        display: none;
+    }
+    
+    .nav-links {
+        display: flex;
+        position: static;
+        flex-direction: row;
+        gap: 20px;
+    }
+    
+    .nav-links.active {
+        display: flex;
+    }
+}
+
+/* Extra Large Devices (desktops, 992px - 1199px) */
+@media (min-width: 992px) and (max-width: 1199px) {
+    .mobile-menu-toggle {
+        display: none;
+    }
+    
+    .nav-links {
+        display: flex;
+        gap: 25px;
+    }
+}
+
+/* XXL Devices (large desktops, 1200px+) */
+@media (min-width: 1200px) {
+    .mobile-menu-toggle {
+        display: none;
+    }
+    
+    .nav-links {
+        display: flex;
+        gap: 30px;
+    }
+}
         
     </style>
 </head>
