@@ -1189,10 +1189,10 @@
         <strong>How 2^4096 Key Space Works:</strong>
     </p>
     <ul style="list-style: none;">
-        <li>400 qubits generate 2^400 possible quantum states</li>
-        <li>Quantum randomness is extracted from all 80 groups</li>
-        <li>Hash function expands to 512 bytes (4096 bits)</li>
-        <li>We generate one key from 2^4096 possibilities (not storing all 2^4096 keys)</li>
+        <li>1 Master Qubit (center, atomic clock synchronization)</li>
+        <li>4 Satellite Qubits per group (Left, Right, Top, Bottom)</li>
+        <li>80 Groups = 400 qubits total</li>
+        <li>160 Encryption Layers (80 forward + 80 backward with bidirectional layering)</li>
     </ul>
     <p>
         <strong>Practical:</strong> Storage is 512 bytes (same as RSA-4096), generation time is &lt;0.01s (simulator) or 30-90s (hardware), with O(n) linear scaling.
