@@ -112,32 +112,7 @@
             cursor: pointer;
         }
         
-        @media (max-width: 768px) {
-            .mobile-menu-toggle {
-                display: block;
-            }
-            
-            .nav-links {
-                position: absolute;
-                top: 100%;
-                left: 0;
-                right: 0;
-                background: rgba(102, 126, 234, 0.98);
-                flex-direction: column;
-                padding: 20px;
-                gap: 15px;
-                display: none;
-                box-shadow: 0 5px 15px rgba(0,0,0,0.2);
-            }
-            
-            .nav-links.active {
-                display: flex;
-            }
-            
-            body {
-                padding-top: 60px;
-            }
-        }
+
         
         /* Header */
         header {
@@ -418,11 +393,39 @@
             text-align: center;
             width: 100%;
             border-radius: 5px;
+            margin-top: 5%;
         }
         .stat-card.centered {
             grid-column: 1 / -1;
             max-width: 300px;
             margin: 0 auto;
+        }
+
+@media (max-width: 768px) {
+            .mobile-menu-toggle {
+                display: block;
+            }
+            
+            .nav-links {
+                position: absolute;
+                top: 100%;
+                left: 0;
+                right: 0;
+                background: rgba(102, 126, 234, 0.98);
+                flex-direction: column;
+                padding: 20px;
+                gap: 15px;
+                display: none;
+                box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+            }
+            
+            .nav-links.active {
+                display: flex;
+            }
+            
+            body {
+                padding-top: 60px;
+            }
         }
         
 @media (max-width: 768px) {
