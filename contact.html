@@ -6,6 +6,7 @@
     <title>Contact Us | Quantum V^ LLC</title>
     <meta name="description" content="Get in touch with Quantum V^ LLC. Contact us for quantum computing consulting, blockchain security, or general inquiries.">
     <link rel="stylesheet" href="styles.css"></link>
+    <script src="app.js" defer></script>
 </head>
 <body>
     <!-- Navigation -->
@@ -82,27 +83,5 @@
             <p><strong>Phone:</strong> <a href="tel:4803417382">480-341-7382 (call/text)</a></p>
         </div>
     </footer>
-
-    <script>
-        function toggleMobileMenu() {
-            document.getElementById('navLinks').classList.toggle('active');
-        }
-
-        // Simple form submission - just opens email with form data
-        document.getElementById('contactForm').addEventListener('submit', function(e) {
-            e.preventDefault();
-            
-            const name = document.getElementById('name').value;
-            const email = document.getElementById('email').value;
-            const company = document.getElementById('company').value;
-            const inquiry = document.getElementById('inquiry').value;
-            const message = document.getElementById('message').value;
-            
-            const subject = `Contact Form: ${inquiry}`;
-            const body = `Name: ${name}\nEmail: ${email}\nCompany: ${company || 'Not provided'}\n\nInquiry Type: ${inquiry}\n\nMessage:\n${message}`;
-            
-            window.location.href = `mailto:nate_vazquez@icloud.com?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
-        });
-    </script>
 </body>
 </html>
