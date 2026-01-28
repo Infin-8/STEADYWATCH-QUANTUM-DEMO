@@ -26,7 +26,7 @@
             padding: 0 20px;
         }
         
-        /* Navigation - Same as your existing nav */
+             /* Navigation */
         nav {
             position: fixed;
             top: 0;
@@ -53,9 +53,14 @@
             font-weight: 700;
             color: white;
             text-decoration: none;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3), 0 0 10px rgba(102, 126, 234, 0.3);
         }
         
-          .nav-brand img {
+        .nav-brand:hover {
+            opacity: 0.9;
+        }
+        
+        .nav-brand img {
             height: 40px;
             width: 40px;
             border-radius: 8px;
@@ -73,16 +78,39 @@
             color: white;
             text-decoration: none;
             font-weight: 500;
+            transition: opacity 0.3s;
+            padding: 8px 0;
         }
         
+        .nav-links a:hover {
+            opacity: 0.8;
+            text-decoration: underline;
+        }
+        
+        /* .nav-cta {
+            background: white;
+            color: #667eea;
+            padding: 10px 20px;
+            border-radius: 25px;
+            font-weight: 600;
+            transition: transform 0.3s, box-shadow 0.3s;
+        } */
+
         .nav-cta {
             background: white;
             color: #667eea !important;
-            padding: 8px 20px;
+            padding: 8px 20px 0 20px;
             border-radius: 25px;
             font-weight: 600;
         }
         
+        .nav-cta:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+            text-decoration: none;
+        }
+        
+        /* Mobile Menu */
         .mobile-menu-toggle {
             display: none;
             background: none;
