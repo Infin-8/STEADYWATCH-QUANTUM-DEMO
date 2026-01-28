@@ -99,6 +99,7 @@
             const body = `Name: ${name}\nEmail: ${email}\nCompany: ${company || 'Not provided'}\n\nInquiry Type: ${inquiry}\n\nMessage:\n${message}`;
             
             window.location.href = `mailto:nate_vazquez@icloud.com?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+        }); // ← Add this closing brace and parenthesis!
     </script>
 </body>
 </html>
