@@ -255,7 +255,7 @@ Our hybrid QKD system combines two complementary security layers:
 
 **Security Properties:**
 - **Massive Key Space:** 2^4096 (vs 2^256 for Bitcoin)
-- **Multi-Layer Defense:** Up to 80 encryption layers
+- **Multi-Layer Defense:** Up to 160 encryption layers
 - **Quantum State-Based:** Safe from Shor's algorithm
 - **Computational Security:** Massive key space protection
 
@@ -568,7 +568,7 @@ We validated GHZ states from 2 to 28 qubits on real hardware:
 - Impossible to brute force
 
 **Multi-Layer Defense:**
-- Up to 80 encryption layers
+- Up to 160 encryption layers via bi-directional layering 
 - Defense-in-depth architecture
 - Multiple independent security mechanisms
 
