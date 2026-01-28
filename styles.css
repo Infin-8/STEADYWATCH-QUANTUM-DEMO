@@ -737,6 +737,112 @@
             transform: translateY(-2px);
             box-shadow: 0 5px 15px rgba(102, 126, 234, 0.3);
         }
+/* Comparison Table Styles */
+.comparison-table-wrapper {
+    overflow-x: auto;
+    margin: 40px 0;
+    border-radius: 10px;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+}
+
+.comparison-table {
+    width: 100%;
+    border-collapse: collapse;
+    background: white;
+    font-size: 1.1em;
+    min-width: 800px;
+}
+
+.comparison-table thead {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+}
+
+.comparison-table th {
+    padding: 20px;
+    text-align: left;
+    font-weight: 600;
+    font-size: 1.1em;
+    border-right: 1px solid rgba(255,255,255,0.2);
+}
+
+.comparison-table th:last-child {
+    border-right: none;
+}
+
+.comparison-table th.highlight-column {
+    background: rgba(255,255,255,0.15);
+    position: relative;
+}
+
+.comparison-table th.highlight-column::after {
+    content: "⭐";
+    margin-left: 8px;
+    font-size: 0.9em;
+}
+
+.comparison-table tbody tr {
+    border-bottom: 1px solid #e0e0e0;
+    transition: background-color 0.3s;
+}
+
+.comparison-table tbody tr:hover {
+    background-color: #f9f9f9;
+}
+
+.comparison-table tbody tr:last-child {
+    border-bottom: none;
+}
+
+.comparison-table td {
+    padding: 20px;
+    color: #555;
+    border-right: 1px solid #e0e0e0;
+}
+
+.comparison-table td:last-child {
+    border-right: none;
+}
+
+.comparison-table td.highlight-column {
+    background: linear-gradient(135deg, rgba(102, 126, 234, 0.1) 0%, rgba(118, 75, 162, 0.1) 100%);
+    color: #667eea;
+    font-weight: 600;
+}
+
+.comparison-table td strong {
+    color: #333;
+    font-weight: 600;
+}
+
+.comparison-table td.highlight-column strong {
+    color: #667eea;
+}     .comparison-table th,
+    .comparison-table td {
+        padding: 15px 10px;
+    }
+}
+
+
+    
+    .comparison-table th,
+    .comparison-table td {
+        padding: 12px 8px;
+    }
+}
+@media (max-width: 480px) {
+    .comparison-table {
+        font-size: 0.85em;
+        min-width: 500px;
+    }
+/* Responsive Table */
+@media (max-width: 768px) {
+    .comparison-table {
+        font-size: 0.9em;
+        min-width: 600px;
+    }
+
+
 
 @media (max-width: 768px) {
             .mobile-menu-toggle {
