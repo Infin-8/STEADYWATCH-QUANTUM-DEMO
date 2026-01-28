@@ -250,7 +250,7 @@ Our hybrid QKD system combines two complementary security layers:
 **Echo Resonance Architecture:**
 - 400-qubit Echo Resonance system
 - Master-satellite entanglement structure
-- Multi-layer encryption (up to 80 layers)
+- Multi-layer encryption (up to 160 layers via bi-directional layering)
 - Quantum state-based (not factoring-based)
 
 **Security Properties:**
