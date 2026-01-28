@@ -6,6 +6,7 @@
     <title>Consulting | Quantum V^ LLC</title>
     <meta name="description" content="Expert consulting on quantum computing research, blockchain security, and educational technology. Proven expertise with 37+ discoveries and hardware validation on 783 qubits via cross-platform aggregation.">
     <link rel="stylesheet" href="styles.css"></link>
+    <script src="app.js" defer></script>
 </head>
 <body>
         <nav>
@@ -273,42 +274,6 @@
             <p style="margin-top: 10px; opacity: 0.8;">Expert Quantum Computing & Educational Technology Consulting</p>
         </div>
     </footer>
-
-<script>
-    function toggleMobileMenu() {
-        const navLinks = document.getElementById('navLinks');
-        navLinks.classList.toggle('active');
-    }
-    
-    // Close mobile menu when clicking a nav link
-    document.addEventListener('DOMContentLoaded', function() {
-        const navLinks = document.getElementById('navLinks');
-        const links = navLinks.querySelectorAll('a');
-        
-        links.forEach(function(link) {
-            link.addEventListener('click', function() {
-                // Only close on mobile (screen width <= 768px)
-                if (window.innerWidth <= 768) {
-                    navLinks.classList.remove('active');
-                }
-            });
-        });
-    });
-    
-    // Close mobile menu when clicking outside
-    document.addEventListener('click', function(event) {
-        const nav = document.querySelector('nav');
-        const navLinks = document.getElementById('navLinks');
-        const toggle = document.querySelector('.mobile-menu-toggle');
-        
-        if (window.innerWidth <= 768 && 
-            !nav.contains(event.target) && 
-            navLinks.classList.contains('active')) {
-            navLinks.classList.remove('active');
-        }
-    });
-</script>
-    
 </body>
 </html>
 
