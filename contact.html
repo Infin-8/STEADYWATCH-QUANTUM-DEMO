@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Contact Us | Quantum V^ LLC</title>
+    <meta name="description" content="Get in touch with Quantum V^ LLC. Contact us for quantum computing consulting, blockchain security, or general inquiries.">
+    <link rel="stylesheet" href="styles.css"></link>
+    <script src="app.js" defer></script>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav>
+        <div class="container">
+            <a href="https://apps.apple.com/us/app/steadywatch-handheld/id6755752518" class="nav-brand">
+                <img src="images/logo.png" alt="STEADYWATCH Logo">
+                <span><u>STEADYWATCH™</u></span>
+            </a>
+            <button class="mobile-menu-toggle" onclick="toggleMobileMenu()">☰</button>
+            <ul class="nav-links" id="navLinks">
+                <li><a href="index.html">Home</a></li>
+                <li><a href="consulting-services.html">Consulting</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <!-- Header -->
+    <header>
+        <div class="container">
+            <h1>Get In Touch</h1>
+            <p>Fill out the form below</p>
+            <p>Or call <strong>Phone:</strong> <a href="tel:4803417382">480-341-7382 (call/text)</a></p>
+            <p>We'll get back to you as soon as possible.</p>
+        </div>
+    </header>
+
+    <!-- Contact Form -->
+    <section class="contact-section">
+        <div class="container">
+            <form class="contact-form" id="contactForm">
+                <div class="form-group">
+                    <label for="name">Name *</label>
+                    <input type="text" id="name" name="name" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="email">Email *</label>
+                    <input type="email" id="email" name="email" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="company">Company / Organization</label>
+                    <input type="text" id="company" name="company">
+                </div>
+
+                <div class="form-group">
+                    <label for="inquiry">How can we help? *</label>
+                    <select id="inquiry" name="inquiry" required>
+                        <option value="">Select an option...</option>
+                        <option value="Blockchain Security">Blockchain Security / Quantum-Resistant Cryptography</option>
+                        <option value="Consulting">Consulting Services</option>
+                        <option value="QKD">QKD Protocol / Quantum Key Distribution</option>
+                        <option value="Research">Research Collaboration</option>
+                        <option value="Partnership">Partnership Opportunity</option>
+                        <option value="General">General Inquiry</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="message">Message *</label>
+                    <textarea id="message" name="message" required placeholder="Tell us about your project, questions, or how we can help..."></textarea>
+                </div>
+
+                <button type="submit" class="submit-button">Send Message</button>
+            </form>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer style="background: #333; color: white; text-align: center; padding: 40px 0;">
+        <div class="container">
+            <p>&copy; 2025 Quantum V^ LLC. All rights reserved.</p>
+            <p><strong>Phone:</strong> <a href="tel:4803417382">480-341-7382 (call/text)</a></p>
+        </div>
+    </footer>
+
+    <script>
+                // Simple form submission - just opens email with form data
+        document.getElementById('contactForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const name = document.getElementById('name').value;
+            const email = document.getElementById('email').value;
+            const company = document.getElementById('company').value;
+            const inquiry = document.getElementById('inquiry').value;
+            const message = document.getElementById('message').value;
+            
+            const subject = `Contact Form: ${inquiry}`;
+            const body = `Name: ${name}\nEmail: ${email}\nCompany: ${company || 'Not provided'}\n\nInquiry Type: ${inquiry}\n\nMessage:\n${message}`;
+            
+            window.location.href = `mailto:nate_vazquez@icloud.com?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+        }); // ← Add this closing brace and parenthesis!
+    </script>
+</body>
+</html>

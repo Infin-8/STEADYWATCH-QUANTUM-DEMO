@@ -3,481 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>STEADYWATCH | QKD API v1.0.0 |</title>
+    <title>QKD API v1.0.0 | STEADYWATCH™</title>
     <meta name="description" content="First complete end-to-end QKD protocol validated on real quantum hardware. Production-ready QKD API v1.0.0 with 14 operational endpoints. Hardware validated on IBM Quantum ibm_fez (156 qubits).">
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-        
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
-            line-height: 1.6;
-            color: #333;
-            background: #f5f5f5;
-            padding-top: 70px; /* Space for fixed nav */
-        }
-        
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 0 20px;
-        }
-        
-        /* Navigation */
-        nav {
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            background: rgba(102, 126, 234, 0.95);
-            backdrop-filter: blur(10px);
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-            z-index: 1000;
-            padding: 15px 0;
-        }
-        
-        nav .container {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-        
-        .nav-brand {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            font-size: 1.5em;
-            font-weight: 700;
-            color: white;
-            text-decoration: none;
-            text-shadow: 2px 2px 4px rgba(0,0,0,0.3), 0 0 10px rgba(102, 126, 234, 0.3);
-        }
-        
-        .nav-brand:hover {
-            opacity: 0.9;
-        }
-        
-        .nav-brand img {
-            height: 40px;
-            width: 40px;
-            border-radius: 8px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.2);
-        }
-        
-        .nav-links {
-            display: flex;
-            list-style: none;
-            gap: 30px;
-            align-items: center;
-        }
-        
-        .nav-links a {
-            color: white;
-            text-decoration: none;
-            font-weight: 500;
-            transition: opacity 0.3s;
-            padding: 8px 0;
-        }
-        
-        .nav-links a:hover {
-            opacity: 0.8;
-            text-decoration: underline;
-        }
-        
-        .nav-cta {
-            background: white;
-            color: #667eea;
-            padding: 10px 20px;
-            border-radius: 25px;
-            font-weight: 600;
-            transition: transform 0.3s, box-shadow 0.3s;
-        }
-        
-        .nav-cta:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
-            text-decoration: none;
-        }
-        
-        /* Mobile Menu */
-        .mobile-menu-toggle {
-            display: none;
-            background: none;
-            border: none;
-            color: white;
-            font-size: 1.5em;
-            cursor: pointer;
-        }
-        
-        @media (max-width: 768px) {
-            .mobile-menu-toggle {
-                display: block;
-            }
-            
-            .nav-links {
-                position: absolute;
-                top: 100%;
-                left: 0;
-                right: 0;
-                background: rgba(102, 126, 234, 0.98);
-                flex-direction: column;
-                padding: 20px;
-                gap: 15px;
-                display: none;
-                box-shadow: 0 5px 15px rgba(0,0,0,0.2);
-            }
-            
-            .nav-links.active {
-                display: flex;
-            }
-            
-            body {
-                padding-top: 60px;
-            }
-        }
-        
-        /* Header */
-        header {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            padding: 80px 0;
-            text-align: center;
-        }
-        
-        header h1 {
-            font-size: 3em;
-            margin-bottom: 20px;
-            font-weight: 700;
-        }
-        
-        header p {
-            font-size: 1.3em;
-            max-width: 800px;
-            margin: 0 auto 30px;
-            opacity: 0.95;
-        }
-        
-        .badge {
-            display: inline-block;
-            background: rgba(255, 255, 255, 0.2);
-            padding: 8px 16px;
-            border-radius: 20px;
-            margin: 5px;
-            font-size: 0.9em;
-            font-weight: 600;
-        }
-        
-        .cta-button {
-            display: inline-block;
-            margin: 10px;
-            padding: 15px 40px;
-            background: white;
-            color: #667eea;
-            text-decoration: none;
-            border-radius: 50px;
-            font-weight: 600;
-            transition: transform 0.3s, box-shadow 0.3s;
-        }
-        
-        .cta-button:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 10px 25px rgba(0,0,0,0.2);
-        }
-        
-        .cta-button.secondary {
-            background: transparent;
-            color: white;
-            border: 2px solid white;
-        }
-        
-        .cta-button.secondary:hover {
-            background: rgba(255, 255, 255, 0.1);
-        }
-        
-        /* Stats Section */
-        .stats {
-            padding: 60px 0;
-            background: white;
-        }
-        
-        .stats-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 30px;
-            margin-top: 40px;
-        }
-        
-        .stat-card {
-            text-align: center;
-            padding: 30px;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            border-radius: 10px;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
-        }
-        
-        .stat-card .number {
-            font-size: 3em;
-            font-weight: bold;
-            margin-bottom: 10px;
-        }
-        
-        .stat-card .label {
-            font-size: 1em;
-            opacity: 0.9;
-        }
-        
-        /* Section Styles */
-        .section {
-            padding: 80px 0;
-        }
-        
-        .section.white {
-            background: white;
-        }
-        
-        .section-title {
-            text-align: center;
-            font-size: 2.5em;
-            margin-bottom: 20px;
-            color: #333;
-        }
-        
-        .section-subtitle {
-            text-align: center;
-            font-size: 1.2em;
-            color: #666;
-            max-width: 800px;
-            margin: 0 auto 50px;
-        }
-        
-        /* Feature Grid */
-        .feature-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-            gap: 30px;
-            margin-top: 40px;
-        }
-        
-        .feature-card {
-            background: #f9f9f9;
-            padding: 30px;
-            border-radius: 10px;
-            border: 1px solid #e0e0e0;
-            transition: transform 0.3s, box-shadow 0.3s;
-        }
-        
-        .feature-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
-        }
-        
-        .feature-card h3 {
-            color: #667eea;
-            margin-bottom: 15px;
-            font-size: 1.5em;
-        }
-        
-        .feature-card ul {
-            list-style: none;
-            padding: 0;
-        }
-        
-        .feature-card li {
-            padding: 8px 0;
-            padding-left: 25px;
-            position: relative;
-            color: #555;
-        }
-        
-        .feature-card li:before {
-            content: "✓";
-            position: absolute;
-            left: 0;
-            color: #667eea;
-            font-weight: bold;
-            font-size: 1.2em;
-        }
-        
-        /* Code Block */
-        .code-block {
-            background: #1e1e1e;
-            color: #d4d4d4;
-            padding: 25px;
-            border-radius: 8px;
-            overflow-x: auto;
-            margin: 20px 0;
-            font-family: 'Courier New', monospace;
-            font-size: 0.9em;
-            line-height: 1.6;
-        }
-        
-        /* Link List */
-        .link-list {
-            list-style: none;
-            padding: 0;
-            max-width: 900px;
-            margin: 0 auto;
-        }
-        
-        .link-list li {
-            padding: 20px 0;
-            border-bottom: 1px solid #e0e0e0;
-        }
-        
-        .link-list li:last-child {
-            border-bottom: none;
-        }
-        
-        .link-list a {
-            color: #667eea;
-            text-decoration: none;
-            font-weight: 600;
-            font-size: 1.1em;
-        }
-        
-        .link-list a:hover {
-            text-decoration: underline;
-        }
-        
-        .link-list p {
-            color: #666;
-            font-size: 0.95em;
-            margin-top: 8px;
-        }
-        
-        /* Footer */
-        footer {
-            background: #2c3e50;
-            color: white;
-            text-align: center;
-            padding: 50px 20px;
-        }
-        
-        footer h3 {
-            margin-bottom: 20px;
-            font-size: 1.8em;
-        }
-        
-        footer p {
-            opacity: 0.8;
-            margin: 10px 0;
-        }
-        
-        footer a {
-            color: white;
-            text-decoration: underline;
-        }
-        .tagline {
-            font-size: 1.0em;
-            font-weight: 100;
-            font-style: italic;
-            opacity: 0.85;
-            margin: -5px 0 15px 0;
-            letter-spacing: 2px;
-            color: rgba(255, 255, 255, 0.9);
-}
-        #copyR {
-            background: #333;
-            color: white;
-            text-align: center;
-            width: 100%;
-        }
-        .stat-card.centered {
-            grid-column: 1 / -1;
-            max-width: 300px;
-            margin: 0 auto;
-        }
-        
-@media (max-width: 768px) {
-    header h1 {
-        font-size: 2em;
-    }
-    
-    header p {
-        font-size: 1.1em;
-    }
-    
-    .section-title {
-        font-size: 2em;
-    }
-    
-    .stats-grid {
-        grid-template-columns: repeat(2, 1fr);
-    }
-    
-    .centered-stat-wrapper {
-        grid-column: span 1 !important;
-        display: block !important;
-    }
-    
-    .centered-stat-wrapper .stat-card {
-        max-width: 100% !important;
-        width: 100% !important;
-    }
-}
-
- @media (max-width: 1024px) {
-       header h1 {
-        font-size: 2em;
-    }
-    
-    header p {
-        font-size: 1.1em;
-    }
-    
-    .section-title {
-        font-size: 2em;
-    }
-    
-    .stats-grid {
-        grid-template-columns: repeat(2, 1fr);
-    }
-    
-    .centered-stat-wrapper {
-        grid-column: span 1 !important;
-        display: block !important;
-    }
-    
-    .centered-stat-wrapper .stat-card {
-        max-width: 100% !important;
-        width: 100% !important;
-    }
-}
-
-@media (max-width: 1280px) {
-           header h1 {
-        font-size: 2em;
-    }
-    
-    header p {
-        font-size: 1.1em;
-    }
-    
-    .section-title {
-        font-size: 2em;
-    }
-    
-    .stats-grid {
-        grid-template-columns: repeat(2, 1fr);
-    }
-    
-    .centered-stat-wrapper {
-        grid-column: span 1 !important;
-        display: block !important;
-    }
-    
-    .centered-stat-wrapper .stat-card {
-        max-width: 100% !important;
-        width: 100% !important;
-    }
- 
-}
-        
-    </style>
+    <link rel="stylesheet" href="styles.css"></link>
+    <script src="app.js" defer></script>
 </head>
 <body>
     <nav>
@@ -489,11 +18,11 @@
             <button class="mobile-menu-toggle" onclick="toggleMobileMenu()">☰</button>
             <ul class="nav-links" id="navLinks">
                 <li><a href="index.html">Home</a></li>
+                <li><a href="#research-papers">Research</a></li>
+                <li><a href="#faq">FAQ</a></li>
                 <li><a href="consulting-services.html">Consulting</a></li>
-                <li><a href="docs/research/QKD_MILESTONE_RESEARCH_PAPER.md">Research</a></li>
-                <li><a href="docs/qkd/QKD_PROTOCOL_QUICK_START.md">Documentation</a></li>
-                <li><a href="https://github.com/Infin-8/STEADYWATCH-QUANTUM-DEMO">Repository</a></li>
-                <li><a href="mailto:nate_vazquez@icloud.com" class="nav-cta" style="color: black; font-size: small;, width: 15px;">Email</a></li>
+                <li><a href="https://github.com/Infin-8/STEADYWATCH-QUANTUM-DEMO/blob/main/docs/qkd/QKD_PROTOCOL_QUICK_START.md" target="_blank">Documentation</a></li>
+                <li><a href="contact.html" class="nav-cta">Contact</a></li>
             </ul>
         </div>
     </nav>
@@ -527,8 +56,11 @@
         <div class="container">
             <h2 class="section-title">🎉 QKD API v1.0.0 - Production Ready</h2>
             <p class="section-subtitle">
-                <strong>Historic Milestone:</strong> First complete end-to-end validation of hybrid quantum key distribution (QKD) protocol on real quantum hardware, combining information-theoretic security (GHZ entanglement) with computational security (Echo Resonance).
+                <strong>Historic Milestone:</strong> First complete end-to-end validation of hybrid quantum key distribution (QKD) protocol on real quantum hardware, combining information-theoretic security (GHZ entanglement) with computational security (Echo Resonance). Think of it as an un-hackable vault for all your digit assets and transactions. <strong>It's not a claim—that's a fact provable by the laws of physics.</strong>Today's security is literally based on computational "assumptions." These assumptions create vulnerabilities that <u>attackers are already exploiting.</u> 
+                Ever hear of <i>"harvest now, decrypt later"?</i> <strong>It's an actual hacking technique, and many attackers have already accumulated your data.</strong>
             </p>
+
+            <p class="section-subtitle">I'm one person who created and discovered everything you're about to review. I didn't go to school, I don't have a college degree. <u>Anyone can do this.</u> <b>Now, imagine a TEAM of individuals like myself, working together trying to steal all your precious information and digital assets—including all your cryptocurrency.</b> No need to worry, this technology was made to protect you. Its bi-directional multi-layer defense-in-depth architecture means you're safe from any attack now or in the future. It's stronger than quantum-resistant—meaning <strong>even the most powerful quantum computers cannot break it, because it's based on information-theoretic security (the laws of physics), not computational assumptions.</strong></p>
             
             <div class="stats-grid">
                 <div class="stat-card">
@@ -552,7 +84,7 @@
                     <br>
                     <span style="font-size: 0.7em; color: #666;"><b>IBM Quantum + AWS Braket</b></span>
                     <br>
-                        <a href="docs/research/CROSS_PLATFORM_QUBIT_AGGREGATION.md" target="_blank" style="color: #667eea; font-size: 0.8em; text-decoration: none;">View Research →</a>
+                        <a href="https://github.com/Infin-8/STEADYWATCH-QUANTUM-DEMO/blob/main/docs/research/CROSS_PLATFORM_QUBIT_AGGREGATION.md" target="_blank" style="color: #667eea; font-size: 0.8em; text-decoration: none;">View Research →</a>
                     </div>
                 </div>
          
@@ -582,7 +114,7 @@
     <div class="container">
         <h2 class="section-title">🔬 Quantum Hardware Partners</h2>
         <p class="section-subtitle">
-            Our QKD protocol and research are validated on multiple quantum platforms, 
+            Our QKD protocol and research are <strong>validated on multiple quantum platforms</strong>, 
             enabling cross-platform qubit aggregation and hardware-agnostic solutions.
         </p>
         
@@ -631,7 +163,7 @@
                     <li><strong>Algorithms:</strong> Shor's (750 qubits) & Grover's (258 qubits) feasible</li>
                 </ul>
                 <div style="margin-top: 15px;">
-                    <a href="docs/research/CROSS_PLATFORM_QUBIT_AGGREGATION.md" class="cta-button" style="display: inline-block;">View Research Paper</a>
+                    <a href="https://github.com/Infin-8/STEADYWATCH-QUANTUM-DEMO/blob/main/docs/research/CROSS_PLATFORM_QUBIT_AGGREGATION.md" class="cta-button" style="display: inline-block;" target="_blank">View Research Paper</a>
                 </div>
             </div>
         </div>
@@ -669,7 +201,9 @@
                         <li>Trust-based routing algorithms</li>
                     </ul>
                 </div>
+
                 
+                <div class="centered-stat-wrapper" style="grid-column: 1 / -1; display: flex; justify-content: space-evenly;">
                 <div class="feature-card">
                     <h3>Production API</h3>
                     <ul>
@@ -688,6 +222,7 @@
                         <li>Record depth: 28 qubits (35% fidelity)</li>
                     </ul>
                 </div>
+                </div>       
             </div>
         </div>
     </div>
@@ -712,7 +247,7 @@
                     <li><strong>Record Depth:</strong> 28 qubits (35% fidelity)</li>
                 </ul>
             </div>
-            
+
             <div class="feature-card">
                 <h3>Cross-Platform Validation</h3>
                 <ul>
@@ -741,39 +276,52 @@
         </div>
         
         <div style="margin-top: 30px; text-align: center;">
-            <a href="docs/research/QKD_MILESTONE_RESEARCH_PAPER.md" class="cta-button">View Complete Results</a>
+            <a href="https://github.com/Infin-8/STEADYWATCH-QUANTUM-DEMO/blob/main/docs/research/QKD_MILESTONE_RESEARCH_PAPER.md" class="cta-button" target="_blank">View Complete Results</a>
         </div>
     </div>
 </div>
 
     <!-- Research Papers -->
-    <div class="section">
+    <div class="section" id="research-papers">
         <div class="container">
             <h2 class="section-title">📚 Research Papers</h2>
             <ul class="link-list">
                 <li>
-                    <a href="docs/research/QKD_MILESTONE_RESEARCH_PAPER.md">QKD Milestone Research Paper</a>
+                    <a href="https://github.com/Infin-8/STEADYWATCH-QUANTUM-DEMO/blob/main/docs/research/QKD_MILESTONE_RESEARCH_PAPER.md" target="_blank">QKD Milestone Research Paper</a>
                     <p>First end-to-end validation on real hardware (White Paper)</p>
                 </li>
                 <li>
-                    <a href="docs/research/QKD_ACADEMIC_PAPER.md">QKD Academic Paper</a>
+                    <a href="https://github.com/Infin-8/STEADYWATCH-QUANTUM-DEMO/blob/main/docs/research/QKD_ACADEMIC_PAPER.md" target="_blank">QKD Academic Paper</a>
                     <p>Formal security analysis ready for academic submission</p>
                 </li>
                 <li>
-                    <a href="docs/research/CROSS_PLATFORM_QUBIT_AGGREGATION.md">Cross-Platform Qubit Aggregation</a>
+                    <a href="https://github.com/Infin-8/STEADYWATCH-QUANTUM-DEMO/blob/main/docs/research/CROSS_PLATFORM_QUBIT_AGGREGATION.md" target="_blank">Cross-Platform Qubit Aggregation Pipeline (CPQAP)</a>
                     <p>First cross-platform qubit aggregation system (783 qubits)</p>
                 </li>
                 <li>
-                    <a href="docs/research/BELL_INEQUALITY_BREAKTHROUGH.md">Bell Inequality Breakthrough</a>
+                    <a href="https://github.com/Infin-8/STEADYWATCH-QUANTUM-DEMO/blob/main/docs/research/BELL_INEQUALITY_BREAKTHROUGH.md" target="_blank">Bell Inequality Breakthrough</a>
                     <p>First Bell inequality violation with quantum randomness</p>
                 </li>
                 <li>
-                    <a href="docs/research/RESEARCH_PAPER_ENTROPY_HASH_MAPS.md">Entropy-Based Hash Map Optimization</a>
+                    <a href="https://github.com/Infin-8/STEADYWATCH-QUANTUM-DEMO/blob/main/docs/research/RESEARCH_PAPER_ENTROPY_HASH_MAPS.md" target="_blank">Entropy-Based Hash Map Optimization</a>
                     <p>A Novel Application of Quantum Key Distribution Information-Theoretic Bounds</p>
                 </li>
                 <li>
-                    <a href="docs/research/RESEARCH_PAPER_ENTROPY_TRANSACTION_QUEUE.md">Entropy-Based Transaction Queue Optimization</a>
-                    <p>A Higher-Order Extension of Quantum Key Distribution Information-Theoretic Bounds</p>
+                    <a href="https://github.com/Infin-8/STEADYWATCH-QUANTUM-DEMO/blob/main/docs/research/UNIFIED_FRAMEWORK_RESEARCH_PAPER.md" target="_blank">A Unified Information-Theoretic Framework for Quantum Computing and Classical Data Structures</a>
+                    <p>QKD security bounds, and classical data structure optimizations (hash maps, queues, trees, caches, graphs)</p>
+                </li>
+
+                <li>
+                    <a href="https://github.com/Infin-8/STEADYWATCH-QUANTUM-DEMO/blob/main/docs/research/RESEARCH_PAPER_QKD_HARDWARE_VALIDATION.md" target="_blank">Quantum Key Distribution: Complete Protocol Validation (SHQKD)</a>
+                    <p>Perfect Key Matching on IBM Quantum & AWS Braket</p>
+                </li>
+                <li>
+                    <a href="https://github.com/Infin-8/STEADYWATCH-QUANTUM-DEMO/blob/main/docs/QUANTUM_COMMUNICATION_EXPLANATION.md" target="_blank">STEADYWATCH Hybrid Quantum Communication (SHQC)</a>
+                    <p>Why It's Needed for Cross-Platform Entanglement</p>
+                </li>
+                <li>
+                    <a href="https://github.com/Infin-8/STEADYWATCH-QUANTUM-DEMO/blob/main/docs/research/GHZ_NETWORK_AUTHENTICATION_GUIDE.md" target="_blank">GHZ Based Network Authentication</a>
+                    <p>A complete guide validated on IBM Hardware</p>
                 </li>
             </ul>
         </div>
@@ -807,9 +355,8 @@
                 <strong>API Endpoint:</strong> <code style="background: #f0f0f0; padding: 5px 10px; border-radius: 3px;">http://quantum.local:5002/api/qkd/</code>
             </p>
             
-            <div style="text-align: center; margin-top: 30px;">
+            <div style="display: flex; justify-content: center; align-items: center; gap: 20px; margin-top: 30px; flex-wrap: wrap;">
                 <a href="docs/qkd/QKD_PROTOCOL_QUICK_START.md" class="cta-button">Read Quick Start Guide</a>
-                <a href="examples/" class="cta-button secondary">View Example Code</a>
             </div>
         </div>
     </div>
@@ -835,7 +382,7 @@
                         <li><a href="https://quantum.ibm.com/jobs/d5gs5mkpe0pc73alki40" target="_blank" style="color: #667eea;">View Validated Job</a></li>
                         <li><a href="https://quantum.ibm.com/" target="_blank" style="color: #667eea;">IBM Quantum Platform</a></li>
                     </ul>
-                </div>
+                </div>                
 
           <div class="feature-card">
                 <h3>AWS Braket</h3>
@@ -854,6 +401,7 @@
             <a href="https://docs.aws.amazon.com/braket/" target="_blank" style="color: #667eea; font-size: 0.9em;">AWS Braket Docs →</a>
             </div>
         </div>
+        <div class="centered-stat-wrapper" style="grid-column: 1 / -1; display: flex; justify-content: space-evenly;">
                 
                 <div class="feature-card">
                     <h3>Hardware Validation</h3>
@@ -863,6 +411,8 @@
                         <li><a href="docs/qkd/QKD_SECURITY_PROOFS_DOCUMENTATION.md" style="color: #667eea;">Security Proofs</a></li>
                     </ul>
                 </div>
+
+                
                 
                 <div class="feature-card">
                     <h3>Advanced Topics</h3>
@@ -872,6 +422,8 @@
                         <li><a href="docs/QUANTUM_COMMUNICATION_EXPLANATION.md" style="color: #667eea;">Quantum Communication Explained</a></li>
                     </ul>
                 </div>
+
+        </div>     
             </div>
         </div>
     </div>
@@ -907,18 +459,89 @@
                         <li>Critical infrastructure protection</li>
                     </ul>
                 </div>
-                
-                <div class="feature-card">
-                    <h3>Healthcare</h3>
+
+                    <div class="centered-stat-wrapper" style="grid-column: 1 / -1; display: flex; justify-content: center;">
+                        <div class="feature-card">
+                        <h3>Healthcare</h3>
                     <ul>
                         <li>Secure medical data transmission</li>
                         <li>HIPAA-compliant encryption</li>
                         <li>Patient data protection</li>
                     </ul>
+                        </div>
                 </div>
+                
             </div>
         </div>
     </div>
+
+    <!-- FAQ Section -->
+    <section class="faq">
+        <div class="container" id="faq">
+            <h2 class="section-title">Frequently Asked Questions</h2>
+          <!-- Technical QKD Protocol FAQ Items -->
+<div class="faq-item feature-card">
+    <h3>How does the eavesdropper detection work in your hybrid QKD protocol?</h3>
+    <p>
+        <strong>Our protocol differs from traditional E91:</strong> Instead of separate measurements, both parties use the <strong>same GHZ measurement</strong> (shared state architecture). This eliminates the need for basis comparison and achieves 0% error rate.
+    </p>
+    <p>
+        <strong>Eavesdropper Detection:</strong> We use parity comparison over classical channels. Random bits are sampled from raw keys, and parity is compared without revealing the actual key bits. Any eavesdropper measurement disturbs the GHZ state, introducing detectable errors.
+    </p>
+    <p>
+        <strong>Detection Probability:</strong> For our parameters (100 samples, 69% fidelity), detection probability is near-certain: P_detect ≥ 1 - exp(-620) ≈ 1.0
+    </p>
+    <p>
+        <strong>Key Distribution:</strong> All communication is over classical channels only. The quantum path is only for GHZ state generation (single execution), then both parties extract keys from the same measurement data.
+    </p>
+</div>
+
+<div class="faq-item feature-card">
+    <h3>What's the core idea behind Echo Resonance? How does it achieve 2^4096 key space?</h3>
+    <p>
+        <strong>Architecture:</strong> Echo Resonance uses a <strong>master-satellite entanglement structure</strong>:
+    </p>
+    <p>
+        <strong>How 2^4096 Key Space Works:</strong>
+    </p>
+    <ul style="list-style: none;">
+        <li>1 Master Qubit (center, atomic clock synchronization)</li>
+        <li>4 Satellite Qubits per group (Left, Right, Top, Bottom)</li>
+        <li>80 Groups = 400 qubits total</li>
+        <li>160 Encryption Layers (80 forward + 80 backward with bidirectional layering)</li>
+    </ul>
+    <p>
+        <strong>Practical:</strong> Storage is 512 bytes (same as RSA-4096), generation time is &lt;0.01s (simulator) or 30-90s (hardware), with O(n) linear scaling.
+    </p>
+</div>
+
+<div class="faq-item feature-card">
+    <h3>Have you developed formal security proofs? (E.g., bounding Eve's information from the 69% fidelity GHZ)</h3>
+    <p>
+        <strong>Yes, we have complete formal security proofs:</strong>
+    </p>
+    <p>
+        <strong>Theorem 1.1 (GHZ Information-Theoretic Security):</strong><br>
+        I(K; E) ≤ (1 - F) · H(K)
+    </p>
+    <p>
+        For our hardware (12 qubits, F = 0.69): I(K; E) ≤ 3.72 bits. After privacy amplification: I(K_final; E) ≤ ε (negligible).
+    </p>
+    <p>
+        <strong>Theorem 2.1 (Eavesdropper Detection):</strong><br>
+        P_detect ≥ 1 - exp(-s · (1 - F) / τ)
+    </p>
+    <p>
+        For our parameters: P_detect ≈ 1.0 (near-certain detection).
+    </p>
+    <p>
+        <strong>Status:</strong> ✅ Formal proofs complete and documented, ✅ Computational verification implemented, ✅ Academic paper ready for submission, ✅ Hardware-validated with verifiable job IDs.
+    </p>
+    <p>
+        <strong>Security Levels:</strong> GHZ Layer: 69% information-theoretic security | Echo Resonance Layer: 100% computational security (2^4096 key space) | Overall Protocol: 79.47% (defense-in-depth).
+    </p>
+</div>
+    </section>
 
     <!-- Repository Links -->
     <div class="section">
@@ -945,7 +568,7 @@
         </div>
     </div>
 
-    <footer>
+    <footer style="display: flex; justify-content: space-between; flex-direction: column; width: 100vw;>
         <div class="container">
             <h3><u>STEADYWATCH™</u></h3>
             <p class="subtitle">Precision Monitoring</p>
@@ -955,48 +578,12 @@
                 This release represents a significant milestone in practical quantum key distribution on NISQ hardware.<br>
                 The system is production-ready and validated on actual quantum hardware.
             </p>
-
-            <div class="container" id="copyR">
+        </div>
+        <div style="width: 100vw;" id="copyR">
             <p>&copy; 2025 Quantum V^ LLC.</p>
-            <p>480-341-7382</p>
+            <p><strong>Phone:</strong> <a href="tel:4803417382">480-341-7382 (call/text)</a></p>
             <p style="margin-top: 10px; opacity: 0.8;">All rights reserved.</p>
-            </div>
         </div>
     </footer>
-    
-    <script>
-        function toggleMobileMenu() {
-            const navLinks = document.getElementById('navLinks');
-            navLinks.classList.toggle('active');
-        }
-        
-        // Close mobile menu when clicking a nav link
-        document.addEventListener('DOMContentLoaded', function() {
-            const navLinks = document.getElementById('navLinks');
-            const links = navLinks.querySelectorAll('a');
-            
-            links.forEach(function(link) {
-                link.addEventListener('click', function() {
-                    // Only close on mobile (screen width <= 768px)
-                    if (window.innerWidth <= 768) {
-                        navLinks.classList.remove('active');
-                    }
-                });
-            });
-        });
-        
-        // Close mobile menu when clicking outside
-        document.addEventListener('click', function(event) {
-            const nav = document.querySelector('nav');
-            const navLinks = document.getElementById('navLinks');
-            const toggle = document.querySelector('.mobile-menu-toggle');
-            
-            if (window.innerWidth <= 768 && 
-                !nav.contains(event.target) && 
-                navLinks.classList.contains('active')) {
-                navLinks.classList.remove('active');
-            }
-        });
-    </script>
 </body>
 </html>

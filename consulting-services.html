@@ -3,422 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Quantum Computing & Educational Technology Consulting | Quantum V^ LLC</title>
+    <title>Consulting | Quantum V^ LLC</title>
     <meta name="description" content="Expert consulting on quantum computing research, blockchain security, and educational technology. Proven expertise with 37+ discoveries and hardware validation on 783 qubits via cross-platform aggregation.">
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-        
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
-            line-height: 1.6;
-            color: #333;
-            background: #f5f5f5;
-        }
-                /* Navigation */
-        nav {
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            background: rgba(102, 126, 234, 0.95);
-            backdrop-filter: blur(10px);
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-            z-index: 1000;
-            padding: 15px 0;
-        }
-        
-        nav .container {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-        
-        .nav-brand {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            font-size: 1.5em;
-            font-weight: 700;
-            color: white;
-            text-decoration: none;
-            text-shadow: 2px 2px 4px rgba(0,0,0,0.3), 0 0 10px rgba(102, 126, 234, 0.3);
-        }
-        
-        .nav-brand:hover {
-            opacity: 0.9;
-        }
-        
-        .nav-brand img {
-            height: 40px;
-            width: 40px;
-            border-radius: 8px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.2);
-        }
-        
-        .nav-links {
-            display: flex;
-            list-style: none;
-            gap: 30px;
-            align-items: center;
-        }
-        
-        .nav-links a {
-            color: white;
-            text-decoration: none;
-            font-weight: 500;
-            transition: opacity 0.3s;
-            padding: 8px 0;
-        }
-        
-        .nav-links a:hover {
-            opacity: 0.8;
-            text-decoration: underline;
-        }
-        
-        .nav-cta {
-            background: white;
-            color: #667eea;
-            padding: 10px 20px;
-            border-radius: 25px;
-            font-weight: 600;
-            transition: transform 0.3s, box-shadow 0.3s;
-        }
-        
-        .nav-cta:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
-            text-decoration: none;
-        }
-        
-        /* Mobile Menu */
-        .mobile-menu-toggle {
-            display: none;
-            background: none;
-            border: none;
-            color: white;
-            font-size: 1.5em;
-            cursor: pointer;
-        }
-        
-        @media (max-width: 768px) {
-            .mobile-menu-toggle {
-                display: block;
-            }
-            
-            .nav-links {
-                position: absolute;
-                top: 100%;
-                left: 0;
-                right: 0;
-                background: rgba(102, 126, 234, 0.98);
-                flex-direction: column;
-                padding: 20px;
-                gap: 15px;
-                display: none;
-                box-shadow: 0 5px 15px rgba(0,0,0,0.2);
-            }
-            
-            .nav-links.active {
-                display: flex;
-            }
-            
-            body {
-                padding-top: 60px;
-            }
-        }
-        
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 0 20px;
-        }
-        
-        /* Header */
-        header {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            padding: 60px 0;
-            text-align: center;
-        }
-        
-        header h1 {
-            font-size: 2.5em;
-            margin-bottom: 20px;
-            font-weight: 700;
-        }
-        
-        header p {
-            font-size: 1.2em;
-            max-width: 800px;
-            margin: 0 auto;
-            opacity: 0.95;
-        }
-        
-        .cta-button {
-            display: inline-block;
-            margin-top: 30px;
-            padding: 15px 40px;
-            background: white;
-            color: #667eea;
-            text-decoration: none;
-            border-radius: 50px;
-            font-weight: 600;
-            transition: transform 0.3s, box-shadow 0.3s;
-        }
-        
-        .cta-button:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 10px 25px rgba(0,0,0,0.2);
-        }
-        
-        /* Services Section */
-        .services {
-            padding: 80px 0;
-            background: white;
-        }
-        
-        .section-title {
-            text-align: center;
-            font-size: 2.2em;
-            margin-bottom: 50px;
-            color: #333;
-        }
-        
-        .services-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-            gap: 30px;
-            margin-top: 40px;
-        }
-        
-        .service-card {
-            background: #f9f9f9;
-            padding: 30px;
-            border-radius: 10px;
-            border: 1px solid #e0e0e0;
-            transition: transform 0.3s, box-shadow 0.3s;
-        }
-        
-        .service-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
-        }
-        
-        .service-card h3 {
-            color: #667eea;
-            margin-bottom: 15px;
-            font-size: 1.4em;
-        }
-        
-        .service-card ul {
-            list-style: none;
-            margin: 15px 0;
-        }
-        
-        .service-card ul li {
-            padding: 5px 0;
-            padding-left: 20px;
-            position: relative;
-        }
-        
-        .service-card ul li:before {
-            content: "✓";
-            position: absolute;
-            left: 0;
-            color: #667eea;
-            font-weight: bold;
-        }
-        
-        .service-price {
-            margin-top: 20px;
-            padding-top: 20px;
-            border-top: 1px solid #e0e0e0;
-            font-weight: 600;
-            color: #667eea;
-        }
-        
-        /* Why Choose Section */
-        .why-choose {
-            padding: 80px 0;
-            background: #f9f9f9;
-        }
-        
-        .features-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 30px;
-            margin-top: 40px;
-        }
-        
-        .feature {
-            text-align: center;
-            padding: 30px;
-        }
-        
-        .feature-icon {
-            font-size: 3em;
-            margin-bottom: 20px;
-        }
-        
-        .feature h3 {
-            color: #667eea;
-            margin-bottom: 15px;
-        }
-        
-        /* Portfolio Section */
-        .portfolio {
-            padding: 80px 0;
-            background: white;
-        }
-        
-        .case-studies {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 30px;
-            margin-top: 40px;
-        }
-        
-        .case-study {
-            background: #f9f9f9;
-            padding: 30px;
-            border-radius: 10px;
-            border-left: 4px solid #667eea;
-        }
-        
-        .case-study h3 {
-            color: #667eea;
-            margin-bottom: 15px;
-        }
-        
-        .case-study .status {
-            display: inline-block;
-            padding: 5px 15px;
-            background: #4caf50;
-            color: white;
-            border-radius: 20px;
-            font-size: 0.9em;
-            margin-top: 10px;
-        }
-        
-        /* Pricing Section */
-        .pricing {
-            padding: 80px 0;
-            background: #f9f9f9;
-        }
-        
-        .pricing-table {
-            max-width: 800px;
-            margin: 40px auto;
-            background: white;
-            border-radius: 10px;
-            overflow: hidden;
-            box-shadow: 0 5px 20px rgba(0,0,0,0.1);
-        }
-        
-        .pricing-table table {
-            width: 100%;
-            border-collapse: collapse;
-        }
-        
-        .pricing-table th {
-            background: #667eea;
-            color: white;
-            padding: 20px;
-            text-align: left;
-        }
-        
-        .pricing-table td {
-            padding: 15px 20px;
-            border-bottom: 1px solid #e0e0e0;
-        }
-        
-        .pricing-table tr:last-child td {
-            border-bottom: none;
-        }
-        
-        .pricing-table tr:hover {
-            background: #f9f9f9;
-        }
-        
-        /* Contact Section */
-        .contact {
-            padding: 80px 0;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            text-align: center;
-        }
-        
-        .contact h2 {
-            margin-bottom: 30px;
-            font-size: 2.2em;
-        }
-        
-        .contact-info {
-            max-width: 600px;
-            margin: 0 auto;
-            background: rgba(255,255,255,0.1);
-            padding: 40px;
-            border-radius: 10px;
-            backdrop-filter: blur(10px);
-        }
-        
-        .contact-info p {
-            margin: 15px 0;
-            font-size: 1.1em;
-        }
-        
-        .contact-info a {
-            color: white;
-            text-decoration: underline;
-        }
-        
-        .contact-info a:hover {
-            text-decoration: none;
-        }
-        
-        /* FAQ Section */
-        .faq {
-            padding: 80px 0;
-            background: white;
-        }
-        
-        .faq-item {
-            margin: 20px 0;
-            padding: 20px;
-            background: #f9f9f9;
-            border-radius: 10px;
-        }
-        
-        .faq-item h3 {
-            color: #667eea;
-            margin-bottom: 10px;
-        }
-        
-        /* Footer */
-        footer {
-            background: #333;
-            color: white;
-            text-align: center;
-            padding: 40px 0;
-        }
-        
-        /* Responsive */
-        @media (max-width: 768px) {
-            header h1 {
-                font-size: 2em;
-            }
-            
-            .services-grid,
-            .features-grid,
-            .case-studies {
-                grid-template-columns: 1fr;
-            }
-        }
-    </style>
+    <link rel="stylesheet" href="styles.css"></link>
+    <script src="app.js" defer></script>
 </head>
 <body>
         <nav>
@@ -430,11 +18,10 @@
             <button class="mobile-menu-toggle" onclick="toggleMobileMenu()">☰</button>
             <ul class="nav-links" id="navLinks">
                 <li><a href="index.html">Home</a></li>
-                <li><a href="consulting-services.html">Consulting</a></li>
-                <li><a href="docs/research/QKD_MILESTONE_RESEARCH_PAPER.md">Research</a></li>
-                <li><a href="docs/qkd/QKD_PROTOCOL_QUICK_START.md">Documentation</a></li>
-                <li><a href="https://github.com/Infin-8/STEADYWATCH-QUANTUM-DEMO">Repository</a></li>
-                <li><a href="mailto:nate_vazquez@icloud.com" class="nav-cta" style="color: black; font-size: small;, width: 15px;">Email</a></li>
+                <li><a href="#portfolio">Portfolio</a></li>
+                <li><a href="#pricing">Pricing</a></li>
+                <li><a href="#faq">FAQ</a></li>
+                <li><a href="contact.html" class="nav-cta">Contact</a></li>
             </ul>
         </div>
     </nav>
@@ -537,7 +124,7 @@
     </section>
 
     <!-- Portfolio Section -->
-    <section class="portfolio">
+    <section class="portfolio" id="portfolio">
         <div class="container">
             <h2 class="section-title">Portfolio & Case Studies</h2>
             <div class="case-studies">
@@ -568,7 +155,7 @@
     </section>
 
     <!-- Pricing Section -->
-    <section class="pricing">
+    <section class="pricing" id="pricing">
         <div class="container">
             <h2 class="section-title">Pricing</h2>
             <div class="pricing-table">
@@ -639,7 +226,7 @@
 
     <!-- FAQ Section -->
     <section class="faq">
-        <div class="container">
+        <div class="container" id="faq">
             <h2 class="section-title">Frequently Asked Questions</h2>
             <div class="faq-item">
                 <h3>What's included in the free consultation?</h3>
@@ -669,13 +256,12 @@
         <div class="container">
             <h2>Ready to Get Started?</h2>
             <div class="contact-info">
-                <h3>Nate Vazquez</h3>
-                <p>Founder, Quantum V^ LLC</p>
-                <p><strong>Email:</strong> <a href="mailto:nate_vazquez@icloud.com">nate_vazquez@icloud.com</a></p>
-                <p><strong>Phone:</strong> <a href="tel:4803417382">480-341-7382</a></p>
-                <p><strong>Company:</strong> Quantum V^ LLC (EIN: 41-3528434)</p>
+                <p><strong>Phone:</strong> <a href="tel:4803417382">480-341-7382 (call/text)</a></p>
+                <p><strong>Company:</strong> Quantum V^ LLC</p>
+                <p>(EIN: 41-3528434)</p>
                 <p style="margin-top: 30px;">
-                    <a href="mailto:nate_vazquez@icloud.com?subject=Consulting Inquiry" class="cta-button" style="background: white; color: #667eea;">Schedule Free Consultation</a>
+                    <a href="contact.html" class="cta-button" style="background: white; color: #667eea;">Schedule Free Consultation</a>
+                    
                 </p>
             </div>
         </div>
@@ -684,31 +270,10 @@
     <!-- Footer -->
     <footer>
         <div class="container">
-            <p>&copy; 2026 Quantum V^ LLC. All rights reserved.</p>
+            <p>&copy; 2025 Quantum V^ LLC. All rights reserved.</p>
             <p style="margin-top: 10px; opacity: 0.8;">Expert Quantum Computing & Educational Technology Consulting</p>
         </div>
     </footer>
-
-        <script>
-        function toggleMobileMenu() {
-            const navLinks = document.getElementById('navLinks');
-            navLinks.classList.toggle('active');
-        }
-        
-        // Close mobile menu when clicking outside
-        document.addEventListener('click', function(event) {
-            const nav = document.querySelector('nav');
-            const navLinks = document.getElementById('navLinks');
-            const toggle = document.querySelector('.mobile-menu-toggle');
-            
-            if (window.innerWidth <= 768 && 
-                !nav.contains(event.target) && 
-                navLinks.classList.contains('active')) {
-                navLinks.classList.remove('active');
-            }
-        });
-    </script>
-    
 </body>
 </html>
 
