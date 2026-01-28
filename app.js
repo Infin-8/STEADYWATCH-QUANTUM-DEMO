@@ -32,17 +32,3 @@
         }
     });
 
-        // Simple form submission - just opens email with form data
-        document.getElementById('contactForm').addEventListener('submit', function(e) {
-            e.preventDefault();
-            
-            const name = document.getElementById('name').value;
-            const email = document.getElementById('email').value;
-            const company = document.getElementById('company').value;
-            const inquiry = document.getElementById('inquiry').value;
-            const message = document.getElementById('message').value;
-            
-            const subject = `Contact Form: ${inquiry}`;
-            const body = `Name: ${name}\nEmail: ${email}\nCompany: ${company || 'Not provided'}\n\nInquiry Type: ${inquiry}\n\nMessage:\n${message}`;
-            
-            window.location.href = `mailto:nate_vazquez@icloud.com?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
