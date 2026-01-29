@@ -1,4 +1,4 @@
-// GHZ 12-Qubit Entanglement Visualization
+// GHZ 12-Qubit Entanglement Visualization - SPHERICAL ARRANGEMENT
 function initGHZVisualization(containerId) {
     const container = document.getElementById(containerId);
     if (!container) return;
@@ -62,36 +62,51 @@ function initGHZVisualization(containerId) {
         opacity: 0.3
     });
 
-    // Create 12 qubits in a circular arrangement
+    // Create 12 qubits in a SPHERICAL arrangement
     const qubits = [];
     const qubitCount = 12;
     const radius = 8;
     const qubitGroup = new THREE.Group();
 
+    // Spherical distribution algorithm (Fibonacci sphere or golden angle)
+    // This creates evenly distributed points on a sphere
+    const goldenAngle = Math.PI * (3 - Math.sqrt(5)); // Golden angle in radians
+    
     for (let i = 0; i < qubitCount; i++) {
-        const angle = (i / qubitCount) * Math.PI * 2;
-        const x = Math.cos(angle) * radius;
-        const z = Math.sin(angle) * radius;
-        const y = Math.sin(i * 0.5) * 2;
+        // Use golden angle spiral for even distribution
+        const y = 1 - (i / (qubitCount - 1)) * 2; // y goes from 1 to -1
+        const radius_at_y = Math.sqrt(1 - y * y); // radius at y
+        
+        const theta = goldenAngle * i; // Golden angle rotation
+        
+        const x = Math.cos(theta) * radius_at_y;
+        const z = Math.sin(theta) * radius_at_y;
+        
+        // Scale to desired radius
+        const finalX = x * radius;
+        const finalY = y * radius * 0.8; // Slightly flatten vertical axis
+        const finalZ = z * radius;
 
+        // Main qubit sphere
         const qubit = new THREE.Mesh(qubitGeometry, qubitMaterial.clone());
-        qubit.position.set(x, y, z);
+        qubit.position.set(finalX, finalY, finalZ);
         qubit.userData.index = i;
-        qubit.userData.basePosition = new THREE.Vector3(x, y, z);
+        qubit.userData.basePosition = new THREE.Vector3(finalX, finalY, finalZ);
         qubits.push(qubit);
         qubitGroup.add(qubit);
 
+        // Glow effect
         const glow = new THREE.Mesh(
             new THREE.SphereGeometry(0.6, 32, 32),
             qubitGlowMaterial.clone()
         );
-        glow.position.set(x, y, z);
+        glow.position.set(finalX, finalY, finalZ);
         qubitGroup.add(glow);
     }
 
     scene.add(qubitGroup);
 
-    // Create entanglement connections
+    // Create entanglement connections (all-to-all for GHZ state)
     const connections = [];
     const connectionGroup = new THREE.Group();
     const connectionMaterial = new THREE.LineBasicMaterial({
@@ -142,23 +157,34 @@ function initGHZVisualization(containerId) {
         time += 0.02;
 
         if (animationRunning) {
+            // Animate qubits with quantum state fluctuations
+            // Keep them orbiting around their base positions in a spherical pattern
             qubits.forEach((qubit, index) => {
                 const basePos = qubit.userData.basePosition;
                 const phase = (index / qubitCount) * Math.PI * 2;
                 const amplitude = 0.3;
                 
-                qubit.position.x = basePos.x + Math.sin(time + phase) * amplitude;
-                qubit.position.y = basePos.y + Math.cos(time * 1.5 + phase) * amplitude;
-                qubit.position.z = basePos.z + Math.sin(time * 0.8 + phase) * amplitude;
+                // Spherical oscillation - maintain spherical shape while animating
+                const radialOffset = Math.sin(time + phase) * amplitude;
+                const thetaOffset = Math.cos(time * 1.5 + phase) * amplitude;
+                const phiOffset = Math.sin(time * 0.8 + phase) * amplitude;
+                
+                // Apply offsets while maintaining spherical structure
+                qubit.position.x = basePos.x + radialOffset * Math.cos(phase);
+                qubit.position.y = basePos.y + thetaOffset;
+                qubit.position.z = basePos.z + radialOffset * Math.sin(phase);
 
+                // Pulse effect
                 const scale = 1 + Math.sin(time * 2 + phase) * 0.1;
                 qubit.scale.set(scale, scale, scale);
 
+                // Color variation based on quantum state
                 const hue = (time * 0.1 + index * 0.1) % 1;
                 qubit.material.color.setHSL(hue, 0.7, 0.6);
                 qubit.material.emissive.setHSL(hue, 0.7, 0.3);
             });
 
+            // Animate connections
             connections.forEach((connection, index) => {
                 const opacity = 0.2 + Math.sin(time + index * 0.1) * 0.2;
                 connection.material.opacity = Math.max(0.1, opacity);
