@@ -1,8 +1,159 @@
+// ============================================
+// EAVESDROPPER DETECTION SYSTEM
+// ============================================
+class EavesdropperDetector {
+    constructor(scene, qubits, camera, renderer, connections) {
+        this.scene = scene;
+        this.qubits = qubits;
+        this.camera = camera;
+        this.renderer = renderer;
+        this.connections = connections;
+        this.laserBeam = null;
+        this.isFiring = false;
+        this.detectionCount = 0;
+        this.originalQubitStates = [];
+        
+        // Store original qubit states for reset
+        this.qubits.forEach(qubit => {
+            this.originalQubitStates.push({
+                position: qubit.position.clone(),
+                materialColor: qubit.material.color.clone()
+            });
+        });
+        
+        this.setupLaser();
+        this.setupButton();
+    }
+    
+    setupLaser() {
+        const laserGeometry = new THREE.BufferGeometry();
+        const laserMaterial = new THREE.LineBasicMaterial({
+            color: 0xff4757,
+            linewidth: 3,
+            transparent: true,
+            opacity: 0.9
+        });
+        
+        const points = [
+            new THREE.Vector3(0, -5, 0),
+            new THREE.Vector3(0, 5, 0)
+        ];
+        laserGeometry.setFromPoints(points);
+        
+        this.laserBeam = new THREE.Line(laserGeometry, laserMaterial);
+        this.laserBeam.visible = false;
+        this.scene.add(this.laserBeam);
+    }
+    
+    setupButton() {
+        const btn = document.getElementById('eavesdropperBtn');
+        if (!btn) return;
+        
+        btn.addEventListener('click', () => {
+            if (this.isFiring) return;
+            this.fireLaser();
+        });
+    }
+    
+    fireLaser() {
+        if (this.isFiring) return;
+        this.isFiring = true;
+        
+        const btn = document.getElementById('eavesdropperBtn');
+        const statusDiv = document.getElementById('detectionStatus');
+        
+        if (btn) btn.disabled = true;
+        
+        const targetQubitIndex = Math.floor(Math.random() * this.qubits.length);
+        const targetQubit = this.qubits[targetQubitIndex];
+        
+        const targetPosition = targetQubit.position.clone();
+        this.laserBeam.position.copy(targetPosition);
+        this.laserBeam.position.y = -10;
+        this.laserBeam.visible = true;
+        
+        const startY = -10;
+        const endY = targetPosition.y;
+        const duration = 500;
+        const startTime = Date.now();
+        
+        const animateLaser = () => {
+            const elapsed = Date.now() - startTime;
+            const progress = Math.min(elapsed / duration, 1);
+            const eased = 1 - Math.pow(1 - progress, 3);
+            const currentY = startY + (endY - startY) * eased;
+            
+            this.laserBeam.position.y = currentY;
+            this.laserBeam.position.x = targetPosition.x;
+            this.laserBeam.position.z = targetPosition.z;
+            
+            if (progress < 1) {
+                requestAnimationFrame(animateLaser);
+            } else {
+                this.detectEavesdropper(targetQubit, targetQubitIndex);
+            }
+        };
+        
+        animateLaser();
+    }
+    
+    detectEavesdropper(targetQubit, qubitIndex) {
+        const statusDiv = document.getElementById('detectionStatus');
+        
+        this.laserBeam.visible = false;
+        
+        if (statusDiv) {
+            statusDiv.textContent = '🚨 EAVESDROPPER DETECTED! 🚨';
+            statusDiv.className = 'detection-status show detected';
+            
+            setTimeout(() => {
+                statusDiv.className = 'detection-status';
+            }, 2000);
+        }
+        
+        // Visualize state collapse - all qubits turn red and stop animating
+        this.qubits.forEach((qubit) => {
+            qubit.material.color.setHex(0xff4757);
+            qubit.material.emissive.setHex(0xff4757);
+            qubit.userData.originalRotationSpeed = qubit.userData.rotationSpeed || 0.01;
+            qubit.userData.rotationSpeed = 0;
+        });
+        
+        // Flash all connections red
+        this.connections.forEach(connection => {
+            connection.material.color.setHex(0xff4757);
+            connection.material.opacity = 1;
+        });
+        
+        this.detectionCount++;
+        
+        setTimeout(() => {
+            this.resetState();
+        }, 3000);
+    }
+    
+    resetState() {
+        const btn = document.getElementById('eavesdropperBtn');
+        
+        // Reset qubit colors
+        this.qubits.forEach((qubit, index) => {
+            const original = this.originalQubitStates[index];
+            qubit.material.color.copy(original.materialColor);
+            qubit.material.emissive.setHSL((index / this.qubits.length) % 1, 0.7, 0.3);
+        });
+        
+        // Reset connection colors
+        this.connections.forEach(connection => {
+            connection.material.color.setHex(0x667eea);
+            connection.material.opacity = 0.3;
+        });
+        
+        if (btn) btn.disabled = false;
+        this.isFiring = false;
+    }
+}
 
-
-// GHZ 12-Qubit Entanglement Visualization - SPHERICAL ARRANGEMENT
-function initGHZVisualization(containerId) {
-    // ... your existing code ...
+//END DETECTION
 
 
 
@@ -158,6 +309,16 @@ function initGHZVisualization(containerId) {
 
     let animationRunning = true;
     let time = 0;
+
+    // Initial connection update
+    updateConnections();
+
+    // ============================================
+    // INITIALIZE EAVESDROPPER DETECTION
+    // ============================================
+    let eavesdropperDetector;
+    eavesdropperDetector = new EavesdropperDetector(scene, qubits, camera, renderer, connections);
+    // ============================================
 
     
     function animate() {
