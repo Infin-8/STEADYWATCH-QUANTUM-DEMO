@@ -10,29 +10,29 @@
 </head>
 
     <!-- Three.js Library -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
-
-<!-- GHZ Visualization -->
-<script src="ghz-visualization.js"></script>
-<script>
-    // Initialize visualization when page loads
-    document.addEventListener('DOMContentLoaded', function() {
-        const vizControls = initGHZVisualization('ghz-visualization');
-        
-        if (vizControls) {
-            document.getElementById('toggle-ghz-animation').addEventListener('click', () => {
-                vizControls.toggleAnimation();
-                const btn = document.getElementById('toggle-ghz-animation');
-                btn.textContent = btn.textContent === 'Pause' ? 'Play' : 'Pause';
-            });
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+    
+    <!-- GHZ Visualization -->
+    <script src="ghz-visualization.js"></script>
+    <script>
+        // This runs when page finishes loading
+        document.addEventListener('DOMContentLoaded', function() {
+            const vizControls = initGHZVisualization('ghz-visualization');
             
-            document.getElementById('reset-ghz-view').addEventListener('click', () => {
-                vizControls.resetView();
-            });
-        }
-    });
-</script>
+            if (vizControls) {
+                document.getElementById('toggle-ghz-animation').addEventListener('click', () => {
+                    vizControls.toggleAnimation();
+                    const btn = document.getElementById('toggle-ghz-animation');
+                    btn.textContent = btn.textContent === 'Pause' ? 'Play' : 'Pause';
+                });
+                
+                document.getElementById('reset-ghz-view').addEventListener('click', () => {
+                    vizControls.resetView();
+                });
+            }
+        });
+    </script>
     
 <body>
     <nav>
@@ -306,6 +306,43 @@
         </div>
     </div>
 </div>
+
+        <!-- GHZ 12-Qubit Visualization -->
+    <div class="section white">
+        <div class="container">
+            <h2 class="section-title">🔮 Interactive GHZ Entanglement Visualization</h2>
+            <p class="section-subtitle">
+                Explore the 12-qubit GHZ entangled state in 3D. All 12 qubits are maximally entangled, 
+                creating a quantum state where measuring one qubit instantly determines the state of all others.
+            </p>
+            
+            <!-- THIS DIV IS WHERE THE 3D VISUALIZATION RENDERS -->
+            <div id="ghz-visualization" class="visualization-container" style="height: 600px;"></div>
+            
+            <div class="visualization-controls">
+                <button id="toggle-ghz-animation" class="viz-button">Pause</button>
+                <button id="reset-ghz-view" class="viz-button">Reset View</button>
+                <div class="viz-stat">
+                    <span>Qubits:</span>
+                    <strong>12</strong>
+                </div>
+                <div class="viz-stat">
+                    <span>Connections:</span>
+                    <strong>66</strong>
+                </div>
+                <div class="viz-stat">
+                    <span>Fidelity:</span>
+                    <strong>69%</strong>
+                </div>
+            </div>
+            
+            <div class="visualization-info">
+                <p><strong>State:</strong> |GHZ₁₂⟩ = (|000000000000⟩ + |111111111111⟩) / √2</p>
+                <p><strong>Hardware:</strong> IBM Quantum ibm_fez (156 qubits)</p>
+                <p><strong>Job ID:</strong> <a href="https://quantum.ibm.com/jobs/d5gs5mkpe0pc73alki40" target="_blank" style="color: #667eea;">d5gs5mkpe0pc73alki40</a></p>
+            </div>
+        </div>
+    </div>
 
     <!-- Research Papers -->
     <div class="section" id="research-papers">
