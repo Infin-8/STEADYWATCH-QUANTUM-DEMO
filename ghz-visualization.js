@@ -3,6 +3,7 @@
 // ============================================
 class EavesdropperDetector {
     constructor(scene, qubits, camera, renderer, connections) {
+        console.log('🔍 EavesdropperDetector: Constructor called');
         this.scene = scene;
         this.qubits = qubits;
         this.camera = camera;
@@ -12,6 +13,9 @@ class EavesdropperDetector {
         this.isFiring = false;
         this.detectionCount = 0;
         this.originalQubitStates = [];
+        
+        console.log('🔍 Qubits count:', this.qubits.length);
+        console.log('🔍 Connections count:', this.connections.length);
         
         // Store original qubit states for reset
         this.qubits.forEach(qubit => {
@@ -26,6 +30,7 @@ class EavesdropperDetector {
     }
     
     setupLaser() {
+        console.log('🔍 Setting up laser...');
         const laserGeometry = new THREE.BufferGeometry();
         const laserMaterial = new THREE.LineBasicMaterial({
             color: 0xff4757,
@@ -42,34 +47,60 @@ class EavesdropperDetector {
         this.laserBeam = new THREE.Line(laserGeometry, laserMaterial);
         this.laserBeam.visible = false;
         this.scene.add(this.laserBeam);
+        console.log('🔍 Laser beam created and added to scene');
     }
     
     setupButton() {
+        console.log('🔍 Setting up button...');
         const btn = document.getElementById('eavesdropperBtn');
-        if (!btn) return;
+        console.log('🔍 Button element:', btn);
         
-        btn.addEventListener('click', () => {
-            if (this.isFiring) return;
+        if (!btn) {
+            console.error('❌ Button with id "eavesdropperBtn" not found!');
+            console.log('💡 Make sure you have this in your HTML:');
+            console.log('   <button id="eavesdropperBtn" class="control-btn eavesdropper-btn">🔍 Fire Eavesdropper Laser</button>');
+            return;
+        }
+        
+        console.log('✅ Button found!');
+        btn.addEventListener('click', (e) => {
+            console.log('🔍 Button clicked!', e);
+            if (this.isFiring) {
+                console.log('⚠️ Already firing, ignoring click');
+                return;
+            }
+            console.log('🔍 Calling fireLaser()...');
             this.fireLaser();
         });
+        console.log('✅ Event listener attached');
     }
     
     fireLaser() {
-        if (this.isFiring) return;
+        console.log('🔍 fireLaser() called');
+        if (this.isFiring) {
+            console.log('⚠️ Already firing');
+            return;
+        }
         this.isFiring = true;
+        console.log('🔍 isFiring set to true');
         
         const btn = document.getElementById('eavesdropperBtn');
         const statusDiv = document.getElementById('detectionStatus');
         
-        if (btn) btn.disabled = true;
+        if (btn) {
+            btn.disabled = true;
+            console.log('🔍 Button disabled');
+        }
         
         const targetQubitIndex = Math.floor(Math.random() * this.qubits.length);
         const targetQubit = this.qubits[targetQubitIndex];
+        console.log('🔍 Target qubit index:', targetQubitIndex);
         
         const targetPosition = targetQubit.position.clone();
         this.laserBeam.position.copy(targetPosition);
         this.laserBeam.position.y = -10;
         this.laserBeam.visible = true;
+        console.log('🔍 Laser beam positioned and made visible');
         
         const startY = -10;
         const endY = targetPosition.y;
@@ -89,6 +120,7 @@ class EavesdropperDetector {
             if (progress < 1) {
                 requestAnimationFrame(animateLaser);
             } else {
+                console.log('🔍 Laser reached target, detecting eavesdropper...');
                 this.detectEavesdropper(targetQubit, targetQubitIndex);
             }
         };
@@ -97,6 +129,7 @@ class EavesdropperDetector {
     }
     
     detectEavesdropper(targetQubit, qubitIndex) {
+        console.log('🔍 detectEavesdropper() called');
         const statusDiv = document.getElementById('detectionStatus');
         
         this.laserBeam.visible = false;
@@ -104,10 +137,13 @@ class EavesdropperDetector {
         if (statusDiv) {
             statusDiv.textContent = '🚨 EAVESDROPPER DETECTED! 🚨';
             statusDiv.className = 'detection-status show detected';
+            console.log('🔍 Detection status updated');
             
             setTimeout(() => {
                 statusDiv.className = 'detection-status';
             }, 2000);
+        } else {
+            console.warn('⚠️ Detection status div not found');
         }
         
         // Visualize state collapse - all qubits turn red and stop animating
@@ -119,21 +155,25 @@ class EavesdropperDetector {
                 qubit.userData.rotationSpeed = 0;
             }
         });
+        console.log('🔍 All qubits turned red');
         
         // Flash all connections red
         this.connections.forEach(connection => {
             connection.material.color.setHex(0xff4757);
             connection.material.opacity = 1;
         });
+        console.log('🔍 All connections turned red');
         
         this.detectionCount++;
         
         setTimeout(() => {
+            console.log('🔍 Resetting state...');
             this.resetState();
         }, 3000);
     }
     
     resetState() {
+        console.log('🔍 resetState() called');
         const btn = document.getElementById('eavesdropperBtn');
         
         // Reset qubit colors
@@ -155,8 +195,9 @@ class EavesdropperDetector {
         
         if (btn) btn.disabled = false;
         this.isFiring = false;
+        console.log('🔍 State reset complete');
     }
-};
+}
 
 
 
@@ -320,8 +361,15 @@ function initGHZVisualization(containerId) {
     // ============================================
     // INITIALIZE EAVESDROPPER DETECTION
     // ============================================
+    console.log('🔍 Initializing eavesdropper detector...');
+    console.log('🔍 Scene:', scene);
+    console.log('🔍 Qubits:', qubits);
+    console.log('🔍 Connections:', connections);
+    
     let eavesdropperDetector;
     eavesdropperDetector = new EavesdropperDetector(scene, qubits, camera, renderer, connections);
+    
+    console.log('🔍 Eavesdropper detector initialized:', eavesdropperDetector);
     // ============================================
 
     // Start animation
