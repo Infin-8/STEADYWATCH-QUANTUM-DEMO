@@ -843,6 +843,14 @@ footer a {
 
 /* Extra Small Devices (phones, < 480px) */
 
+/* Hide comparison link on all mobile screens */
+@media (max-width: 768px) {
+    .nav-links .comparison-link,
+    .nav-links li:has(a[href*="comparison.html"]) {
+        display: none;
+    }
+}
+
 @media (max-width: 768px) {
     .comparison-viz-container {
         height: 900px;
