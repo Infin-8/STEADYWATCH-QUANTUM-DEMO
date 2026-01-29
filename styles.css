@@ -836,6 +836,82 @@ footer a {
     font-weight: 600;
 }
 
+/* Eavesdropper Detection Styles */
+.eavesdropper-btn {
+    background: linear-gradient(135deg, #ff6b6b, #ee5a6f);
+    color: white;
+    border: 2px solid #ff4757;
+    box-shadow: 0 4px 15px rgba(255, 71, 87, 0.4);
+    animation: pulse-danger 2s infinite;
+}
+
+.eavesdropper-btn:hover {
+    background: linear-gradient(135deg, #ff4757, #c44569);
+    box-shadow: 0 6px 20px rgba(255, 71, 87, 0.6);
+    transform: translateY(-2px);
+}
+
+.eavesdropper-btn:active {
+    transform: translateY(0);
+}
+
+.eavesdropper-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    animation: none;
+}
+
+@keyframes pulse-danger {
+    0%, 100% { box-shadow: 0 4px 15px rgba(255, 71, 87, 0.4); }
+    50% { box-shadow: 0 4px 25px rgba(255, 71, 87, 0.8); }
+}
+
+.detection-status {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 2em;
+    font-weight: bold;
+    color: #ff4757;
+    text-shadow: 0 0 20px rgba(255, 71, 87, 1);
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.3s;
+    z-index: 1000;
+}
+
+.detection-status.show {
+    opacity: 1;
+}
+
+.detection-status.detected {
+    color: #ff4757;
+    animation: detection-pulse 1s ease-out;
+}
+
+@keyframes detection-pulse {
+    0% { transform: translate(-50%, -50%) scale(0.5); opacity: 0; }
+    50% { transform: translate(-50%, -50%) scale(1.2); opacity: 1; }
+    100% { transform: translate(-50%, -50%) scale(1); opacity: 0; }
+}
+
+/* Laser beam effect */
+.laser-beam {
+    position: absolute;
+    width: 4px;
+    background: linear-gradient(to bottom, #ff4757, #ff6b6b, transparent);
+    box-shadow: 0 0 10px #ff4757, 0 0 20px #ff4757, 0 0 30px #ff4757;
+    pointer-events: none;
+    z-index: 999;
+    opacity: 0;
+    transition: opacity 0.1s;
+}
+
+.laser-beam.active {
+    opacity: 1;
+}
+
 
 /* ============================================
    MEDIA QUERIES
