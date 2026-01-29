@@ -49,8 +49,8 @@
                 Explore how our hybrid information-theoretic + computational system compares to NIST Post-Quantum Cryptography standards
             </p>
             
-            <div id="nist-comparison-viz" class="comparison-viz-container" style="min-height: 700px; border: 2px dashed #ccc;">
-            
+            <!-- CONTAINER MUST EXIST BEFORE SCRIPTS -->
+            <div id="nist-comparison-viz" class="comparison-viz-container"></div>
         </div>
     </div>
 
@@ -58,9 +58,6 @@
     <div class="section">
         <div class="container">
             <h2 class="section-title">📊 Detailed Comparison</h2>
-
-    <!-- Chart will appear here -->
-            </div>
             
             <div class="comparison-table-wrapper">
                 <table class="comparison-table">
@@ -212,14 +209,43 @@
         </div>
     </footer>
 
-    <!-- D3.js Library -->
+    <!-- CRITICAL: Scripts MUST be at the end, in this exact order -->
+    <!-- Step 1: Load D3.js FIRST -->
     <script src="https://d3js.org/d3.v7.min.js"></script>
     
-    <!-- NIST Comparison Visualization -->
+    <!-- Step 2: Load your visualization script AFTER D3 -->
     <script src="nist-comparison-viz.js"></script>
+    
+    <!-- Step 3: Initialize AFTER both scripts are loaded -->
     <script>
+        // Wait for DOM and D3 to be ready
         document.addEventListener('DOMContentLoaded', function() {
-            initNISTComparison('nist-comparison-viz');
+            // Double-check D3 is loaded
+            if (typeof d3 === 'undefined') {
+                console.error('D3.js failed to load!');
+                document.getElementById('nist-comparison-viz').innerHTML = 
+                    '<p style="color: red; padding: 20px; text-align: center;">Error: D3.js library failed to load. Please check your internet connection.</p>';
+                return;
+            }
+            
+            // Double-check function exists
+            if (typeof initNISTComparison === 'undefined') {
+                console.error('initNISTComparison function not found! Check if nist-comparison-viz.js loaded correctly.');
+                document.getElementById('nist-comparison-viz').innerHTML = 
+                    '<p style="color: red; padding: 20px; text-align: center;">Error: Visualization script not loaded. Check if nist-comparison-viz.js exists.</p>';
+                return;
+            }
+            
+            // Initialize visualization
+            console.log('Initializing NIST comparison visualization...');
+            try {
+                initNISTComparison('nist-comparison-viz');
+                console.log('Visualization initialized successfully!');
+            } catch (error) {
+                console.error('Error initializing visualization:', error);
+                document.getElementById('nist-comparison-viz').innerHTML = 
+                    '<p style="color: red; padding: 20px; text-align: center;">Error: ' + error.message + '</p>';
+            }
         });
     </script>
 </body>
