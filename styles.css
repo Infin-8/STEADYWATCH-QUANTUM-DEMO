@@ -742,12 +742,12 @@ footer a {
 }
 
 .visualization-controls {
-    position: absolute;
+    position: fixed; /* Changed from absolute to fixed */
     bottom: 20px;
     left: 50%;
     transform: translateX(-50%);
-    z-index: 10;
-    background: rgba(0, 0, 0, 0.7);
+    z-index: 1000; /* Higher z-index to ensure it's on top */
+    background: rgba(0, 0, 0, 0.8);
     padding: 12px 20px;
     border-radius: 25px;
     backdrop-filter: blur(10px);
@@ -756,6 +756,7 @@ footer a {
     align-items: center;
     flex-wrap: wrap;
     justify-content: center;
+    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.5); /* Added shadow for better visibility */
 }
 
 .viz-button {
