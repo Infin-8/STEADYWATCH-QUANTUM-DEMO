@@ -8,6 +8,32 @@
     <link rel="stylesheet" href="styles.css"></link>
     <script src="app.js" defer></script>
 </head>
+
+    <!-- Three.js Library -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+
+<!-- GHZ Visualization -->
+<script src="ghz-visualization.js"></script>
+<script>
+    // Initialize visualization when page loads
+    document.addEventListener('DOMContentLoaded', function() {
+        const vizControls = initGHZVisualization('ghz-visualization');
+        
+        if (vizControls) {
+            document.getElementById('toggle-ghz-animation').addEventListener('click', () => {
+                vizControls.toggleAnimation();
+                const btn = document.getElementById('toggle-ghz-animation');
+                btn.textContent = btn.textContent === 'Pause' ? 'Play' : 'Pause';
+            });
+            
+            document.getElementById('reset-ghz-view').addEventListener('click', () => {
+                vizControls.resetView();
+            });
+        }
+    });
+</script>
+    
 <body>
     <nav>
         <div class="container">
