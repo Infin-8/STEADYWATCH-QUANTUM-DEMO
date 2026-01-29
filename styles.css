@@ -723,11 +723,140 @@ footer a {
     color: #667eea;
 }
 
+/* GHZ Visualization Styles */
+.visualization-container {
+    position: relative;
+    width: 100%;
+    height: 600px;
+    margin: 40px 0;
+    border-radius: 10px;
+    overflow: hidden;
+    box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+    background: linear-gradient(135deg, #0a0a1a 0%, #1a1a2e 100%);
+}
+
+.ghz-canvas {
+    width: 100%;
+    height: 100%;
+    position: relative;
+}
+
+.visualization-controls {
+    position: absolute;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 10;
+    background: rgba(0, 0, 0, 0.7);
+    padding: 12px 20px;
+    border-radius: 25px;
+    backdrop-filter: blur(10px);
+    display: flex;
+    gap: 15px;
+    align-items: center;
+    flex-wrap: wrap;
+    justify-content: center;
+}
+
+.viz-button {
+    background: rgba(102, 126, 234, 0.3);
+    border: 2px solid rgba(102, 126, 234, 0.5);
+    color: white;
+    padding: 8px 18px;
+    border-radius: 20px;
+    cursor: pointer;
+    font-size: 0.9em;
+    font-weight: 600;
+    transition: all 0.3s;
+    font-family: inherit;
+}
+
+.viz-button:hover {
+    background: rgba(102, 126, 234, 0.5);
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(102, 126, 234, 0.3);
+}
+
+.viz-stat {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 0.85em;
+    color: rgba(255, 255, 255, 0.9);
+}
+
+.viz-stat strong {
+    color: #fff;
+    font-weight: 700;
+}
+
+.visualization-info {
+    margin-top: 30px;
+    padding: 20px;
+    background: #f9f9f9;
+    border-radius: 10px;
+    border-left: 4px solid #667eea;
+}
+
+.visualization-info p {
+    margin: 8px 0;
+    color: #555;
+    font-size: 0.95em;
+}
+
+.visualization-info a {
+    color: #667eea;
+    text-decoration: none;
+}
+
+.visualization-info a:hover {
+    text-decoration: underline;
+}
+
 /* ============================================
    MEDIA QUERIES
    ============================================ */
 
 /* Extra Small Devices (phones, < 480px) */
+
+@media (max-width: 768px) {
+    .visualization-container {
+        height: 500px;
+    }
+    
+    .visualization-controls {
+        padding: 10px 15px;
+        gap: 10px;
+        bottom: 10px;
+    }
+    
+    .viz-button {
+        padding: 6px 14px;
+        font-size: 0.85em;
+    }
+    
+    .viz-stat {
+        font-size: 0.8em;
+    }
+}
+
+@media (max-width: 480px) {
+    .visualization-container {
+        height: 400px;
+    }
+    
+    .visualization-controls {
+        flex-direction: column;
+        gap: 8px;
+        padding: 10px;
+    }
+    
+    .viz-stat {
+        font-size: 0.75em;
+    }
+}
+
+
 @media (max-width: 479px) {
     .mobile-menu-toggle {
         display: block;
