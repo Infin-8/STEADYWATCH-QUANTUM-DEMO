@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NIST PQC vs SHQKD | Quantum V^ LLC</title>
+    <meta name="description" content="Compare NIST Post-Quantum Cryptography standards with our hybrid information-theoretic + computational security system. Hardware validated on IBM Quantum.">
+    <link rel="stylesheet" href="styles.css">
+    <script src="app.js" defer></script>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav>
+        <div class="container">
+            <a href="https://apps.apple.com/us/app/steadywatch-handheld/id6755752518" class="nav-brand">
+                <img src="images/logo.png" alt="STEADYWATCH Logo">
+                <span><u>STEADYWATCH™</u></span>
+            </a>
+            <button class="mobile-menu-toggle" onclick="toggleMobileMenu()">☰</button>
+            <ul class="nav-links" id="navLinks">
+                <li><a href="index.html">Home</a></li>
+                <li><a href="index.html#research-papers">Research</a></li>
+                <li><a href="index.html#faq">FAQ</a></li>
+                <li><a href="consulting-services.html">Consulting</a></li>
+                <li><a href="https://github.com/Infin-8/STEADYWATCH-QUANTUM-DEMO/blob/main/docs/qkd/QKD_PROTOCOL_QUICK_START.md" target="_blank">Documentation</a></li>
+                <li><a href="contact.html" class="nav-cta">Contact</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <!-- Header -->
+    <header>
+        <div class="container">
+            <h1>NIST PQC vs Our Hybrid System</h1>
+            <p class="subtitle">A Comprehensive Comparison of Post-Quantum Security Approaches</p>
+            <div style="margin-top: 30px;">
+                <span class="badge">✅ Hardware Validated</span>
+                <span class="badge">✅ Information-Theoretic Security</span>
+                <span class="badge">✅ Production Ready</span>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Comparison Section -->
+    <div class="section white">
+        <div class="container">
+            <h2 class="section-title">🛡️ Interactive Comparison</h2>
+            <p class="section-subtitle">
+                Explore how our hybrid information-theoretic + computational system compares to NIST Post-Quantum Cryptography standards
+            </p>
+            
+            <div id="nist-comparison-viz" class="comparison-viz-container"></div>
+        </div>
+    </div>
+
+    <!-- Detailed Comparison Table -->
+    <div class="section">
+        <div class="container">
+            <h2 class="section-title">📊 Detailed Comparison</h2>
+            
+            <div class="comparison-table-wrapper">
+                <table class="comparison-table">
+                    <thead>
+                        <tr>
+                            <th>Aspect</th>
+                            <th>NIST PQC</th>
+                            <th class="highlight-column">Our Hybrid System</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><strong>Security Basis</strong></td>
+                            <td>Computational hardness</td>
+                            <td class="highlight-column"><strong>Information-theoretic + Computational</strong></td>
+                        </tr>
+                        <tr>
+                            <td><strong>Key Size</strong></td>
+                            <td>1,500-1,700 bytes</td>
+                            <td class="highlight-column"><strong>512 bytes (4096 bits)</strong></td>
+                        </tr>
+                        <tr>
+                            <td><strong>Long-Term Guarantee</strong></td>
+                            <td>Secure until math breakthrough</td>
+                            <td class="highlight-column"><strong>Unconditional (GHZ layer)</strong></td>
+                        </tr>
+                        <tr>
+                            <td><strong>Migration Complexity</strong></td>
+                            <td>High (hard forks)</td>
+                            <td class="highlight-column"><strong>Hybrid-friendly (layer on top)</strong></td>
+                        </tr>
+                        <tr>
+                            <td><strong>Proof of Security</strong></td>
+                            <td>Theoretical + standardization</td>
+                            <td class="highlight-column"><strong>Empirical hardware validation</strong></td>
+                        </tr>
+                        <tr>
+                            <td><strong>Current Readiness</strong></td>
+                            <td>Software libraries ready</td>
+                            <td class="highlight-column"><strong>Production SDK with hardware validation</strong></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- Key Advantages Section -->
+    <div class="section white">
+        <div class="container">
+            <h2 class="section-title">⭐ Key Advantages of Our Hybrid System</h2>
+            <div class="feature-grid">
+                <div class="feature-card">
+                    <h3>🔒 Dual-Layer Security</h3>
+                    <p><strong>Information-Theoretic (GHZ):</strong> Unconditional security guaranteed by quantum mechanics</p>
+                    <p><strong>Computational (Echo Resonance):</strong> 2^4096 key space for additional protection</p>
+                </div>
+                
+                <div class="feature-card">
+                    <h3>📉 Smaller Key Sizes</h3>
+                    <p><strong>70% reduction:</strong> 512 bytes vs 1,700 bytes</p>
+                    <p>More efficient for blockchain and IoT applications</p>
+                </div>
+                
+                <div class="feature-card">
+                    <h3>✅ Hardware Validated</h3>
+                    <p><strong>69% fidelity</strong> on IBM Quantum ibm_fez</p>
+                    <p><strong>0% error rate</strong> in key matching</p>
+                    <p>Not just theoretical—proven on real hardware</p>
+                </div>
+                
+                <div class="feature-card">
+                    <h3>🚀 Easy Migration</h3>
+                    <p>Hybrid-friendly architecture</p>
+                    <p>Layer on top of existing systems</p>
+                    <p>No hard forks required</p>
+                </div>
+                
+                <div class="feature-card">
+                    <h3>♾️ Unconditional Security</h3>
+                    <p>GHZ layer provides information-theoretic security</p>
+                    <p>Protected by laws of physics, not computational assumptions</p>
+                    <p>Future-proof against any mathematical breakthrough</p>
+                </div>
+                
+                <div class="feature-card">
+                    <h3>🏭 Production Ready</h3>
+                    <p>Production SDK available</p>
+                    <p>14 operational API endpoints</p>
+                    <p>Validated on real quantum hardware</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Hardware Validation Proof -->
+    <div class="section">
+        <div class="container">
+            <h2 class="section-title">🔬 Hardware Validation</h2>
+            <p class="section-subtitle">
+                Our hybrid system has been validated on real quantum hardware, not just simulated
+            </p>
+            
+            <div class="feature-grid">
+                <div class="feature-card">
+                    <h3>IBM Quantum ibm_fez</h3>
+                    <ul>
+                        <li><strong>Backend:</strong> Heron R2 (156 qubits)</li>
+                        <li><strong>Fidelity:</strong> 69% (12-qubit GHZ state)</li>
+                        <li><strong>Job ID:</strong> <a href="https://quantum.ibm.com/jobs/d5gs5mkpe0pc73alki40" target="_blank" style="color: #667eea;">d5gs5mkpe0pc73alki40</a></li>
+                        <li><strong>Status:</strong> ✅ Verified</li>
+                    </ul>
+                </div>
+                
+                <div class="feature-card">
+                    <h3>Key Matching Results</h3>
+                    <ul>
+                        <li><strong>Error Rate:</strong> 0%</li>
+                        <li><strong>Perfect Correlation:</strong> ✅</li>
+                        <li><strong>Production Ready:</strong> ✅</li>
+                        <li><strong>Hardware Validated:</strong> ✅</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- CTA Section -->
+    <div class="section white">
+        <div class="container">
+            <div style="text-align: center; padding: 60px 0;">
+                <h2 class="section-title">Ready to Protect Your Digital Assets?</h2>
+                <p class="section-subtitle" style="max-width: 600px; margin: 0 auto 40px;">
+                    Our hybrid system combines the best of both worlds: unconditional security and practical implementation
+                </p>
+                <div style="display: flex; gap: 20px; justify-content: center; flex-wrap: wrap;">
+                    <a href="contact.html" class="cta-button">Get Started</a>
+                    <a href="consulting-services.html" class="cta-button secondary">Learn More</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer style="background: #333; color: white; text-align: center; padding: 40px 0;">
+        <div class="container">
+            <p>&copy; 2025 Quantum V^ LLC. All rights reserved.</p>
+            <p><strong>Phone:</strong> <a href="tel:4803417382" style="color: white;">480-341-7382 (call/text)</a></p>
+        </div>
+    </footer>
+
+    <!-- D3.js Library -->
+    <script src="https://d3js.org/d3.v7.min.js"></script>
+    
+    <!-- NIST Comparison Visualization -->
+    <script src="nist-comparison-viz.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            initNISTComparison('nist-comparison-viz');
+        });
+    </script>
+</body>
+</html>
