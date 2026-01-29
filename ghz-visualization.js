@@ -155,6 +155,7 @@ class EavesdropperDetector {
     }
 }
 
+
 // ============================================
 // END EAVESDROPPER DETECTION SYSTEM
 // ============================================
@@ -318,18 +319,6 @@ function initGHZVisualization(containerId) {
     let animationRunning = true;
     let time = 0;
 
-    // Initial connection update
-    updateConnections();
-
-    // ============================================
-    // INITIALIZE EAVESDROPPER DETECTION
-    // ============================================
-    let eavesdropperDetector;
-    eavesdropperDetector = new EavesdropperDetector(scene, qubits, camera, renderer, connections);
-    // ============================================
-
-    // Start animation
-    animate();
     
     function animate() {
         requestAnimationFrame(animate);
