@@ -20,12 +20,12 @@
         document.addEventListener('DOMContentLoaded', function() {
             const vizControls = initGHZVisualization('ghz-visualization');
             
-            // if (vizControls) {
-            //     document.getElementById('toggle-ghz-animation').addEventListener('click', () => {
-            //         vizControls.toggleAnimation();
-            //         const btn = document.getElementById('toggle-ghz-animation');
-            //         btn.textContent = btn.textContent === 'Pause' ? 'Play' : 'Pause';
-            //     });
+            if (vizControls) {
+                document.getElementById('toggle-ghz-animation').addEventListener('click', () => {
+                    vizControls.toggleAnimation();
+                    const btn = document.getElementById('toggle-ghz-animation');
+                    btn.textContent = btn.textContent === 'Pause' ? 'Play' : 'Pause';
+                });
                 
                 document.getElementById('reset-ghz-view').addEventListener('click', () => {
                     vizControls.resetView();
