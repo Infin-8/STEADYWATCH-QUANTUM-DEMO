@@ -107,7 +107,125 @@ class UnifiedQubitStyling {
         const alpha = Math.min(1.0, deltaTime / timeConstant);
         return alpha * rawNoise + (1.0 - alpha) * previousSmoothed;
     }
+
+    // ============================================
+    // ECHO BILATERAL SHADOWING (45-degree light)
+    // ============================================
+
+        calculateLightingFactor(rotationAngle) {
+        // Cosine-based lighting (from SteadyWatch)
+        // Cosine(0°) = 1.0 (facing user): maximum glow, shadow, sharpness
+        // Cosine(180°) = -1.0 (away from user): minimum glow, shadow, sharpness
+        // Normalize cosine from [-1, 1] to [0, 1] for lighting factor
+        return (Math.cos(rotationAngle) + 1.0) / 2.0;
+    }
+
+        calculateBilateralShadowOffset(waveYOffset, lightAngleDegrees = 45.0) {
+        // Bilateral shadow calculation (from SteadyWatch)
+        // For 45°: tan(45°) = 1.0, so shadow extends equally in X and Y
+        const lightAngleRadians = lightAngleDegrees * Math.PI / 180.0;
+        return Math.abs(waveYOffset) * Math.tan(lightAngleRadians);
+    }
+
+    // ============================================
+    // TESLA 3-6-9 PATTERN APPLICATION
+    // ============================================
+
+        applyTeslaPattern(value, qubitIndex) {
+        // Tesla 3-6-9 pattern: Apply harmonic multipliers based on qubit index
+        const teslaGroup = qubitIndex % 3;
+        let multiplier = this.teslaMultipliers.base;
+        
+        if (teslaGroup === 0) {
+            // Group 0: Base frequency (3, 6, 9, 12)
+            multiplier = this.teslaMultipliers.base;
+        } else if (teslaGroup === 1) {
+            // Group 1: 1/3 harmonic (1, 4, 7, 10)
+            multiplier = this.teslaMultipliers.harmonic3;
+        } else {
+            // Group 2: 1/6 harmonic (2, 5, 8, 11)
+            multiplier = this.teslaMultipliers.harmonic6;
+        }
+        
+        return value * multiplier;
+    }
+
+    // ============================================
+    // UNIFIED STYLING CALCULATION
+    // All qubits share the same math
+    // ============================================
+
+        calculateUnifiedStyle(qubitIndex, time, rotationAngle, basePosition) {
+        // 1. Generate Perlin noise (organic variation)
+        const noiseFrequency = 0.25; // 4 second cycle (from SteadyWatch)
+        const rawNoise = this.generateNoise(time, noiseFrequency);
+        
+        // 2. Smooth noise with time-based exponential smoothing
+        const currentTime = time;
+        const lastUpdate = this.noiseState.lastNoiseUpdateTime || currentTime;
+        const smoothedNoise = this.smoothNoiseWithTime(
+            rawNoise,
+            currentTime,
+            lastUpdate,
+            this.noiseState.smoothedNoiseValue,
+            this.noiseState.noiseSmoothingTimeConstant
+        );
+        this.noiseState.smoothedNoiseValue = smoothedNoise;
+        this.noiseState.lastNoiseUpdateTime = currentTime;
+        
+        // 3. Apply noise factor (±5% variation from SteadyWatch)
+        const noiseFactor = 1.0 + (smoothedNoise * 0.05);
+        
+        // 4. Calculate lighting factor (rotation-based)
+        const lightingFactor = this.calculateLightingFactor(rotationAngle);
+        
+        // 5. Calculate ECHO shadow parameters
+        const waveYOffset = basePosition.y; // Use qubit's Y position as wave offset
+        const bilateralShadowXOffset = this.calculateBilateralShadowOffset(waveYOffset);
+        
+        // 6. Apply Tesla pattern to frequency/phase
+        const teslaPhase = this.applyTeslaPattern(rotationAngle, qubitIndex);
+        
+        // 7. Calculate unified glow intensity (from SteadyWatch formula)
+        const glowIntensity = (this.shadowParams.baseGlowIntensity + 
+                              (lightingFactor * this.shadowParams.glowIntensityRange)) * noiseFactor;
+        
+        // 8. Calculate unified shadow radius
+        const shadowRadius = ((this.shadowParams.baseShadowRadius + 
+                              (lightingFactor * this.shadowParams.shadowRadiusRange)) * 
+                              this.shadowParams.shadowTightnessFactor || 1.0) * noiseFactor;
+        
+        // 9. Calculate unified shadow intensity
+        const shadowIntensity = (this.shadowParams.baseShadowIntensity + 
+                               (lightingFactor * this.shadowParams.shadowIntensityRange)) * noiseFactor;
+        
+        // 10. Calculate blur radius (inverted relationship)
+        const blurRadius = (0.3 + ((1.0 - lightingFactor) * 0.9)) / noiseFactor;
+        
+        // Return unified style object
+        return {
+            // Perlin noise values
+            noiseFactor: noiseFactor,
+            smoothedNoise: smoothedNoise,
+            
+            // ECHO shadowing
+            glowIntensity: Math.max(0.12, Math.min(0.3, glowIntensity)),
+            shadowRadius: Math.max(1.5, Math.min(5.0, shadowRadius)),
+            shadowIntensity: Math.max(0.5, Math.min(0.85, shadowIntensity)),
+            blurRadius: Math.max(0.3, Math.min(1.2, blurRadius)),
+            bilateralShadowXOffset: bilateralShadowXOffset,
+            
+            // Lighting
+            lightingFactor: lightingFactor,
+            
+            // Tesla pattern
+            teslaPhase: teslaPhase,
+            teslaMultiplier: this.applyTeslaPattern(1.0, qubitIndex)
+        };
+    }
+
     
+}
     
 } // end unified styling;
     
