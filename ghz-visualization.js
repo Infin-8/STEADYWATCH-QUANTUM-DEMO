@@ -223,11 +223,7 @@ class UnifiedQubitStyling {
             teslaMultiplier: this.applyTeslaPattern(1.0, qubitIndex)
         };
     }
-
-    
-}
-    
-} // end unified styling;
+} // end QUBIT styling;
     
 
 
