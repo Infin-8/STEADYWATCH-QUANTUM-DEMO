@@ -586,16 +586,6 @@ const unifiedStyling = new UnifiedQubitStyling();
                 const basePos = qubit.userData.basePosition;
                 const phase = (index / qubitCount) * Math.PI * 2;
                 const amplitude = 0.3;
-                
-                // Spherical oscillation - maintain spherical shape while animating
-                const radialOffset = Math.sin(time + phase) * amplitude;
-                const thetaOffset = Math.cos(time * 1.5 + phase) * amplitude;
-                const phiOffset = Math.sin(time * 0.8 + phase) * amplitude;
-                
-                // Apply offsets while maintaining spherical structure
-                // qubit.position.x = basePos.x + radialOffset * Math.cos(phase);
-                // qubit.position.y = basePos.y + thetaOffset;
-                // qubit.position.z = basePos.z + radialOffset * Math.sin(phase);
 
                 // Pulse effect
                 const scale = 1 + Math.sin(time * 2 + phase) * 0.1;
@@ -616,6 +606,7 @@ const unifiedStyling = new UnifiedQubitStyling();
                 // Original oscillation (keep it simple)
                 const radialOffset = Math.sin(time + phase) * amplitude;
                 const thetaOffset = Math.cos(time * 1.5 + phase) * amplitude;
+                const phiOffset = Math.sin(time * 0.8 + phase) * amplitude;
                 
                 qubit.position.x = basePos.x + radialOffset * Math.cos(phase);
                 qubit.position.y = basePos.y + thetaOffset;
