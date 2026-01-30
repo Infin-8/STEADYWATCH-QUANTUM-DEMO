@@ -32,6 +32,82 @@ class UnifiedQubitStyling {
         };
     }
 
+    // ============================================
+    // PERLIN NOISE (from SteadyWatch AtomicClockView.swift)
+    // ============================================
+
+        hash(x) {
+        // Simple hash function for pseudo-random gradients
+        const wrapped = x % 2147483647; // Large prime
+        let hash = Math.abs(wrapped);
+        hash = ((hash * 1103515245) + 12345) & 0x7fffffff;
+        hash = ((hash * 1103515245) + 12345) & 0x7fffffff;
+        // Convert to range [-1.0, 1.0]
+        return (hash % 2000000000) / 1000000000.0 - 1.0;
+    }
+
+        smoothstep(t) {
+        // 5th order polynomial smoothstep (from SteadyWatch)
+        const clamped = Math.max(0.0, Math.min(1.0, t));
+        // 6t^5 - 15t^4 + 10t^3
+        return clamped * clamped * clamped * (clamped * (clamped * 6.0 - 15.0) + 10.0);
+    }
+
+        lerp(a, b, t) {
+        return a + (b - a) * t;
+    }
+
+        gradient(x, t) {
+        const grad = this.hash(x);
+        const dist = t - x;
+        return grad * dist;
+    }
+
+     perlin1D(x) {
+        // Handle large values by wrapping
+        const wrappedX = x % 1000000.0;
+        
+        // Find grid points
+        const x0 = Math.floor(wrappedX);
+        const x1 = x0 + 1;
+        
+        // Calculate fractional part for interpolation
+        const fx = wrappedX - x0;
+        
+        // Get gradients at grid points
+        const g0 = this.gradient(x0, wrappedX);
+        const g1 = this.gradient(x1, wrappedX);
+        
+        // Smooth interpolation between gradients
+        const t = this.smoothstep(fx);
+        return this.lerp(g0, g1, t);
+    }
+
+        generateNoise(time, frequency = 1.0) {
+        // Multiple octaves for organic, natural variation (from SteadyWatch)
+        // Base octave: Primary variation (slow, large-scale)
+        const baseOctave = this.perlin1D(time * frequency * 0.5) * 0.6;
+        
+        // Detail octave: Fine detail (medium frequency)
+        const detailOctave = this.perlin1D(time * frequency * 2.0) * 0.25;
+        
+        // Micro octave: Subtle texture (high frequency)
+        const microOctave = this.perlin1D(time * frequency * 4.0) * 0.15;
+        
+        // Combine octaves for layered complexity
+        const combined = baseOctave + detailOctave + microOctave;
+        
+        // Clamp to ±1.0 range
+        return Math.max(-1.0, Math.min(1.0, combined));
+    }
+
+        smoothNoiseWithTime(rawNoise, currentTime, lastUpdateTime, previousSmoothed, timeConstant) {
+        // Time-based exponential smoothing (from SteadyWatch)
+        const deltaTime = currentTime - lastUpdateTime;
+        const alpha = Math.min(1.0, deltaTime / timeConstant);
+        return alpha * rawNoise + (1.0 - alpha) * previousSmoothed;
+    }
+    
     
 } // end unified styling;
     
