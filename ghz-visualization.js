@@ -659,13 +659,6 @@ const unifiedStyling = new UnifiedQubitStyling();
     renderer.render(scene, camera);
 }
 
-        updateConnections();
-    }
-
-    controls.update();
-    renderer.render(scene, camera);
-}
-
     // Handle window resize
     function handleResize() {
         const newWidth = container.clientWidth;
