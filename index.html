@@ -32,6 +32,22 @@
                 });
             }
         });
+
+        // Keyboard shortcut for "P" to pause/play
+        document.addEventListener('keydown', (event) => {
+            // Check if "P" key is pressed (case-insensitive)
+            if (event.key.toLowerCase() === 'p') {
+                // Prevent default behavior
+                event.preventDefault();
+                // Toggle animation
+                vizControls.toggleAnimation();
+                // Update button text to match state
+                if (toggleBtn) {
+                    toggleBtn.textContent = toggleBtn.textContent === 'Pause' ? 'Play' : 'Pause';
+                }
+            }
+        });
+    }
     </script>
     
 <body>
