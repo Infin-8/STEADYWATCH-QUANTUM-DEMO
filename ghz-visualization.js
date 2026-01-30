@@ -620,10 +620,38 @@ const unifiedStyling = new UnifiedQubitStyling();
                 qubit.material.emissive.setHSL(emissiveHue, emissiveSaturation, emissiveLightness);
             });
             
-            // Animate connections
+  // Animate connections using unified styling
             connections.forEach((connection, index) => {
-                const opacity = 0.2 + Math.sin(time + index * 0.1) * 0.2;
-                connection.material.opacity = Math.max(0.1, opacity);
+                // Calculate unified style for this connection
+                // Use connection index and time for styling calculation
+                const phase = (index / connections.length) * Math.PI * 2;
+                const rotationAngle = time + phase;
+                
+                // Use average position of the two connected qubits as base position
+                const qubit1Index = connection.userData.qubit1;
+                const qubit2Index = connection.userData.qubit2;
+                const qubit1Pos = qubits[qubit1Index].position;
+                const qubit2Pos = qubits[qubit2Index].position;
+                const avgPosition = new THREE.Vector3(
+                    (qubit1Pos.x + qubit2Pos.x) / 2,
+                    (qubit1Pos.y + qubit2Pos.y) / 2,
+                    (qubit1Pos.z + qubit2Pos.z) / 2
+                );
+                
+                // Calculate unified style
+                const style = unifiedStyling.calculateUnifiedStyle(index, time, rotationAngle, avgPosition);
+                
+                // Apply opacity using glow intensity (higher glow = more visible connection)
+                const baseOpacity = 0.2;
+                const opacityVariation = style.glowIntensity * 2.0; // Map glow [0.12-0.3] to opacity variation
+                const opacity = Math.max(0.1, Math.min(0.6, baseOpacity + opacityVariation));
+                connection.material.opacity = opacity;
+                
+                // Apply color variation based on lighting factor and Tesla pattern
+                const hue = (time * 0.05 + index * 0.05 + style.lightingFactor * 0.1) % 1;
+                const saturation = 0.7 * (0.8 + style.glowIntensity * 0.4);
+                const lightness = 0.5 * (0.9 + style.lightingFactor * 0.2);
+                connection.material.color.setHSL(hue, saturation, lightness);
             });
 
             updateConnections();
