@@ -574,8 +574,10 @@ const unifiedStyling = new UnifiedQubitStyling();
 
     let animationRunning = true;
     let time = 0;
+    const unifiedStyling = new UnifiedQubitStyling();
 
     function animate() {
+        
         requestAnimationFrame(animate);
         time += 0.02;
 
@@ -583,28 +585,41 @@ const unifiedStyling = new UnifiedQubitStyling();
             // Animate qubits with quantum state fluctuations
             // Keep them orbiting around their base positions in a spherical pattern
             qubits.forEach((qubit, index) => {
-                const basePos = qubit.userData.basePosition;
+                    const basePos = qubit.userData.basePosition;
                 const phase = (index / qubitCount) * Math.PI * 2;
-                const amplitude = 0.3;
+                const rotationAngle = time + phase;
                 
-                // Spherical oscillation - maintain spherical shape while animating
-                const radialOffset = Math.sin(time + phase) * amplitude;
-                const thetaOffset = Math.cos(time * 1.5 + phase) * amplitude;
-                const phiOffset = Math.sin(time * 0.8 + phase) * amplitude;
+                // Calculate unified style (Perlin Noise + ECHO Shadowing + Tesla Patterns)
+                const style = unifiedStyling.calculateUnifiedStyle(index, time, rotationAngle, basePos);
                 
-                // Apply offsets while maintaining spherical structure
-                qubit.position.x = basePos.x + radialOffset * Math.cos(phase);
+                // Apply position offsets using Tesla phase and noise factor
+                const amplitude = 0.3 * style.noiseFactor;
+                const radialOffset = Math.sin(style.teslaPhase) * amplitude;
+                const thetaOffset = Math.cos(style.teslaPhase * 1.5) * amplitude;
+                
+                // Apply bilateral shadow offset for ECHO shadowing effect
+                qubit.position.x = basePos.x + radialOffset * Math.cos(phase) + style.bilateralShadowXOffset * 0.1;
                 qubit.position.y = basePos.y + thetaOffset;
                 qubit.position.z = basePos.z + radialOffset * Math.sin(phase);
 
-                // Pulse effect
-                const scale = 1 + Math.sin(time * 2 + phase) * 0.1;
+                // Pulse effect using glow intensity (inverse relationship - higher glow = larger scale)
+                const baseScale = 1.0;
+                const scaleVariation = (style.glowIntensity - 0.15) * 2.0; // Map glow [0.12-0.3] to scale variation
+                const scale = baseScale + scaleVariation * 0.1;
                 qubit.scale.set(scale, scale, scale);
 
-                // Color variation based on quantum state
-                const hue = (time * 0.1 + index * 0.1) % 1;
-                qubit.material.color.setHSL(hue, 0.7, 0.6);
-                qubit.material.emissive.setHSL(hue, 0.7, 0.3);
+                // Color variation based on lighting factor and glow intensity
+                // Use lighting factor to modulate hue, glow intensity for saturation/lightness
+                const hue = (time * 0.1 + index * 0.1 + style.lightingFactor * 0.2) % 1;
+                const saturation = 0.7 * (0.8 + style.glowIntensity * 0.4); // 0.7 * [0.8-1.0]
+                const lightness = 0.6 * (0.9 + style.lightingFactor * 0.2); // 0.6 * [0.9-1.1]
+                qubit.material.color.setHSL(hue, saturation, lightness);
+                
+                // Emissive uses glow intensity directly
+                const emissiveHue = (time * 0.1 + index * 0.1) % 1;
+                const emissiveSaturation = 0.7;
+                const emissiveLightness = style.glowIntensity * 2.0; // Map glow [0.12-0.3] to emissive [0.24-0.6]
+                qubit.material.emissive.setHSL(emissiveHue, emissiveSaturation, emissiveLightness);
             });
             
             // Animate connections
