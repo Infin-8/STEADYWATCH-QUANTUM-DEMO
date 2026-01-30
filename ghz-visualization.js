@@ -420,8 +420,6 @@ function initGHZVisualization(containerId) {
 // Create unified styling instance (shared across all qubits)
 
 const unifiedStyling = new UnifiedQubitStyling();
-// end VISUAL REFACTOR 
-    console.log("unified styling" , unifiedStyling)
 
     const container = document.getElementById(containerId);
     if (!container) return;
