@@ -12,7 +12,7 @@ class UnifiedQubitStyling {
             noiseSmoothingTimeConstant: 0.5 // seconds
         };
         
-        // ECHO Shadowing parameters (45-degree light)
+        // ECHO Shadowing parameters
         this.shadowParams = {
             lightAngle: 45.0, // degrees
             baseGlowIntensity: 0.15,
@@ -223,14 +223,8 @@ class UnifiedQubitStyling {
             teslaMultiplier: this.applyTeslaPattern(1.0, qubitIndex)
         };
     }
-} // end QUBIT styling;
+} // end styling class;
     
-
-
-
-
-
-
 // ============================================
 // EAVESDROPPER DETECTION SYSTEM
 // ============================================
