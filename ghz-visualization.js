@@ -415,8 +415,6 @@ function initGHZVisualization(containerId) {
 // INTEGRATION INTO GHZ VISUALIZATION
 // ============================================
 
-// Add this to your initGHZVisualization function, after creating qubits:
-
 // Create unified styling instance (shared across all qubits)
 
 const unifiedStyling = new UnifiedQubitStyling();
