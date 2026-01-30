@@ -1,4 +1,47 @@
 // ============================================
+// UNIFIED STYLING SYSTEM
+// Shared math for all qubits - Perlin Noise + ECHO Shadowing + Tesla Patterns
+// ============================================
+
+class UnifiedQubitStyling {
+    constructor() {
+        // Perlin Noise state (from SteadyWatch)
+        this.noiseState = {
+            lastNoiseUpdateTime: 0,
+            smoothedNoiseValue: 0,
+            noiseSmoothingTimeConstant: 0.5 // seconds
+        };
+        
+        // ECHO Shadowing parameters (45-degree light)
+        this.shadowParams = {
+            lightAngle: 45.0, // degrees
+            baseGlowIntensity: 0.15,
+            glowIntensityRange: 0.12,
+            baseShadowRadius: 2.0,
+            shadowRadiusRange: 2.0,
+            baseShadowIntensity: 0.55,
+            shadowIntensityRange: 0.25
+        };
+        
+        // Tesla 3-6-9 pattern multipliers
+        this.teslaMultipliers = {
+            base: 1.0,
+            harmonic3: 1.0 / 3.0,
+            harmonic6: 1.0 / 6.0,
+            harmonic9: 1.0 / 9.0
+        };
+    }
+
+    
+} // end unified styling;
+    
+
+
+
+
+
+
+// ============================================
 // EAVESDROPPER DETECTION SYSTEM
 // ============================================
 class EavesdropperDetector {
