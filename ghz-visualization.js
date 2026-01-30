@@ -572,7 +572,7 @@ const unifiedStyling = new UnifiedQubitStyling();
 
     let animationRunning = true;
     let time = 0;
-    const unifiedStyling = new UnifiedQubitStyling();
+
 
     function animate() {
         
