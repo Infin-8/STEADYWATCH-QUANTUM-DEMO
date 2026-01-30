@@ -418,7 +418,10 @@ function initGHZVisualization(containerId) {
 // Add this to your initGHZVisualization function, after creating qubits:
 
 // Create unified styling instance (shared across all qubits)
+
 const unifiedStyling = new UnifiedQubitStyling();
+// end VISUAL REFACTOR 
+    
 
     const container = document.getElementById(containerId);
     if (!container) return;
@@ -580,28 +583,54 @@ const unifiedStyling = new UnifiedQubitStyling();
             // Animate qubits with quantum state fluctuations
             // Keep them orbiting around their base positions in a spherical pattern
             qubits.forEach((qubit, index) => {
-                const basePos = qubit.userData.basePosition;
-                const phase = (index / qubitCount) * Math.PI * 2;
-                const amplitude = 0.3;
-                
-                // Spherical oscillation - maintain spherical shape while animating
-                const radialOffset = Math.sin(time + phase) * amplitude;
-                const thetaOffset = Math.cos(time * 1.5 + phase) * amplitude;
-                const phiOffset = Math.sin(time * 0.8 + phase) * amplitude;
-                
-                // Apply offsets while maintaining spherical structure
-                qubit.position.x = basePos.x + radialOffset * Math.cos(phase);
-                qubit.position.y = basePos.y + thetaOffset;
-                qubit.position.z = basePos.z + radialOffset * Math.sin(phase);
-
-                // Pulse effect
-                const scale = 1 + Math.sin(time * 2 + phase) * 0.1;
-                qubit.scale.set(scale, scale, scale);
-
-                // Color variation based on quantum state
-                const hue = (time * 0.1 + index * 0.1) % 1;
-                qubit.material.color.setHSL(hue, 0.7, 0.6);
-                qubit.material.emissive.setHSL(hue, 0.7, 0.3);
+     const basePos = qubit.userData.basePosition;
+            const phase = (index / qubitCount) * Math.PI * 2;
+            const amplitude = 0.3;
+            
+            // Calculate rotation angle for lighting
+            const rotationAngle = time + phase;
+            
+            // Get unified style (same math for all qubits)
+            const style = unifiedStyling.calculateUnifiedStyle(
+                index,
+                time,
+                rotationAngle,
+                basePos
+            );
+            
+            // Apply Tesla pattern to oscillation
+            const teslaPhase = style.teslaPhase;
+            const radialOffset = Math.sin(time * style.teslaMultiplier + teslaPhase) * amplitude;
+            const thetaOffset = Math.cos(time * 1.5 * style.teslaMultiplier + teslaPhase) * amplitude;
+            const phiOffset = Math.sin(time * 0.8 * style.teslaMultiplier + teslaPhase) * amplitude;
+            
+            // Apply offsets while maintaining spherical structure
+            qubit.position.x = basePos.x + radialOffset * Math.cos(phase);
+            qubit.position.y = basePos.y + thetaOffset;
+            qubit.position.z = basePos.z + radialOffset * Math.sin(phase);
+            
+            // Apply unified glow intensity
+            const glowScale = 1 + Math.sin(time * 2 + phase) * 0.1 * style.glowIntensity;
+            qubit.scale.set(glowScale, glowScale, glowScale);
+            
+            // Apply unified color with Perlin noise variation
+            const hue = (time * 0.1 * style.teslaMultiplier + index * 0.1) % 1;
+            const saturation = 0.7 * (1.0 + style.noiseFactor * 0.1);
+            const lightness = 0.6 * style.glowIntensity;
+            
+            qubit.material.color.setHSL(hue, saturation, lightness);
+            qubit.material.emissive.setHSL(hue, 0.7, style.glowIntensity);
+            qubit.material.emissiveIntensity = style.glowIntensity;
+            
+            // Apply ECHO bilateral shadowing (if using custom shaders)
+            // For Three.js, we can simulate this with emissive intensity and opacity
+            qubit.material.opacity = 0.9 * (0.5 + style.lightingFactor * 0.5);
+            
+            // Update glow sphere if it exists
+            if (qubit.userData.glowSphere) {
+                qubit.userData.glowSphere.material.opacity = style.glowIntensity * 0.3;
+                qubit.userData.glowSphere.material.emissiveIntensity = style.glowIntensity;
+            }
             });
 
             // Animate connections
