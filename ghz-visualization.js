@@ -586,6 +586,16 @@ const unifiedStyling = new UnifiedQubitStyling();
                 const basePos = qubit.userData.basePosition;
                 const phase = (index / qubitCount) * Math.PI * 2;
                 const amplitude = 0.3;
+                
+                // Spherical oscillation - maintain spherical shape while animating
+                const radialOffset = Math.sin(time + phase) * amplitude;
+                const thetaOffset = Math.cos(time * 1.5 + phase) * amplitude;
+                const phiOffset = Math.sin(time * 0.8 + phase) * amplitude;
+                
+                // Apply offsets while maintaining spherical structure
+                qubit.position.x = basePos.x + radialOffset * Math.cos(phase);
+                qubit.position.y = basePos.y + thetaOffset;
+                qubit.position.z = basePos.z + radialOffset * Math.sin(phase);
 
                 // Pulse effect
                 const scale = 1 + Math.sin(time * 2 + phase) * 0.1;
@@ -595,36 +605,6 @@ const unifiedStyling = new UnifiedQubitStyling();
                 const hue = (time * 0.1 + index * 0.1) % 1;
                 qubit.material.color.setHSL(hue, 0.7, 0.6);
                 qubit.material.emissive.setHSL(hue, 0.7, 0.3);
-
-                const style = unifiedStyling.calculateUnifiedStyle(
-                    index,
-                    time,
-                    time + phase,
-                    basePos
-                );
-                
-                // Original oscillation (keep it simple)
-                const _radialOffset = Math.sin(time + phase) * amplitude;
-                const thetaOffset = Math.cos(time * 1.5 + phase) * amplitude;
-                const phiOffset = Math.sin(time * 0.8 + phase) * amplitude;
-                
-                qubit.position.x = basePos.x + _radialOffset * Math.cos(phase);
-                qubit.position.y = basePos.y + thetaOffset;
-                qubit.position.z = basePos.z + _radialOffset * Math.sin(phase);
-
-                // Apply unified styling to qubit appearance
-                const scale = 1 + Math.sin(time * 2 + phase) * 0.1;
-                qubit.scale.set(scale, scale, scale);
-
-                // Apply unified color with Perlin noise variation
-                const hue = (time * 0.1 * style.teslaMultiplier + index * 0.1) % 1;
-                const saturation = 0.7 * (1.0 + style.noiseFactor * 0.1);
-                const lightness = 0.6 * style.glowIntensity * 2; // Scale up for visibility
-                
-                qubit.material.color.setHSL(hue, saturation, lightness);
-                qubit.material.emissive.setHSL(hue, 0.7, style.glowIntensity);
-                qubit.material.emissiveIntensity = style.glowIntensity;
-                qubit.material.opacity = 0.9 * (0.5 + style.lightingFactor * 0.5);
             });
             
             // Animate connections
