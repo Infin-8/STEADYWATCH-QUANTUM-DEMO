@@ -12,7 +12,6 @@ class EavesdropperDetector {
         this.isFiring = false;
         this.detectionCount = 0;
         this.originalQubitStates = [];
-        
         // Store original qubit states for reset
         this.qubits.forEach(qubit => {
             this.originalQubitStates.push({
@@ -23,6 +22,8 @@ class EavesdropperDetector {
         
         this.setupLaser();
         this.setupButton();
+        this.setupKeyboard();
+        
     }
     
     setupLaser() {
@@ -56,6 +57,19 @@ class EavesdropperDetector {
             this.fireLaser();
         });
     }
+
+    setupKeyboard() {
+    // Add keyboard event listener for "F" key (easter egg / quick key)
+    document.addEventListener('keydown', (event) => {
+        // Check if "F" key is pressed (case-insensitive)
+        if (event.key.toLowerCase() === 'f' && !this.isFiring) {
+            // Prevent default behavior (like browser search)
+            event.preventDefault();
+            // Fire the eavesdropper detection
+            this.fireLaser();
+        }
+    });
+}
     
     fireLaser() {
         if (this.isFiring) return;
