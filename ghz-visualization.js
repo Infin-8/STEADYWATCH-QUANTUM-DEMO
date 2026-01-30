@@ -410,6 +410,16 @@ class EavesdropperDetector {
 // GHZ 12-QUBIT ENTANGLEMENT VISUALIZATION
 // ============================================
 function initGHZVisualization(containerId) {
+
+// ============================================
+// INTEGRATION INTO GHZ VISUALIZATION
+// ============================================
+
+// Add this to your initGHZVisualization function, after creating qubits:
+
+// Create unified styling instance (shared across all qubits)
+const unifiedStyling = new UnifiedQubitStyling();
+
     const container = document.getElementById(containerId);
     if (!container) return;
 
