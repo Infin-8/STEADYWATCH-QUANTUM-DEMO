@@ -583,7 +583,7 @@ const unifiedStyling = new UnifiedQubitStyling();
             // Animate qubits with quantum state fluctuations
             // Keep them orbiting around their base positions in a spherical pattern
             qubits.forEach((qubit, index) => {
-     const basePos = qubit.userData.basePosition;
+            const basePos = qubit.userData.basePosition;
             const phase = (index / qubitCount) * Math.PI * 2;
             const amplitude = 0.3;
             
@@ -632,19 +632,32 @@ const unifiedStyling = new UnifiedQubitStyling();
                 qubit.userData.glowSphere.material.emissiveIntensity = style.glowIntensity;
             }
             });
+            
+        // Animate connections with unified styling
+        connections.forEach((connection, index) => {
+            // Apply Perlin noise to connection opacity
+            const style = unifiedStyling.calculateUnifiedStyle(
+                index % qubitCount,
+                time,
+                time + index * 0.1,
+                new THREE.Vector3(0, 0, 0)
+            );
+            
+            const opacity = (0.2 + Math.sin(time + index * 0.1) * 0.2) * style.glowIntensity;
+            connection.material.opacity = Math.max(0.1, opacity);
+            connection.material.color.setHSL(
+                (time * 0.1) % 1,
+                0.7,
+                0.5 * style.glowIntensity
+            );
+        });
 
-            // Animate connections
-            connections.forEach((connection, index) => {
-                const opacity = 0.2 + Math.sin(time + index * 0.1) * 0.2;
-                connection.material.opacity = Math.max(0.1, opacity);
-            });
-
-            updateConnections();
-        }
-
-        controls.update();
-        renderer.render(scene, camera);
+        updateConnections();
     }
+
+    controls.update();
+    renderer.render(scene, camera);
+}
 
     // Handle window resize
     function handleResize() {
