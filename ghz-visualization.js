@@ -697,22 +697,6 @@ let bigBangSystem;
     let animationRunning = true;
     let time = 0;
 
-    function animate() {
-
-        bigBangSystem = new BigBangSystem(scene, qubits, connections);
-        
-        requestAnimationFrame(animate);
-        time += 0.02;
-
-
-
-        if (animationRunning) {
-            // Animate qubits with quantum state fluctuations
-            // Keep them orbiting around their base positions in a spherical pattern
-        // Update Big Bang system
-        if (bigBangSystem) {
-            bigBangSystem.update();
-        }
             qubits.forEach((qubit, index) => {
                     const basePos = qubit.userData.basePosition;
                 const phase = (index / qubitCount) * Math.PI * 2;
