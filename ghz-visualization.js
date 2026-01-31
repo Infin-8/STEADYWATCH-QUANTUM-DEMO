@@ -807,7 +807,7 @@ const unifiedStyling = new UnifiedQubitStyling();
     // Start animation
     animate();
 
-    Return controls for external use
+    // Return controls for external use
     return {
         toggleAnimation: () => {
             animationRunning = !animationRunning;
