@@ -542,8 +542,7 @@ function initGHZVisualization(containerId) {
 // Create unified styling instance (shared across all qubits)
 
 const unifiedStyling = new UnifiedQubitStyling();
-// Create Big Bang system
-let bigBangSystem;
+
 
     const container = document.getElementById(containerId);
     if (!container) return;
@@ -675,6 +674,8 @@ let bigBangSystem;
     }
 
     scene.add(connectionGroup);
+
+    let bigBangSystem = new BigBangSystem(scene, qubits, connections);
 
     function updateConnections() {
         connections.forEach(connection => {
