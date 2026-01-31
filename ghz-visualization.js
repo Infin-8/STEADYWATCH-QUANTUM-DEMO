@@ -1,4 +1,133 @@
 // ============================================
+// BIG BANG / WAVE COLLAPSE SYSTEM
+// ============================================
+class BigBangSystem {
+    constructor(scene, qubits, connections) {
+        this.scene = scene;
+        this.qubits = qubits;
+        this.connections = connections;
+        
+        // Big Bang state
+        this.isActive = false;
+        this.progress = 0.0; // 0.0 to 1.0
+        this.duration = 2000; // 2 seconds for full expansion
+        this.startTime = 0;
+        
+        // Golden ratio for expansion
+        this.goldenRatio = 1.618033988749895;
+        this.k = 3.0; // Expansion rate constant
+        
+        // Store original positions
+        this.originalPositions = qubits.map(q => q.userData.basePosition.clone());
+    }
+    
+    // Calculate expansion scale using golden ratio (from STEADYWATCH)
+    calculateExpansionScale(progress) {
+        const expansionDuration = 0.15; // 15% of animation
+        const collapsedSize = 0.5; // Start at 50% size
+        const expandedSize = 1.0; // End at 100% size
+        
+        if (progress < expansionDuration) {
+            const expansionProgress = progress / expansionDuration; // 0.0 to 1.0
+            
+            // Golden ratio exponential expansion: φ^(-k * progress)
+            const goldenExponent = -this.k * expansionProgress;
+            const goldenExpansion = 1.0 - Math.pow(this.goldenRatio, goldenExponent);
+            
+            // Normalize to ensure we reach exactly 1.0 at progress = 1.0
+            const maxExponent = -this.k * 1.0;
+            const maxGoldenExpansion = 1.0 - Math.pow(this.goldenRatio, maxExponent);
+            const normalizedExpansion = goldenExpansion / maxGoldenExpansion;
+            
+            return collapsedSize + (expandedSize - collapsedSize) * normalizedExpansion;
+        } else {
+            return expandedSize;
+        }
+    }
+    
+    // Trigger Big Bang
+    trigger() {
+        this.isActive = true;
+        this.progress = 0.0;
+        this.startTime = Date.now();
+        
+        // Collapse all qubits to center (singularity)
+        this.qubits.forEach(qubit => {
+            qubit.userData.bigBangStartPos = qubit.userData.basePosition.clone();
+            qubit.userData.bigBangProgress = 0.0;
+        });
+    }
+    
+    // Update Big Bang animation
+    update() {
+        if (!this.isActive) return;
+        
+        const elapsed = Date.now() - this.startTime;
+        this.progress = Math.min(1.0, elapsed / this.duration);
+        
+        // Calculate expansion scale using golden ratio
+        const expansionScale = this.calculateExpansionScale(this.progress);
+        
+        // Animate qubits from center outward
+        this.qubits.forEach((qubit, index) => {
+            const basePos = qubit.userData.basePosition;
+            const startPos = qubit.userData.bigBangStartPos || basePos;
+            
+            // Phase 1: Collapse to center (0.0 to 0.2 progress)
+            if (this.progress < 0.2) {
+                const collapseProgress = this.progress / 0.2; // 0.0 to 1.0
+                const collapseFactor = 1.0 - collapseProgress;
+                qubit.position.lerp(new THREE.Vector3(0, 0, 0), collapseFactor);
+                qubit.scale.set(0.2, 0.2, 0.2); // Shrink to 20% during collapse
+            }
+            // Phase 2: Expand from center (0.2 to 1.0 progress)
+            else {
+                const expansionProgress = (this.progress - 0.2) / 0.8; // 0.0 to 1.0
+                
+                // Use golden ratio expansion
+                const goldenExponent = -this.k * expansionProgress;
+                const goldenExpansion = 1.0 - Math.pow(this.goldenRatio, goldenExponent);
+                const maxExponent = -this.k * 1.0;
+                const maxGoldenExpansion = 1.0 - Math.pow(this.goldenRatio, maxExponent);
+                const normalizedExpansion = goldenExpansion / maxGoldenExpansion;
+                
+                // Interpolate from center to base position
+                const targetPos = basePos.clone();
+                const currentPos = new THREE.Vector3(0, 0, 0).lerp(targetPos, normalizedExpansion);
+                qubit.position.copy(currentPos);
+                
+                // Scale from 0.2 to 1.0 using expansion scale
+                const scale = 0.2 + (1.0 - 0.2) * normalizedExpansion;
+                qubit.scale.set(scale, scale, scale);
+            }
+        });
+        
+        // Animate connections (fade in as qubits expand)
+        const connectionOpacity = Math.max(0, (this.progress - 0.2) * 1.25); // Fade in from 0.2
+        this.connections.forEach(connection => {
+            if (connection.material) {
+                connection.material.opacity = 0.3 * connectionOpacity;
+            }
+        });
+        
+        // Complete animation
+        if (this.progress >= 1.0) {
+            this.isActive = false;
+            // Ensure qubits are at final positions
+            this.qubits.forEach(qubit => {
+                qubit.position.copy(qubit.userData.basePosition);
+                qubit.scale.set(1.0, 1.0, 1.0);
+            });
+            this.connections.forEach(connection => {
+                if (connection.material) {
+                    connection.material.opacity = 0.3;
+                }
+            });
+        }
+    }
+}
+
+// ============================================
 // UNIFIED STYLING SYSTEM
 // Shared math for all qubits - Perlin Noise + ECHO Shadowing + Tesla Patterns
 // ============================================
@@ -545,6 +674,12 @@ const unifiedStyling = new UnifiedQubitStyling();
 
     scene.add(connectionGroup);
 
+    // ============================================
+    // INITIALIZE BIG BANG SYSTEM
+    // ============================================
+    let bigBangSystem = new BigBangSystem(scene, qubits, connections);
+    // ============================================
+
     function updateConnections() {
         connections.forEach(connection => {
             const i = connection.userData.qubit1;
@@ -569,6 +704,11 @@ const unifiedStyling = new UnifiedQubitStyling();
     function animate() {
         requestAnimationFrame(animate);
         time += 0.02;
+
+        // Update Big Bang system
+        if (bigBangSystem) {
+            bigBangSystem.update();
+        }
 
          if (animationRunning) {
             // Animate qubits with quantum state fluctuations
@@ -678,15 +818,25 @@ const unifiedStyling = new UnifiedQubitStyling();
     animate();
 
     // Return controls for external use
-    return {
-        toggleAnimation: () => {
-            animationRunning = !animationRunning;
-        },
-        resetView: () => {
+    // return {
+    //     toggleAnimation: () => {
+    //         animationRunning = !animationRunning;
+    //     },
+    //     resetView: () => {
+    //         camera.position.set(0, 15, 25);
+    //         camera.lookAt(0, 0, 0);
+    //         controls.reset();
+    //     }
+    // };
+            resetView: () => {
+            // Trigger Big Bang instead of just resetting camera
+            if (bigBangSystem) {
+                bigBangSystem.trigger();
+            }
+            // Also reset camera
             camera.position.set(0, 15, 25);
             camera.lookAt(0, 0, 0);
             controls.reset();
         }
-    };
 }
 
