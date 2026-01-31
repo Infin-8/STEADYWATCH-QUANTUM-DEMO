@@ -697,8 +697,21 @@ let bigBangSystem;
     let animationRunning = true;
     let time = 0;
 
+    function animate() {
+        requestAnimationFrame(animate);
+        time += 0.02;
+
+        // Update Big Bang system
+        if (bigBangSystem) {
+            bigBangSystem.update();
+        }
+
+         if (animationRunning) {
+            // Animate qubits with quantum state fluctuations
+            // Keep them orbiting around their base positions in a spherical pattern
+
             qubits.forEach((qubit, index) => {
-                    const basePos = qubit.userData.basePosition;
+                const basePos = qubit.userData.basePosition;
                 const phase = (index / qubitCount) * Math.PI * 2;
                 const rotationAngle = time + phase;
                 
@@ -812,11 +825,6 @@ let bigBangSystem;
     //     }
     // };
     
-    // Return controls for external use
-    return {
-        toggleAnimation: () => {
-            animationRunning = !animationRunning;
-        },
         resetView: () => {
             // Trigger Big Bang instead of just resetting camera
             if (bigBangSystem) {
@@ -827,7 +835,6 @@ let bigBangSystem;
             camera.lookAt(0, 0, 0);
             controls.reset();
         }
-    };
 }
 
     
