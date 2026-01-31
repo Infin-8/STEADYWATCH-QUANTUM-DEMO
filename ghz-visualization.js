@@ -817,26 +817,16 @@ const unifiedStyling = new UnifiedQubitStyling();
     // Start animation
     animate();
 
-    // Return controls for external use
-    // return {
-    //     toggleAnimation: () => {
-    //         animationRunning = !animationRunning;
-    //     },
-    //     resetView: () => {
-    //         camera.position.set(0, 15, 25);
-    //         camera.lookAt(0, 0, 0);
-    //         controls.reset();
-    //     }
-    // };
-            resetView: () => {
-            // Trigger Big Bang instead of just resetting camera
-            if (bigBangSystem) {
-                bigBangSystem.trigger();
-            }
-            // Also reset camera
+    Return controls for external use
+    return {
+        toggleAnimation: () => {
+            animationRunning = !animationRunning;
+        },
+        resetView: () => {
             camera.position.set(0, 15, 25);
             camera.lookAt(0, 0, 0);
             controls.reset();
         }
+    };
 }
 
