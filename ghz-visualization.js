@@ -677,7 +677,7 @@ const unifiedStyling = new UnifiedQubitStyling();
     // ============================================
     // INITIALIZE BIG BANG SYSTEM
     // ============================================
-    let bigBangSystem = new BigBangSystem(scene, qubits, connections);
+    // let bigBangSystem = new BigBangSystem(scene, qubits, connections);
     // ============================================
 
     function updateConnections() {
