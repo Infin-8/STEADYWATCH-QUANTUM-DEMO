@@ -675,8 +675,6 @@ const unifiedStyling = new UnifiedQubitStyling();
 
     scene.add(connectionGroup);
 
-    let bigBangSystem = new BigBangSystem(scene, qubits, connections);
-
     function updateConnections() {
         connections.forEach(connection => {
             const i = connection.userData.qubit1;
@@ -701,11 +699,6 @@ const unifiedStyling = new UnifiedQubitStyling();
     function animate() {
         requestAnimationFrame(animate);
         time += 0.02;
-
-        // Update Big Bang system
-        if (bigBangSystem) {
-            bigBangSystem.update();
-        }
 
          if (animationRunning) {
             // Animate qubits with quantum state fluctuations
@@ -814,28 +807,17 @@ const unifiedStyling = new UnifiedQubitStyling();
     // Start animation
     animate();
 
-    // Return controls for external use
-    // return {
-    //     toggleAnimation: () => {
-    //         animationRunning = !animationRunning;
-    //     },
-    //     resetView: () => {
-    //         camera.position.set(0, 15, 25);
-    //         camera.lookAt(0, 0, 0);
-    //         controls.reset();
-    //     }
-    // };
-    
+    Return controls for external use
+    return {
+        toggleAnimation: () => {
+            animationRunning = !animationRunning;
+        },
         resetView: () => {
-            // Trigger Big Bang instead of just resetting camera
-            if (bigBangSystem) {
-                bigBangSystem.trigger();
-            }
-            // Also reset camera
             camera.position.set(0, 15, 25);
             camera.lookAt(0, 0, 0);
             controls.reset();
         }
+    };
 }
 
     
