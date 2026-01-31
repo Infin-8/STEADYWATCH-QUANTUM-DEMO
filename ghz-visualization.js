@@ -542,6 +542,8 @@ function initGHZVisualization(containerId) {
 // Create unified styling instance (shared across all qubits)
 
 const unifiedStyling = new UnifiedQubitStyling();
+// Create Big Bang system
+let bigBangSystem;
 
     const container = document.getElementById(containerId);
     if (!container) return;
@@ -694,12 +696,17 @@ const unifiedStyling = new UnifiedQubitStyling();
 
     let animationRunning = true;
     let time = 0;
-
+    bigBangSystem = new BigBangSystem(scene, qubits, connections);
 
     function animate() {
         
         requestAnimationFrame(animate);
         time += 0.02;
+
+        // Update Big Bang system
+        if (bigBangSystem) {
+            bigBangSystem.update();
+        }
 
         if (animationRunning) {
             // Animate qubits with quantum state fluctuations
@@ -808,15 +815,35 @@ const unifiedStyling = new UnifiedQubitStyling();
     animate();
 
     // Return controls for external use
+    // return {
+    //     toggleAnimation: () => {
+    //         animationRunning = !animationRunning;
+    //     },
+    //     resetView: () => {
+    //         camera.position.set(0, 15, 25);
+    //         camera.lookAt(0, 0, 0);
+    //         controls.reset();
+    //     }
+    // };
+    
+    // Return controls for external use
     return {
         toggleAnimation: () => {
             animationRunning = !animationRunning;
         },
         resetView: () => {
+            // Trigger Big Bang instead of just resetting camera
+            if (bigBangSystem) {
+                bigBangSystem.trigger();
+            }
+            // Also reset camera
             camera.position.set(0, 15, 25);
             camera.lookAt(0, 0, 0);
             controls.reset();
         }
     };
+}
+
+    
 }
 
