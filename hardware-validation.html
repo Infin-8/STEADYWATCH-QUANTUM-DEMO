@@ -319,7 +319,7 @@
     <script>
         // Validation data - Populated with your actual validations
         const validations = [
-                        {
+            {
                 id: 'ghz-2',
                 category: 'ghz',
                 title: '2-Qubit GHZ State',
@@ -340,6 +340,30 @@
                 },
                 links: [
                     { text: 'View on IBM Quantum', url: 'https://quantum.ibm.com/jobs/d5fe61n67pic73830po0' },
+                    { text: 'Research Paper', url: 'docs/research/RESEARCH_PAPER_QKD_HARDWARE_VALIDATION.md' }
+                ]
+            },
+            {
+                id: 'ghz-3',
+                category: 'ghz',
+                title: '3-Qubit GHZ State',
+                backend: 'ibm_fez',
+                qubits: 3,
+                fidelity: '94%',
+                jobId: 'd5fef6cpe0pc73ajtqig',
+                date: '2026-01-07',
+                executionTime: '~30-40s',
+                description: '3-qubit GHZ state generation on IBM Quantum ibm_fez. Peak fideality at 94%',
+                media: {
+                    type: 'screenshot',
+                    path: 'images/3_qubit_ghz.png'
+                },
+                video: {
+                    path: 'images/3_qubit_ghz_video.mov',
+                    available: true
+                },
+                links: [
+                    { text: 'View on IBM Quantum', url: 'https://quantum.ibm.com/jobs/d5fef6cpe0pc73ajtqig' },
                     { text: 'Research Paper', url: 'docs/research/RESEARCH_PAPER_QKD_HARDWARE_VALIDATION.md' }
                 ]
             },
