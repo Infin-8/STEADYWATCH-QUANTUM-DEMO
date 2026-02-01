@@ -276,14 +276,14 @@
                     <div class="stat-number" id="total-validations">0</div>
                     <div class="stat-label">Total Validations</div>
                 </div>
-                <div class="stat-item">
+                <!-- <div class="stat-item">
                     <div class="stat-number" id="total-jobs">0</div>
                     <div class="stat-label">Quantum Jobs</div>
-                </div>
-                <div class="stat-item">
+                </div> -->
+                <!-- <div class="stat-item">
                     <div class="stat-number" id="avg-fidelity">0%</div>
                     <div class="stat-label">Avg Fidelity</div>
-                </div>
+                </div> -->
                 <div class="stat-item">
                     <div class="stat-number" id="backends-used">0</div>
                     <div class="stat-label">Backends Used</div>
@@ -1476,7 +1476,7 @@
 
             document.getElementById('total-validations').textContent = total;
             document.getElementById('total-jobs').textContent = uniqueJobs;
-            document.getElementById('avg-fidelity').textContent = Math.round(avgFidelity) + '%';
+            // document.getElementById('avg-fidelity').textContent = Math.round(avgFidelity) + '%';
             document.getElementById('backends-used').textContent = backends;
         }
 
