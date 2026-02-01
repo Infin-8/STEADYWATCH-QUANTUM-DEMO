@@ -583,6 +583,30 @@
                     { text: 'View on IBM Quantum', url: 'https://quantum.ibm.com/jobs/d5gs5mkpe0pc73alki40' },
                     { text: 'GHZ Scaling Analysis', url: 'docs/research/RESEARCH_PAPER_QKD_HARDWARE_VALIDATION.md' }
                 ]
+            },
+            {
+                id: 'shqkd-1',
+                category: 'hybrid',
+                title: 'Full SHQKD 5 Phases validated',
+                backend: 'ibm_fez',
+                qubits: 12,
+                fidelity: '72%',
+                jobId: 'd5mq1p48d8hc73cgun2g',
+                date: '2026-01-18',
+                executionTime: '~23s',
+                description: "The full 5-phase protocol flow was validated end-to-end, including error correction (LDPC, Quantum-Amplified, Cascade) and privacy amplification (universal hashing). Cross-platform validation confirms the protocol's hardware-agnostic design, with execution times ranging from 7.24 seconds (AWS Braket) to 25.0 seconds (IBM Quantum) for 12-qubit GHZ states. Fidelity measurements range from 20% (16-qubit AWS Braket) to 75% (12-qubit IBM Quantum), demonstrating robust key extraction even under NISQ hardware noise conditions.",
+                media: {
+                    type: 'screenshot',
+                    path: 'images/shqkd_val.png'
+                },
+                video: {
+                    path: 'images/shqkd_val_video.mov',
+                    available: true
+                },
+                links: [
+                    { text: 'View on IBM Quantum', url: 'https://quantum.ibm.com/jobs/d5mq1p48d8hc73cgun2g' },
+                    { text: 'GHZ Scaling Analysis', url: 'docs/research/RESEARCH_PAPER_QKD_HARDWARE_VALIDATION.md' }
+                ]
             }
             // Add more validations as you organize more media files
         ];
