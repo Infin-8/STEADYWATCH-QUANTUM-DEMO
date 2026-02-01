@@ -1,0 +1,499 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>IBM Quantum Hardware Validations | STEADYWATCH™</title>
+    <meta name="description" content="Complete gallery of IBM Quantum hardware validation runs with screenshots, videos, and verifiable job IDs. All validations executed on real quantum hardware.">
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        /* Gallery-specific styles */
+        .validation-gallery {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+            gap: 30px;
+            margin: 40px 0;
+        }
+        
+        .validation-card {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            overflow: hidden;
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+        
+        .validation-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 15px rgba(0,0,0,0.2);
+        }
+        
+        .validation-media {
+            width: 100%;
+            height: 250px;
+            object-fit: cover;
+            background: #f0f0f0;
+            cursor: pointer;
+        }
+        
+        .validation-video {
+            width: 100%;
+            height: 250px;
+            background: #000;
+        }
+        
+        .validation-info {
+            padding: 20px;
+        }
+        
+        .validation-title {
+            font-size: 1.2em;
+            font-weight: 700;
+            color: #667eea;
+            margin-bottom: 10px;
+        }
+        
+        .validation-meta {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+        
+        .meta-badge {
+            background: #f0f0f0;
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 0.85em;
+            font-weight: 500;
+        }
+        
+        .meta-badge.backend {
+            background: #667eea;
+            color: white;
+        }
+        
+        .meta-badge.fidelity {
+            background: #10b981;
+            color: white;
+        }
+        
+        .meta-badge.job-id {
+            background: #f59e0b;
+            color: white;
+            font-family: monospace;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+        
+        .meta-badge.job-id:hover {
+            background: #d97706;
+        }
+        
+        .validation-description {
+            color: #666;
+            font-size: 0.9em;
+            line-height: 1.6;
+            margin-bottom: 15px;
+        }
+        
+        .validation-links {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+        
+        .validation-link {
+            color: #667eea;
+            text-decoration: none;
+            font-size: 0.9em;
+            font-weight: 500;
+            padding: 5px 10px;
+            border: 1px solid #667eea;
+            border-radius: 5px;
+            transition: all 0.3s;
+        }
+        
+        .validation-link:hover {
+            background: #667eea;
+            color: white;
+        }
+        
+        .filter-buttons {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin: 30px 0;
+            justify-content: center;
+        }
+        
+        .filter-btn {
+            padding: 10px 20px;
+            background: white;
+            border: 2px solid #667eea;
+            color: #667eea;
+            border-radius: 25px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.3s;
+        }
+        
+        .filter-btn:hover,
+        .filter-btn.active {
+            background: #667eea;
+            color: white;
+        }
+        
+        .stats-summary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 40px;
+            border-radius: 12px;
+            margin: 40px 0;
+            text-align: center;
+        }
+        
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 30px;
+            margin-top: 30px;
+        }
+        
+        .stat-item {
+            text-align: center;
+        }
+        
+        .stat-number {
+            font-size: 2.5em;
+            font-weight: 700;
+            margin-bottom: 5px;
+        }
+        
+        .stat-label {
+            font-size: 0.9em;
+            opacity: 0.9;
+        }
+        
+        .media-container {
+            position: relative;
+        }
+        
+        .play-overlay {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(102, 126, 234, 0.9);
+            color: white;
+            padding: 15px 25px;
+            border-radius: 50%;
+            font-size: 2em;
+            opacity: 0;
+            transition: opacity 0.3s;
+            pointer-events: none;
+        }
+        
+        .media-container:hover .play-overlay {
+            opacity: 1;
+        }
+        
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 2000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.9);
+            cursor: pointer;
+        }
+        
+        .modal-content {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            max-width: 90%;
+            max-height: 90%;
+        }
+        
+        .modal-content img,
+        .modal-content video {
+            max-width: 100%;
+            max-height: 90vh;
+            border-radius: 8px;
+        }
+        
+        .close-modal {
+            position: absolute;
+            top: 20px;
+            right: 40px;
+            color: white;
+            font-size: 40px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+    <nav>
+        <div class="container">
+            <a href="https://apps.apple.com/us/app/steadywatch-handheld/id6755752518" class="nav-brand">
+                <img src="images/logo.png" alt="STEADYWATCH Logo">
+                <span><u>STEADYWATCH™</u></span>
+            </a>
+            <button class="mobile-menu-toggle" onclick="toggleMobileMenu()">☰</button>
+            <ul class="nav-links" id="navLinks">
+                <li><a href="index.html">Home</a></li>
+                <li><a href="index.html#research-papers">Research</a></li>
+                <li><a href="hardware-validation.html" class="active">Validations</a></li>
+                <li><a href="comparison.html">VS</a></li>
+                <li><a href="consulting-services.html">Consulting</a></li>
+                <li><a href="contact.html" class="nav-cta">Contact</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <header>
+        <div class="container">
+            <h1><u>IBM Quantum Hardware Validations</u></h1>
+            <p class="subtitle">Complete Gallery of Real Quantum Hardware Execution</p>
+            <p style="margin-top: 20px; max-width: 800px; margin-left: auto; margin-right: auto;">
+                All validations executed on real IBM Quantum hardware. Every job ID is verifiable on the IBM Quantum platform. 
+                Screenshots and videos provided for easy review without requiring IBM Quantum accounts.
+            </p>
+        </div>
+    </header>
+
+    <section class="container">
+        <div class="stats-summary">
+            <h2 style="margin-bottom: 20px;">Validation Statistics</h2>
+            <div class="stats-grid">
+                <div class="stat-item">
+                    <div class="stat-number" id="total-validations">0</div>
+                    <div class="stat-label">Total Validations</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-number" id="total-jobs">0</div>
+                    <div class="stat-label">Quantum Jobs</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-number" id="avg-fidelity">0%</div>
+                    <div class="stat-label">Avg Fidelity</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-number" id="backends-used">0</div>
+                    <div class="stat-label">Backends Used</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="filter-buttons">
+            <button class="filter-btn active" onclick="filterValidations('all')">All</button>
+            <button class="filter-btn" onclick="filterValidations('ghz')">GHZ States</button>
+            <button class="filter-btn" onclick="filterValidations('qkd')">QKD Protocol</button>
+            <button class="filter-btn" onclick="filterValidations('hybrid')">Hybrid System</button>
+            <button class="filter-btn" onclick="filterValidations('echo')">Echo Resonance</button>
+            <button class="filter-btn" onclick="filterValidations('seed')">Seed Generation</button>
+            <button class="filter-btn" onclick="filterValidations('bell')">Bell Inequality</button>
+        </div>
+
+        <div class="validation-gallery" id="validationGallery">
+            <!-- Validation cards will be inserted here by JavaScript -->
+        </div>
+    </section>
+
+    <!-- Modal for full-size media -->
+    <div id="mediaModal" class="modal" onclick="closeModal()">
+        <span class="close-modal">&times;</span>
+        <div class="modal-content" onclick="event.stopPropagation()">
+            <img id="modalImage" src="" alt="">
+            <video id="modalVideo" controls style="display: none;">
+                <source src="" type="video/mp4">
+            </video>
+        </div>
+    </div>
+
+    <script>
+        // Validation data - Populated with your actual validations
+        const validations = [
+            {
+                id: 'ghz-12',
+                category: 'ghz',
+                title: '12-Qubit GHZ State',
+                backend: 'ibm_fez',
+                qubits: 12,
+                fidelity: '70-75%',
+                jobId: 'd5fen5nea9qs738vpnj0',
+                date: '2026-01-11',
+                executionTime: '~30-40s',
+                description: '12-qubit GHZ state generation on IBM Quantum ibm_fez. Demonstrates multipartite entanglement at production scale. Multiple validation runs showing 70-75% fidelity.',
+                media: {
+                    type: 'screenshot',
+                    path: 'images/validations/ghz/ghz-12qubit-screenshot.png'
+                },
+                video: {
+                    path: 'images/validations/ghz/ghz-12qubit-video.mov',
+                    available: true
+                },
+                links: [
+                    { text: 'View on IBM Quantum', url: 'https://quantum.ibm.com/jobs/d5fen5nea9qs738vpnj0' },
+                    { text: 'Research Paper', url: 'docs/research/RESEARCH_PAPER_QKD_HARDWARE_VALIDATION.md' }
+                ]
+            },
+            {
+                id: 'ghz-28',
+                category: 'ghz',
+                title: '28-Qubit GHZ State (Record)',
+                backend: 'ibm_fez',
+                qubits: 28,
+                fidelity: '35%',
+                jobId: 'd5g22lf67pic7383m5qg',
+                date: '2026-01-11',
+                executionTime: '~23s',
+                description: 'Record-breaking 28-qubit GHZ state generation. Deepest GHZ state validated on IBM Quantum hardware, demonstrating extreme entanglement depth. New depth record for multipartite entanglement.',
+                media: {
+                    type: 'screenshot',
+                    path: 'images/validations/ghz/ghz-28qubit-record-screenshot.png'
+                },
+                video: {
+                    path: 'images/validations/ghz/ghz-28qubit-record-video.mov',
+                    available: true
+                },
+                links: [
+                    { text: 'View on IBM Quantum', url: 'https://quantum.ibm.com/jobs/d5g22lf67pic7383m5qg' },
+                    { text: 'GHZ Scaling Analysis', url: 'docs/research/RESEARCH_PAPER_QKD_HARDWARE_VALIDATION.md' }
+                ]
+            }
+            // Add more validations as you organize more media files
+        ];
+
+        // Calculate statistics
+        function calculateStats() {
+            const total = validations.length;
+            const uniqueJobs = new Set(validations.map(v => v.jobId)).size;
+            const avgFidelity = validations.reduce((sum, v) => {
+                const fid = parseFloat(v.fidelity.replace('%', '').split('-')[0]);
+                return sum + (isNaN(fid) ? 0 : fid);
+            }, 0) / total;
+            const backends = new Set(validations.map(v => v.backend)).size;
+
+            document.getElementById('total-validations').textContent = total;
+            document.getElementById('total-jobs').textContent = uniqueJobs;
+            document.getElementById('avg-fidelity').textContent = Math.round(avgFidelity) + '%';
+            document.getElementById('backends-used').textContent = backends;
+        }
+
+        // Render validation cards
+        function renderValidations(filter = 'all') {
+            const gallery = document.getElementById('validationGallery');
+            gallery.innerHTML = '';
+
+            const filtered = filter === 'all' 
+                ? validations 
+                : validations.filter(v => v.category === filter);
+
+            filtered.forEach(validation => {
+                const card = document.createElement('div');
+                card.className = 'validation-card';
+                card.dataset.category = validation.category;
+
+                const mediaHTML = validation.media.type === 'video'
+                    ? `<video class="validation-video" controls>
+                         <source src="${validation.media.path}" type="video/mp4">
+                         Your browser does not support the video tag.
+                       </video>`
+                    : `<div class="media-container" onclick="openModal('${validation.media.path}', 'image')">
+                         <img src="${validation.media.path}" alt="${validation.title}" class="validation-media" onerror="this.src='images/logo.png'">
+                         ${validation.video && validation.video.available ? '<div class="play-overlay">▶</div>' : ''}
+                       </div>`;
+
+                const linksHTML = validation.links.map(link => 
+                    `<a href="${link.url}" target="_blank" class="validation-link">${link.text}</a>`
+                ).join('');
+
+                const videoLink = validation.video && validation.video.available
+                    ? `<a href="${validation.video.path}" target="_blank" class="validation-link">📹 Watch Video</a>`
+                    : '';
+
+                card.innerHTML = `
+                    ${mediaHTML}
+                    <div class="validation-info">
+                        <div class="validation-title">${validation.title}</div>
+                        <div class="validation-meta">
+                            <span class="meta-badge backend">${validation.backend}</span>
+                            <span class="meta-badge fidelity">${validation.fidelity} Fidelity</span>
+                            <span class="meta-badge">${validation.qubits} Qubits</span>
+                            <span class="meta-badge job-id" onclick="copyJobId('${validation.jobId}')" title="Click to copy">${validation.jobId}</span>
+                        </div>
+                        <div class="validation-description">${validation.description}</div>
+                        <div class="validation-links">${linksHTML}${videoLink}</div>
+                    </div>
+                `;
+
+                gallery.appendChild(card);
+            });
+        }
+
+        // Filter validations
+        function filterValidations(category) {
+            // Update active button
+            document.querySelectorAll('.filter-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            event.target.classList.add('active');
+
+            // Render filtered validations
+            renderValidations(category);
+        }
+
+        // Copy job ID to clipboard
+        function copyJobId(jobId) {
+            navigator.clipboard.writeText(jobId).then(() => {
+                alert(`Job ID ${jobId} copied to clipboard!`);
+            });
+        }
+
+        // Modal functions
+        function openModal(src, type) {
+            const modal = document.getElementById('mediaModal');
+            const modalImage = document.getElementById('modalImage');
+            const modalVideo = document.getElementById('modalVideo');
+            
+            if (type === 'image') {
+                modalImage.src = src;
+                modalImage.style.display = 'block';
+                modalVideo.style.display = 'none';
+            } else {
+                modalVideo.src = src;
+                modalVideo.style.display = 'block';
+                modalImage.style.display = 'none';
+            }
+            
+            modal.style.display = 'block';
+        }
+
+        function closeModal() {
+            document.getElementById('mediaModal').style.display = 'none';
+            const modalVideo = document.getElementById('modalVideo');
+            modalVideo.pause();
+            modalVideo.src = '';
+        }
+
+        // Close modal on Escape key
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') {
+                closeModal();
+            }
+        });
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', () => {
+            calculateStats();
+            renderValidations('all');
+        });
+    </script>
+</body>
+</html>
