@@ -110,7 +110,7 @@ async function loadValidations() {
       // e.g., if it's { "validations": [...] }, do: validations = validations.validations || [];
     }
     
-    console.log('Loaded', validations.length, 'validations');
+    console.log('Loaded', validations, 'validations');
     return validations;
     
   } catch (error) {
@@ -122,6 +122,8 @@ async function loadValidations() {
 loadValidations()
     .then(data => {
         validations = data;
+    })
+    .then(() => ({
         calculateStats();
         renderValidations('all');
     })
