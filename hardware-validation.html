@@ -91,29 +91,39 @@
 
     <script>
 
+let validations = [];
 
-    let validations = [];  // declare outside so it's in scope
-console.log('preasync')
-(async () => {
+async function loadValidations() {
   try {
-    const response = await fetch('https://github.com/Infin-8/STEADYWATCH-QUANTUM-DEMO/hardware_validations.json');
-    if (!response.ok) throw new Error('Network response was not ok');
-    console.log("response", response)
-    validations = await response.json();           // ← this is your array now
+    const url = 'https://raw.githubusercontent.com/Infin-8/STEADYWATCH-QUANTUM-DEMO/main/hardware_validations.json';
+    const response = await fetch(url);
     
-    // Optional safety:
-    if (!Array.isArray(validations)) {
-      console.warn('Data is not an array — wrapping it');
-      validations = Array.from(validation);
+    if (!response.ok) {
+      throw new Error(`Failed to fetch: ${response.status} ${response.statusText}`);
     }
     
-    console.log('Validations loaded:', validations.length, 'items');
-  } catch (err) {
-    console.error(err);
-    validations = [];  // fallback
+    const validations = await response.json();
+    
+    // Safety check (in case it's wrapped or malformed)
+    if (!Array.isArray(validations)) {
+      console.warn('Data is not an array — check JSON structure');
+      // e.g., if it's { "validations": [...] }, do: validations = validations.validations || [];
+    }
+    
+    console.log('Loaded', validations.length, 'validations');
+    return validations;
+    
+  } catch (error) {
+    console.error('Error loading validations:', error);
+    return []; // fallback
   }
-})();
-console.log("post")
+}
+
+// Call it
+loadValidations()
+    .then(data => ({validations = data}))
+    .catch(error)
+        
         // Calculate statistics
         function calculateStats() {
             const total = validations.length;
