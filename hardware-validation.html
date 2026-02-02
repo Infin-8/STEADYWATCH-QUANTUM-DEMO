@@ -119,10 +119,14 @@ async function loadValidations() {
   }
 }
 
-// Call it
 loadValidations()
-    .then(data => ({validations = data}))
-    .catch(console.error)
+    .then(data => {
+        validations = data;
+        calculateStats();
+        renderValidations('all');
+    })
+    .catch(console.error);
+
         
         // Calculate statistics
         function calculateStats() {
@@ -243,11 +247,6 @@ loadValidations()
             }
         });
 
-        // Initialize
-        document.addEventListener('DOMContentLoaded', () => {
-            calculateStats();
-            renderValidations('all');
-        });
     </script>
 </body>
 </html>
