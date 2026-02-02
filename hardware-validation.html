@@ -122,7 +122,7 @@ async function loadValidations() {
 // Call it
 loadValidations()
     .then(data => ({validations = data}))
-    .catch(error)
+    .catch(console.error)
         
         // Calculate statistics
         function calculateStats() {
