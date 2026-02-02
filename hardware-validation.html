@@ -98,7 +98,7 @@
   try {
     const response = await fetch('https://github.com/Infin-8/STEADYWATCH-QUANTUM-DEMO/hardware_validations.json');
     if (!response.ok) throw new Error('Network response was not ok');
-    
+    console.log("response", response)
     validations = await response.json();           // ← this is your array now
     
     // Optional safety:
