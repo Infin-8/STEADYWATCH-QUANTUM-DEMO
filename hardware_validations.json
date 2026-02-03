@@ -168,6 +168,30 @@
     ]
   },
   {
+    "id": "12_qubit_hybrid",
+    "category": "hyprid",
+    "title": "12-Qubit Hybrid",
+    "backend": "ibm_fez",
+    "qubits": 12,
+    "fidelity": "70-75%",
+    "jobId": "d5gs5mkpe0pc73alki40",
+    "date": "2026-01-07",
+    "executionTime": "~30-40s",
+    "description": "12-qubit GHZ state generation on IBM Quantum ibm_fez. Demonstrates multipartite entanglement at production scale. Multiple validation runs showing 70-75% fidelity.",
+    "media": {
+      "type": "screenshot",
+      "path": "images/12_qubit_h.png"
+    },
+    "video": {
+      "path": "images/12_qubit_h_video.mov",
+      "available": true
+    },
+    "links": [
+      { "text": "View on IBM Quantum", "url": "https://quantum.ibm.com/jobs/d5gs5mkpe0pc73alki40" },
+      { "text": "Research Paper", "url": "docs/research/RESEARCH_PAPER_QKD_HARDWARE_VALIDATION.md" }
+    ]
+  },
+  {
     "id": "ghz-20",
     "category": "ghz",
     "title": "20-Qubit GHZ State",
