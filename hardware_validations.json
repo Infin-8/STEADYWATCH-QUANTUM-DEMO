@@ -169,7 +169,7 @@
   },
   {
     "id": "12_qubit_hybrid",
-    "category": "hyprid",
+    "category": "hybrid",
     "title": "12-Qubit Hybrid",
     "backend": "ibm_fez",
     "qubits": 12,
