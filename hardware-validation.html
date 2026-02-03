@@ -107,7 +107,7 @@ async function loadValidations() {
     // Safety check (in case it's wrapped or malformed)
     if (!Array.isArray(validations)) {
       console.warn('Data is not an array — check JSON structure');
-      // e.g., if it's { "validations": [...] }, do: validations = validations.validations || [];
+        validations = Array.from(validations);
     }
     
     console.log('egg_1', validations, 'validations');
