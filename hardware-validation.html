@@ -142,7 +142,7 @@ loadValidations()
                 const fid = parseFloat(v.fidelity.replace('%', '').split('-')[0]);
                 return sum + (isNaN(fid) ? 0 : fid);
             }, 0) / (total - (validations.filter((item) => item.category === "seed").length));
-            const backends = new Set(validations.map(v => v.backend)).size;
+            const backends = Number(new Set(validations.map(v => v.backend)).size) + 1;
 
             document.getElementById('total-validations').textContent = total;
             // document.getElementById('total-jobs').textContent = uniqueJobs;
