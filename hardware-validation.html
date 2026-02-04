@@ -137,7 +137,7 @@ loadValidations()
             const avgFidelity = validations.filter((item) => item.category !== "seed").reduce((sum, v) => {
                 const fid = parseFloat(v.fidelity.replace('%', '').split('-')[0]);
                 return sum + (isNaN(fid) ? 0 : fid);
-            }, 0) / validations.filter((item) => item.category == "seed").length - total;
+            }, 0) / (total - (validations.filter((item) => item.category == "seed").length));
             const backends = new Set(validations.map(v => v.backend)).size;
 
             document.getElementById('total-validations').textContent = total;
