@@ -9,7 +9,7 @@
     "jobId": "d5ovqi48d8hc73cjc5f0",
     "date": "2026-01-22",
     "executionTime": "~1s",
-    "description": "84% fidelity run (hardware) 48 <=> 36, Multi-Party Authentication, Quantum Network Protocols, Hybrid Security, Performance Optimization",
+    "description": "84% fidelity run (hardware) 48 <=> 36, Multi-Party Authentication, Quantum Network Protocols, Hybrid Security, Performance Optimizations",
     "media": {
       "type": "screenshot",
       "path": "images/12_qubit_net_auth.png"
