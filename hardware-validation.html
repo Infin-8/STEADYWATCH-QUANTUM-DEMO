@@ -180,7 +180,7 @@ loadValidations()
 
                 card.innerHTML = `
                     ${mediaHTML}
-                    <div class="validation-info" style=border: `${validation.isImportant ? 1px solid red : ""}`}>
+                    <div class="validation-info" style=border:${validation.isImportant}>
                         <div class="validation-title">${validation.title}</div>
                         <div class="validation-meta">
                             <span class="meta-badge backend">${validation.backend}</span>
