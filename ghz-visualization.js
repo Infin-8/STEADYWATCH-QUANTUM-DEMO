@@ -294,6 +294,7 @@ class EavesdropperDetector {
             event.preventDefault();
             // Fire the eavesdropper detection
             this.fireLaser();
+            console.log("egg_4", "T1000")
         }
     });
 }
