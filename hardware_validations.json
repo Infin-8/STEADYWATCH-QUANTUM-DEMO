@@ -1,4 +1,28 @@
 [
+    {
+    "id": "ghz-net_auth",
+    "category": "ghz",
+    "title": "GHZ Network Authentication",
+    "backend": "ibm_marrakesh",
+    "qubits": 12,
+    "fidelity": "84%",
+    "jobId": "d5ovqi48d8hc73cjc5f0",
+    "date": "2026-01-22",
+    "executionTime": "~1s",
+    "description": "84% fidelity run (hardware) 48 <=> 36, Multi-Party Authentication, Quantum Network Protocols, Hybrid Security, Performance Optimization",
+    "media": {
+      "type": "screenshot",
+      "path": "images/12_qubit_net_auth.png"
+    },
+    "video": {
+      "path": "images/12_qubit_net_auth_video.mov",
+      "available": true
+    },
+    "links": [
+      { "text": "View on IBM Quantum", "url": "https://quantum.ibm.com/jobs/d5ovqi48d8hc73cjc5f0" },
+      { "text": "Research Paper", "url": "docs/research/RESEARCH_PAPER_QKD_HARDWARE_VALIDATION.md" }
+    ]
+  },
   {
     "id": "ghz-2",
     "category": "ghz",
@@ -20,30 +44,6 @@
     },
     "links": [
       { "text": "View on IBM Quantum", "url": "https://quantum.ibm.com/jobs/d5fe61n67pic73830po0" },
-      { "text": "Research Paper", "url": "docs/research/RESEARCH_PAPER_QKD_HARDWARE_VALIDATION.md" }
-    ]
-  },
-  {
-    "id": "ghz-net_auth",
-    "category": "ghz",
-    "title": "GHZ Network Authentication",
-    "backend": "ibm_marrakesh",
-    "qubits": 12,
-    "fidelity": "84%",
-    "jobId": "d5ovqi48d8hc73cjc5f0",
-    "date": "2026-01-22",
-    "executionTime": "~1s",
-    "description": "84% fidelity run (hardware) 48 <=> 36, Multi-Party Authentication, Quantum Network Protocols, Hybrid Security, Performance Optimization",
-    "media": {
-      "type": "screenshot",
-      "path": "images/12_qubit_net_auth.png"
-    },
-    "video": {
-      "path": "images/12_qubit_net_auth_video.mov",
-      "available": true
-    },
-    "links": [
-      { "text": "View on IBM Quantum", "url": "https://quantum.ibm.com/jobs/d5ovqi48d8hc73cjc5f0" },
       { "text": "Research Paper", "url": "docs/research/RESEARCH_PAPER_QKD_HARDWARE_VALIDATION.md" }
     ]
   },
