@@ -134,7 +134,7 @@ loadValidations()
         function calculateStats() {
             const total = validations.length;
             const uniqueJobs = new Set(validations.map(v => v.jobId)).size;
-            const avgFidelity = validations.filter((item) => item.type !== "seed").reduce((sum, v) => {
+            const avgFidelity = validations.filter((item) => item.category !== "seed").reduce((sum, v) => {
                 const fid = parseFloat(v.fidelity.replace('%', '').split('-')[0]);
                 return sum + (isNaN(fid) ? 0 : fid);
             }, 0) / total;
