@@ -5,7 +5,7 @@
 
 class UnifiedQubitStyling {
     constructor() {
-        // Perlin Noise state (from SteadyWatch)
+        // Perlin Noise state (from STEADYWATCH™)
         this.noiseState = {
             lastNoiseUpdateTime: 0,
             smoothedNoiseValue: 0,
@@ -33,7 +33,7 @@ class UnifiedQubitStyling {
     }
 
     // ============================================
-    // PERLIN NOISE (from SteadyWatch AtomicClockView.swift)
+    // PERLIN NOISE (from STEADYWATCH™ AtomicClockView.swift)
     // ============================================
 
         hash(x) {
@@ -47,7 +47,7 @@ class UnifiedQubitStyling {
     }
 
         smoothstep(t) {
-        // 5th order polynomial smoothstep (from SteadyWatch)
+        // 5th order polynomial smoothstep (from STEADYWATCH™)
         const clamped = Math.max(0.0, Math.min(1.0, t));
         // 6t^5 - 15t^4 + 10t^3
         return clamped * clamped * clamped * (clamped * (clamped * 6.0 - 15.0) + 10.0);
@@ -84,7 +84,7 @@ class UnifiedQubitStyling {
     }
 
         generateNoise(time, frequency = 1.0) {
-        // Multiple octaves for organic, natural variation (from SteadyWatch)
+        // Multiple octaves for organic, natural variation (from STEADYWATCH™)
         // Base octave: Primary variation (slow, large-scale)
         const baseOctave = this.perlin1D(time * frequency * 0.5) * 0.6;
         
@@ -102,7 +102,7 @@ class UnifiedQubitStyling {
     }
 
         smoothNoiseWithTime(rawNoise, currentTime, lastUpdateTime, previousSmoothed, timeConstant) {
-        // Time-based exponential smoothing (from SteadyWatch)
+        // Time-based exponential smoothing (from STEADYWATCH™)
         const deltaTime = currentTime - lastUpdateTime;
         const alpha = Math.min(1.0, deltaTime / timeConstant);
         return alpha * rawNoise + (1.0 - alpha) * previousSmoothed;
@@ -113,7 +113,7 @@ class UnifiedQubitStyling {
     // ============================================
 
         calculateLightingFactor(rotationAngle) {
-        // Cosine-based lighting (from SteadyWatch)
+        // Cosine-based lighting (from STEADYWATCH™)
         // Cosine(0°) = 1.0 (facing user): maximum glow, shadow, sharpness
         // Cosine(180°) = -1.0 (away from user): minimum glow, shadow, sharpness
         // Normalize cosine from [-1, 1] to [0, 1] for lighting factor
@@ -121,7 +121,7 @@ class UnifiedQubitStyling {
     }
 
         calculateBilateralShadowOffset(waveYOffset, lightAngleDegrees = 45.0) {
-        // Bilateral shadow calculation (from SteadyWatch)
+        // Bilateral shadow calculation (from STEADYWATCH™)
         // For 45°: tan(45°) = 1.0, so shadow extends equally in X and Y
         const lightAngleRadians = lightAngleDegrees * Math.PI / 180.0;
         return Math.abs(waveYOffset) * Math.tan(lightAngleRadians);
@@ -157,7 +157,7 @@ class UnifiedQubitStyling {
 
         calculateUnifiedStyle(qubitIndex, time, rotationAngle, basePosition) {
         // 1. Generate Perlin noise (organic variation)
-        const noiseFrequency = 0.25; // 4 second cycle (from SteadyWatch)
+        const noiseFrequency = 0.25; // 4 second cycle (from STEADYWATCH™)
         const rawNoise = this.generateNoise(time, noiseFrequency);
         
         // 2. Smooth noise with time-based exponential smoothing
@@ -173,7 +173,7 @@ class UnifiedQubitStyling {
         this.noiseState.smoothedNoiseValue = smoothedNoise;
         this.noiseState.lastNoiseUpdateTime = currentTime;
         
-        // 3. Apply noise factor (±5% variation from SteadyWatch)
+        // 3. Apply noise factor (±5% variation from STEADYWATCH™)
         const noiseFactor = 1.0 + (smoothedNoise * 0.05);
         
         // 4. Calculate lighting factor (rotation-based)
@@ -186,7 +186,7 @@ class UnifiedQubitStyling {
         // 6. Apply Tesla pattern to frequency/phase
         const teslaPhase = this.applyTeslaPattern(rotationAngle, qubitIndex);
         
-        // 7. Calculate unified glow intensity (from SteadyWatch formula)
+        // 7. Calculate unified glow intensity (from STEADYWATCH™ formula)
         const glowIntensity = (this.shadowParams.baseGlowIntensity + 
                               (lightingFactor * this.shadowParams.glowIntensityRange)) * noiseFactor;
         
