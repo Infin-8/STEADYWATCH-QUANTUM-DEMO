@@ -170,7 +170,7 @@ loadValidations()
                          ${validation.video && validation.video.available && validation?.isImportant ? '<div style="color: lime; "class="play-overlay">^^</div>' : ''}
                          ${validation.video && validation.video.available && !validation?.isImportant ? '<div class="play-overlay">^^</div>' : ''}
                        </div>`;
-
+               // conditionally render ojos locos color based on importance, using optional chaining..
                 const linksHTML = validation.links.map(link => 
                     `<a href="${link.url}" target="_blank" class="validation-link">${link.text}</a>`
                 ).join('');
