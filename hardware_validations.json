@@ -10,7 +10,7 @@
     "date": "2026-01-22",
     "executionTime": "~1s",
     "description": "84% fidelity run (hardware) 48 <=> 36, Multi-Party Authentication, Quantum Network Protocols, Hybrid Security, Performance Optimizations",
-    "isImportant": true;
+    "isImportant": "1px solid red";
     "media": {
       "type": "screenshot",
       "path": "images/12_qubit_net_auth.png"
