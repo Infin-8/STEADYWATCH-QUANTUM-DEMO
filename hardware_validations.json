@@ -203,6 +203,7 @@
     "date": "2026-01-07",
     "executionTime": "~30-40s",
     "description": "Perfect key matching results, 0% error rate, perfect key correlation, production ready via hardware validations",
+    "isImportant": true,
     "media": {
       "type": "screenshot",
       "path": "images/12_qubit_h.png"
@@ -275,7 +276,8 @@
     "date": "2026-01-11",
     "executionTime": "~23s",
     "description": "Record-breaking 28-qubit GHZ state generation. Deepest GHZ state validated on IBM Quantum hardware, demonstrating extreme entanglement depth. New depth record for multipartite entanglement.",
-    "media": {
+    "isImportant": true,
+      "media": {
       "type": "screenshot",
       "path": "images/28_qubit_ghz.png"
     },
@@ -323,7 +325,8 @@
     "date": "2026-01-18",
     "executionTime": "~23s",
     "description": "The full 5-phase protocol flow was validated end-to-end, including error correction (LDPC, Quantum-Amplified, Cascade) and privacy amplification (universal hashing). Cross-platform validation confirms the protocol's hardware-agnostic design, with execution times ranging from 7.24 seconds (AWS Braket) to 25.0 seconds (IBM Quantum) for 12-qubit GHZ states. Fidelity measurements range from 20% (16-qubit AWS Braket) to 75% (12-qubit IBM Quantum), demonstrating robust key extraction even under NISQ hardware noise conditions.",
-    "media": {
+    "isImportant": true,
+     "media": {
       "type": "screenshot",
       "path": "images/shqkd_val.png"
     },
