@@ -56,10 +56,10 @@
                     <div class="stat-number" id="avg-fidelity">0%</div>
                     <div class="stat-label">Avg Fidelity</div>
                 </div> -->
-                <!-- <div class="stat-item">
+                <div class="stat-item">
                     <div class="stat-number" id="backends-used">0</div>
                     <div class="stat-label">Backends Used</div>
-                </div> -->
+                </div>
             </div>
         </div>
 
@@ -143,7 +143,7 @@ loadValidations()
             document.getElementById('total-validations').textContent = total;
             // document.getElementById('total-jobs').textContent = uniqueJobs;
             // document.getElementById('avg-fidelity').textContent = Math.round(avgFidelity) + '%';
-            // document.getElementById('backends-used').textContent = backends;
+            document.getElementById('backends-used').textContent = backends;
         }
 
         // Render validation cards
