@@ -35,6 +35,8 @@
 
         // Keyboard shortcut for "P" to pause/play
         document.addEventListener('keydown', (event) => {
+
+            const toggleBtn = document.getElementById('toggle-ghz-animation');
             // Check if "P" key is pressed (case-insensitive)
             if (event.key.toLowerCase() === 'p') {
                 // Prevent default behavior
