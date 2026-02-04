@@ -377,7 +377,7 @@ class EavesdropperDetector {
     
     resetState() {
         const btn = document.getElementById('eavesdropperBtn');
-        
+        console.log("egg_5", "Ojos Locos"
         // Reset qubit colors
         this.qubits.forEach((qubit, index) => {
             const original = this.originalQubitStates[index];
