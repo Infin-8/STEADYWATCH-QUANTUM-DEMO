@@ -167,7 +167,7 @@ loadValidations()
                        </video>`
                     : `<div class="media-container" onclick="openModal('${validation.media.path}', 'image')">
                          <img src="${validation.media.path}" alt="${validation.title}" class="validation-media" onerror="this.src='images/logo.png'">
-                         ${validation.video && validation.video.available && validation?.isImportant ? '<div style="color: red; "class="play-overlay">^^</div>' : ''}
+                         ${validation.video && validation.video.available && validation?.isImportant ? '<div style="color: lime; "class="play-overlay">^^</div>' : ''}
                          ${validation.video && validation.video.available && !validation?.isImportant ? '<div class="play-overlay">^^</div>' : ''}
                        </div>`;
 
