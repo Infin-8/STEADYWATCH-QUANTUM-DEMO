@@ -350,6 +350,7 @@
     "date": "2026-01-18",
     "executionTime": "~23s",
     "description": "Perfect Quantum Key Matching Validated on IBM and AWS Braket",
+    "isImportant": true,
     "media": {
       "type": "screenshot",
       "path": "images/echo_val.png"
