@@ -133,12 +133,11 @@ loadValidations()
         // Calculate statistics
         function calculateStats() {
             const total = validations.length;
-            const seeds = ((item, i, arr) => item.valdation === "seed");
             const uniqueJobs = new Set(validations.map(v => v.jobId)).size;
-            const avgFidelity = validations.filter((fn) => !seeds(fn)).reduce((sum, v) => {
+            const avgFidelity = validations.filter((item) => item.category !== "seed").reduce((sum, v) => {
                 const fid = parseFloat(v.fidelity.replace('%', '').split('-')[0]);
                 return sum + (isNaN(fid) ? 0 : fid);
-            }, 0) / (total - (validations.filter(seeds).length));
+            }, 0) / (total - (validations.filter((item) => item.category === "seed").length));
             const backends = new Set(validations.map(v => v.backend)).size;
 
             document.getElementById('total-validations').textContent = total;
