@@ -12,6 +12,10 @@ body {
     padding-top: 70px; /* Space for fixed nav */
 }
 
+.quickShadow {
+    text-shadow: 1px 2px 2px black;
+}
+
 .container {
     max-width: 1200px;
     margin: 0 auto;
