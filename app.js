@@ -1,4 +1,4 @@
-const modalImage = document.getElementById('modalImage');
+const modalImages = document.querySelectorAll("img");   // ← fixed spelling
 
 
 function toggleMobileMenu() {
@@ -63,7 +63,7 @@ document.addEventListener('DOMContentLoaded', function() {
     });
     
 
-modalImage.addEventListener('mouseover', function() {
+modalImages.addEventListener('mouseover', function() {
     console.log("egg6", "boo");           // your log
 });
 });
