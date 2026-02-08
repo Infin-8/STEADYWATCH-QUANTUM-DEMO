@@ -1,6 +1,6 @@
 document.addEventListener('mouseover', function(event) {
     if (event.target.tagName === 'IMG') {
-        console.log("egg6", "boo");
+        console.log("egg_6", "boo");
     }
 });
 
