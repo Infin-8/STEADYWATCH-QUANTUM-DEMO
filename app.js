@@ -1,5 +1,8 @@
-const modalImages = document.querySelectorAll("img");   // ← fixed spelling
-
+document.addEventListener('mouseover', function(event) {
+    if (event.target.tagName === 'IMG') {
+        console.log("egg6", "boo");
+    }
+});
 
 function toggleMobileMenu() {
     const navLinks = document.getElementById('navLinks');
@@ -62,8 +65,4 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
     
-
-modalImages.addEventListener('mouseover', function() {
-    console.log("egg6", "boo");           // your log
-});
 });
