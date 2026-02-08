@@ -1,3 +1,6 @@
+const card = document.querySelector('.card');
+
+
 function toggleMobileMenu() {
     const navLinks = document.getElementById('navLinks');
     navLinks.classList.toggle('active');
@@ -58,4 +61,9 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         }
     });
+    
+
+card.addEventListener('mouseover', function() {
+    console.log("egg6", "boo");           // your log
+});
 });
