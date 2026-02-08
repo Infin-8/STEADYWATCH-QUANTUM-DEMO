@@ -1,4 +1,4 @@
-const card = document.querySelector('.card');
+const modalImage = document.getElementById('modalImage');
 
 
 function toggleMobileMenu() {
@@ -63,7 +63,7 @@ document.addEventListener('DOMContentLoaded', function() {
     });
     
 
-card.addEventListener('mouseover', function() {
+modalImage.addEventListener('mouseover', function() {
     console.log("egg6", "boo");           // your log
 });
 });
