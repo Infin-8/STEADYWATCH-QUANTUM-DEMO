@@ -16,6 +16,10 @@ body {
     text-shadow: 1px 2px 2px black;
 }
 
+.quickRadius {
+    border: 10px;
+}
+
 .secondaryShadow {
     text-shadow: 1px 1px 2px black;
 }
