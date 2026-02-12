@@ -4,6 +4,233 @@
 // Prime p=5 → 144 Satellites
 // ============================================
 
+// ============================================
+// UNIFIED STYLING SYSTEM
+// Shared math for all satellites - Perlin Noise + ECHO Shadowing + Tesla Patterns
+// ============================================
+
+class UnifiedQubitStyling {
+    constructor() {
+        // Perlin Noise state (from STEADYWATCH™ HANDHELD)
+        this.noiseState = {
+            lastNoiseUpdateTime: 0,
+            smoothedNoiseValue: 0,
+            noiseSmoothingTimeConstant: 0.5 // seconds
+        };
+        
+        // ECHO Shadowing parameters
+        this.shadowParams = {
+            lightAngle: 45.0, // degrees
+            baseGlowIntensity: 0.15,
+            glowIntensityRange: 0.12,
+            baseShadowRadius: 2.0,
+            shadowRadiusRange: 2.0,
+            baseShadowIntensity: 0.55,
+            shadowIntensityRange: 0.25
+        };
+        
+        // Tesla 3-6-9 pattern multipliers
+        this.teslaMultipliers = {
+            base: 1.0,
+            harmonic3: 1.0 / 3.0,
+            harmonic6: 1.0 / 6.0,
+            harmonic9: 1.0 / 9.0
+        };
+    }
+
+    // ============================================
+    // PERLIN NOISE (from STEADYWATCH™ HANDHELD AtomicClockView.swift)
+    // ============================================
+
+    hash(x) {
+        // Simple hash function for pseudo-random gradients
+        const wrapped = x % 2147483647; // Large prime
+        let hash = Math.abs(wrapped);
+        hash = ((hash * 1103515245) + 12345) & 0x7fffffff;
+        hash = ((hash * 1103515245) + 12345) & 0x7fffffff;
+        // Convert to range [-1.0, 1.0]
+        return (hash % 2000000000) / 1000000000.0 - 1.0;
+    }
+
+    smoothstep(t) {
+        // 5th order polynomial smoothstep (from STEADYWATCH™ HANDHELD)
+        const clamped = Math.max(0.0, Math.min(1.0, t));
+        // 6t^5 - 15t^4 + 10t^3
+        return clamped * clamped * clamped * (clamped * (clamped * 6.0 - 15.0) + 10.0);
+    }
+
+    lerp(a, b, t) {
+        return a + (b - a) * t;
+    }
+
+    gradient(x, t) {
+        const grad = this.hash(x);
+        const dist = t - x;
+        return grad * dist;
+    }
+
+    perlin1D(x) {
+        // Handle large values by wrapping
+        const wrappedX = x % 1000000.0;
+        
+        // Find grid points
+        const x0 = Math.floor(wrappedX);
+        const x1 = x0 + 1;
+        
+        // Calculate fractional part for interpolation
+        const fx = wrappedX - x0;
+        
+        // Get gradients at grid points
+        const g0 = this.gradient(x0, wrappedX);
+        const g1 = this.gradient(x1, wrappedX);
+        
+        // Smooth interpolation between gradients
+        const t = this.smoothstep(fx);
+        return this.lerp(g0, g1, t);
+    }
+
+    generateNoise(time, frequency = 1.0) {
+        // Multiple octaves for organic, natural variation (from STEADYWATCH™ HANDHELD)
+        // Base octave: Primary variation (slow, large-scale)
+        const baseOctave = this.perlin1D(time * frequency * 0.5) * 0.6;
+        
+        // Detail octave: Fine detail (medium frequency)
+        const detailOctave = this.perlin1D(time * frequency * 2.0) * 0.25;
+        
+        // Micro octave: Subtle texture (high frequency)
+        const microOctave = this.perlin1D(time * frequency * 4.0) * 0.15;
+        
+        // Combine octaves for layered complexity
+        const combined = baseOctave + detailOctave + microOctave;
+        
+        // Clamp to ±1.0 range
+        return Math.max(-1.0, Math.min(1.0, combined));
+    }
+
+    smoothNoiseWithTime(rawNoise, currentTime, lastUpdateTime, previousSmoothed, timeConstant) {
+        // Time-based exponential smoothing (from STEADYWATCH™ HANDHELD)
+        const deltaTime = currentTime - lastUpdateTime;
+        const alpha = Math.min(1.0, deltaTime / timeConstant);
+        return alpha * rawNoise + (1.0 - alpha) * previousSmoothed;
+    }
+
+    // ============================================
+    // ECHO BILATERAL SHADOWING (45-degree light)
+    // ============================================
+
+    calculateLightingFactor(rotationAngle) {
+        // Cosine-based lighting (from STEADYWATCH™ HANDHELD)
+        // Cosine(0°) = 1.0 (facing user): maximum glow, shadow, sharpness
+        // Cosine(180°) = -1.0 (away from user): minimum glow, shadow, sharpness
+        // Normalize cosine from [-1, 1] to [0, 1] for lighting factor
+        return (Math.cos(rotationAngle) + 1.0) / 2.0;
+    }
+
+    calculateBilateralShadowOffset(waveYOffset, lightAngleDegrees = 45.0) {
+        // Bilateral shadow calculation (from STEADYWATCH™ HANDHELD)
+        // For 45°: tan(45°) = 1.0, so shadow extends equally in X and Y
+        const lightAngleRadians = lightAngleDegrees * Math.PI / 180.0;
+        return Math.abs(waveYOffset) * Math.tan(lightAngleRadians);
+    }
+
+    // ============================================
+    // TESLA 3-6-9 PATTERN APPLICATION
+    // ============================================
+
+    applyTeslaPattern(value, satelliteIndex) {
+        // Tesla 3-6-9 pattern: Apply harmonic multipliers based on satellite index
+        const teslaGroup = satelliteIndex % 3;
+        let multiplier = this.teslaMultipliers.base;
+        
+        if (teslaGroup === 0) {
+            // Group 0: Base frequency (3, 6, 9, 12, ...)
+            multiplier = this.teslaMultipliers.base;
+        } else if (teslaGroup === 1) {
+            // Group 1: 1/3 harmonic (1, 4, 7, 10, ...)
+            multiplier = this.teslaMultipliers.harmonic3;
+        } else {
+            // Group 2: 1/6 harmonic (2, 5, 8, 11, ...)
+            multiplier = this.teslaMultipliers.harmonic6;
+        }
+        
+        return value * multiplier;
+    }
+
+    // ============================================
+    // UNIFIED STYLING CALCULATION
+    // All satellites share the same math
+    // ============================================
+
+    calculateUnifiedStyle(satelliteIndex, time, rotationAngle, basePosition) {
+        // 1. Generate Perlin noise (organic variation)
+        const noiseFrequency = 0.25; // 4 second cycle (from STEADYWATCH™ HANDHELD)
+        const rawNoise = this.generateNoise(time, noiseFrequency);
+        
+        // 2. Smooth noise with time-based exponential smoothing
+        const currentTime = time;
+        const lastUpdate = this.noiseState.lastNoiseUpdateTime || currentTime;
+        const smoothedNoise = this.smoothNoiseWithTime(
+            rawNoise,
+            currentTime,
+            lastUpdate,
+            this.noiseState.smoothedNoiseValue,
+            this.noiseState.noiseSmoothingTimeConstant
+        );
+        this.noiseState.smoothedNoiseValue = smoothedNoise;
+        this.noiseState.lastNoiseUpdateTime = currentTime;
+        
+        // 3. Apply noise factor (±5% variation from STEADYWATCH™ HANDHELD)
+        const noiseFactor = 1.0 + (smoothedNoise * 0.05);
+        
+        // 4. Calculate lighting factor (rotation-based)
+        const lightingFactor = this.calculateLightingFactor(rotationAngle);
+        
+        // 5. Calculate ECHO shadow parameters
+        const waveYOffset = basePosition.y; // Use satellite's Y position as wave offset
+        const bilateralShadowXOffset = this.calculateBilateralShadowOffset(waveYOffset);
+        
+        // 6. Apply Tesla pattern to frequency/phase
+        const teslaPhase = this.applyTeslaPattern(rotationAngle, satelliteIndex);
+        
+        // 7. Calculate unified glow intensity (from STEADYWATCH™ HANDHELD formula)
+        const glowIntensity = (this.shadowParams.baseGlowIntensity + 
+                              (lightingFactor * this.shadowParams.glowIntensityRange)) * noiseFactor;
+        
+        // 8. Calculate unified shadow radius
+        const shadowRadius = ((this.shadowParams.baseShadowRadius + 
+                              (lightingFactor * this.shadowParams.shadowRadiusRange)) * 
+                              (this.shadowParams.shadowTightnessFactor || 1.0)) * noiseFactor;
+        
+        // 9. Calculate unified shadow intensity
+        const shadowIntensity = (this.shadowParams.baseShadowIntensity + 
+                               (lightingFactor * this.shadowParams.shadowIntensityRange)) * noiseFactor;
+        
+        // 10. Calculate blur radius (inverted relationship)
+        const blurRadius = (0.3 + ((1.0 - lightingFactor) * 0.9)) / noiseFactor;
+        
+        // Return unified style object
+        return {
+            // Perlin noise values
+            noiseFactor: noiseFactor,
+            smoothedNoise: smoothedNoise,
+            
+            // ECHO shadowing
+            glowIntensity: Math.max(0.12, Math.min(0.3, glowIntensity)),
+            shadowRadius: Math.max(1.5, Math.min(5.0, shadowRadius)),
+            shadowIntensity: Math.max(0.5, Math.min(0.85, shadowIntensity)),
+            blurRadius: Math.max(0.3, Math.min(1.2, blurRadius)),
+            bilateralShadowXOffset: bilateralShadowXOffset,
+            
+            // Lighting
+            lightingFactor: lightingFactor,
+            
+            // Tesla pattern
+            teslaPhase: teslaPhase,
+            teslaMultiplier: this.applyTeslaPattern(1.0, satelliteIndex)
+        };
+    }
+}
+
 /**
  * 4D-to-3D Projection for Hurwitz Quaternions
  * Projects 4D coordinates (a, b, c, d) to 3D (x, y, z)
@@ -71,6 +298,11 @@ function getSatelliteColor(index, total = 144) {
 function init144SatellitesVisualization(containerId) {
     const container = document.getElementById(containerId);
     if (!container) return;
+
+    // ============================================
+    // CREATE UNIFIED STYLING INSTANCE
+    // ============================================
+    const unifiedStyling = new UnifiedQubitStyling();
 
     // Scene setup
     const scene = new THREE.Scene();
@@ -285,26 +517,44 @@ function init144SatellitesVisualization(containerId) {
             // Get the expanded position (from expansion animation)
             const expandedPos = satellite.position.clone();
             const phase = satellite.userData.phase;
+            const basePos = satellite.userData.basePosition;
+            
+            // Calculate unified style for satellite
+            const rotationAngle = time + phase;
+            const style = unifiedStyling.calculateUnifiedStyle(index, time, rotationAngle, basePos);
             
             // Orbital motion (small circular motion around expanded position)
-            const orbitRadius = 0.3;
-            const orbitSpeed = 0.5;
-            const orbitX = Math.cos(time * orbitSpeed + phase) * orbitRadius;
-            const orbitY = Math.sin(time * orbitSpeed * 1.3 + phase) * orbitRadius;
-            const orbitZ = Math.cos(time * orbitSpeed * 0.7 + phase) * orbitRadius;
+            // Apply Tesla pattern to orbital motion
+            const orbitRadius = 0.3 * style.teslaMultiplier;
+            const orbitSpeed = 0.5 * style.teslaMultiplier;
+            const orbitX = Math.cos(time * orbitSpeed + style.teslaPhase) * orbitRadius;
+            const orbitY = Math.sin(time * orbitSpeed * 1.3 + style.teslaPhase) * orbitRadius;
+            const orbitZ = Math.cos(time * orbitSpeed * 0.7 + style.teslaPhase) * orbitRadius;
 
-            // Apply orbital motion on top of expanded position
+            // Apply orbital motion on top of expanded position with noise factor
             satellite.position.set(
-                expandedPos.x + orbitX,
-                expandedPos.y + orbitY,
-                expandedPos.z + orbitZ
+                expandedPos.x + orbitX * style.noiseFactor,
+                expandedPos.y + orbitY * style.noiseFactor,
+                expandedPos.z + orbitZ * style.noiseFactor
             );
 
-            // Phase-based color pulsing
-            const pulseIntensity = 0.3 + Math.sin(time * 2 + phase) * 0.2;
+            // Apply unified styling to satellite material
             // Only update if not hovered (hover effect overrides)
             if (hoveredSatellite !== satellite) {
-                satellite.material.emissiveIntensity = 0.4 + pulseIntensity * 0.3;
+                // Use unified glow intensity
+                satellite.material.emissiveIntensity = 0.4 + style.glowIntensity * 0.3;
+                
+                // Apply color variation based on unified style
+                const hue = (time * 0.1 + index * 0.1 + style.lightingFactor * 0.2) % 1;
+                const saturation = 0.7 * (0.8 + style.glowIntensity * 0.4);
+                const lightness = 0.6 * (0.9 + style.lightingFactor * 0.2);
+                satellite.material.color.setHSL(hue, saturation, lightness);
+                
+                // Emissive uses glow intensity directly
+                const emissiveHue = (time * 0.1 + index * 0.1) % 1;
+                const emissiveSaturation = 0.7;
+                const emissiveLightness = style.glowIntensity * 2.0; // Map glow [0.12-0.3] to emissive [0.24-0.6]
+                satellite.material.emissive.setHSL(emissiveHue, emissiveSaturation, emissiveLightness);
             }
             
             // Update glow position and intensity
@@ -313,14 +563,16 @@ function init144SatellitesVisualization(containerId) {
             );
             if (glow) {
                 glow.position.copy(satellite.position);
-                glow.material.emissiveIntensity = 0.2 + pulseIntensity * 0.1;
+                glow.material.emissiveIntensity = 0.2 + style.glowIntensity * 0.1;
             }
         });
 
-        // Seed pulsing
-        const seedPulse = 0.5 + Math.sin(time * 1.5) * 0.2;
-        seed.material.emissiveIntensity = 0.5 + seedPulse * 0.3;
-        seedGlow.material.emissiveIntensity = 0.3 + seedPulse * 0.2;
+        // Seed pulsing with unified styling
+        const seedRotationAngle = time * 1.5;
+        const seedBasePos = new THREE.Vector3(0, 0, 0);
+        const seedStyle = unifiedStyling.calculateUnifiedStyle(0, time, seedRotationAngle, seedBasePos);
+        seed.material.emissiveIntensity = 0.5 + seedStyle.glowIntensity * 0.3;
+        seedGlow.material.emissiveIntensity = 0.3 + seedStyle.glowIntensity * 0.2;
     }
 
     // ============================================
@@ -414,6 +666,32 @@ function init144SatellitesVisualization(containerId) {
                 positions[4] = pos2.y;
                 positions[5] = pos2.z;
                 connection.geometry.attributes.position.needsUpdate = true;
+                
+                // Apply unified styling to connections
+                const phase = (index / connections.length) * Math.PI * 2;
+                const rotationAngle = time + phase;
+                
+                // Use average position of seed and satellite as base position
+                const avgPosition = new THREE.Vector3(
+                    (pos1.x + pos2.x) / 2,
+                    (pos1.y + pos2.y) / 2,
+                    (pos1.z + pos2.z) / 2
+                );
+                
+                // Calculate unified style
+                const style = unifiedStyling.calculateUnifiedStyle(index, time, rotationAngle, avgPosition);
+                
+                // Apply opacity using glow intensity (higher glow = more visible connection)
+                const baseOpacity = 0.2;
+                const opacityVariation = style.glowIntensity * 2.0; // Map glow [0.12-0.3] to opacity variation
+                const opacity = Math.max(0.1, Math.min(0.6, baseOpacity + opacityVariation));
+                connection.material.opacity = opacity;
+                
+                // Apply color variation based on lighting factor and Tesla pattern
+                const hue = (time * 0.05 + index * 0.05 + style.lightingFactor * 0.1) % 1;
+                const saturation = 0.7 * (0.8 + style.glowIntensity * 0.4);
+                const lightness = 0.5 * (0.9 + style.lightingFactor * 0.2);
+                connection.material.color.setHSL(hue, saturation, lightness);
             }
         });
     }
