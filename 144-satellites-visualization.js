@@ -759,6 +759,17 @@ function init144SatellitesVisualization(containerId) {
         });
     }
 
+    document.addEventListener('keydown', (event) => {
+    // Option A: case-insensitive (most common)
+    if (event.key === 'r' || event.key === 'R') {
+        const newWidth = container.clientWidth;
+        const newHeight = container.clientHeight || 600;
+        camera.aspect = newWidth / newHeight;
+        camera.updateProjectionMatrix();
+        renderer.setSize(newWidth, newHeight);
+    }
+});
+
     // Handle window resize
     window.addEventListener('resize', () => {
         const newWidth = container.clientWidth;
