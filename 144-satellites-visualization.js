@@ -753,11 +753,24 @@ function init144SatellitesVisualization(containerId) {
 
     // Reset expansion
     const resetExpansionBtn = document.getElementById('reset-144-expansion');
+    const resetExpansion = () => {
+        expansionProgress = 0;
+    };
+    
     if (resetExpansionBtn) {
-        resetExpansionBtn.addEventListener('click', () => {
-            expansionProgress = 0;
-        });
+        resetExpansionBtn.addEventListener('click', resetExpansion);
     }
+    
+    // Keyboard shortcut for reset expansion (E key)
+    document.addEventListener('keydown', (event) => {
+        // Check if "E" key is pressed (case-insensitive)
+        if (event.key.toLowerCase() === 'e') {
+            // Prevent default behavior
+            event.preventDefault();
+            // Reset expansion
+            resetExpansion();
+        }
+    });
 
     document.addEventListener('keydown', (event) => {
     // Option A: case-insensitive (most common)
