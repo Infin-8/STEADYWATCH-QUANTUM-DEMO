@@ -1,6 +1,6 @@
 # 144 Z Primes: Quantum Entropy Seed Generation via Hurwitz Quaternion Satellite Architecture
 
-**Authors:** SteadyWatch Research Team  
+**Authors:** STEADYWATCH™ Research Team  
 **Date:** February 1, 2026  
 **Status:** ✅ **COMPLETE - HARDWARE VALIDATED**
 
