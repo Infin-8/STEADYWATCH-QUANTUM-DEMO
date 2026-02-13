@@ -511,45 +511,82 @@ function init144SatellitesVisualization(containerId) {
     }
 
     // ============================================
-    // RELEASE ANIMATION (Satellites move away from center)
+    // RELEASE ANIMATION (Satellites float away like dandelion seeds)
     // ============================================
     function updateRelease() {
+        satellites.forEach((satellite, index) => {
+            if (!satellite.userData.expanded) return; // Only release if expanded
+            
+            // Initialize drift velocity when release starts (one-time setup)
+            if (!satellite.userData.driftVelocity && releaseProgress > 0) {
+                const basePos = satellite.userData.basePosition;
+                const direction = basePos.clone();
+                const distance = direction.length();
+                
+                // Calculate base drift direction (radial outward)
+                let baseDirection;
+                if (distance > 0.001) {
+                    baseDirection = direction.normalize();
+                } else {
+                    // Random direction if at origin
+                    baseDirection = new THREE.Vector3(
+                        (Math.random() - 0.5) * 2,
+                        (Math.random() - 0.5) * 2,
+                        (Math.random() - 0.5) * 2
+                    ).normalize();
+                }
+                
+                // Add randomness for natural floating motion (like wind)
+                const randomOffset = new THREE.Vector3(
+                    (Math.random() - 0.5) * 0.6,
+                    (Math.random() - 0.5) * 0.6,
+                    (Math.random() - 0.5) * 0.6
+                );
+                
+                // Combine base direction with random offset for natural drift
+                const driftDirection = baseDirection.clone().add(randomOffset).normalize();
+                
+                // Each satellite gets its own drift speed (like different seed weights)
+                const driftSpeed = 0.3 + (Math.random() * 0.2); // 0.3 to 0.5 speed
+                
+                // Store drift velocity vector
+                satellite.userData.driftVelocity = driftDirection.multiplyScalar(driftSpeed);
+                
+                // Store initial release position
+                satellite.userData.releaseStartPosition = basePos.clone();
+                satellite.userData.releaseStartTime = time; // Track when release started
+            }
+            
+            // If released, continuously update position based on drift (even after progress = 1.0)
+            if (satellite.userData.driftVelocity && releaseProgress > 0) {
+                // Calculate elapsed time since release started
+                const elapsedTime = time - (satellite.userData.releaseStartTime || time);
+                
+                // Calculate drift distance based on elapsed time (continuous floating)
+                const driftDistance = elapsedTime * 0.5; // Continuous drift speed
+                
+                // Add continuous floating motion (like wind currents)
+                const floatTime = time * 0.3; // Slower floating motion
+                const floatX = Math.sin(floatTime + index * 0.1) * 0.2;
+                const floatY = Math.cos(floatTime * 1.3 + index * 0.15) * 0.2;
+                const floatZ = Math.sin(floatTime * 0.7 + index * 0.12) * 0.2;
+                const floatOffset = new THREE.Vector3(floatX, floatY, floatZ);
+                
+                // Calculate release position: start position + continuous drift + floating motion
+                const driftOffset = satellite.userData.driftVelocity.clone().multiplyScalar(driftDistance);
+                const releasePos = satellite.userData.releaseStartPosition.clone()
+                    .add(driftOffset)
+                    .add(floatOffset);
+                
+                satellite.userData.releasePosition = releasePos;
+                satellite.userData.released = true; // Mark as released once drift is initialized
+            }
+        });
+        
+        // Continue release progress (for initial animation, but floating continues after)
         if (releaseProgress < 1.0) {
             releaseProgress = Math.min(1.0, releaseProgress + releaseSpeed);
         }
-
-        satellites.forEach((satellite, index) => {
-            if (!satellite.userData.expanded) return; // Only release if expanded
-
-            const basePos = satellite.userData.basePosition;
-            
-            // Calculate direction from center to base position
-            const direction = basePos.clone();
-            const distance = direction.length();
-            
-            // Only apply release if satellite is not at origin
-            if (distance > 0.001) {
-                direction.normalize();
-                
-                // Calculate release position (base position + direction * releaseDistance * progress)
-                const releaseOffset = direction.multiplyScalar(releaseDistance * releaseProgress);
-                const releasePos = basePos.clone().add(releaseOffset);
-                
-                // Store the release position for orbital animation
-                satellite.userData.releasePosition = releasePos;
-            } else {
-                // If at origin, use a random direction
-                const randomDirection = new THREE.Vector3(
-                    (Math.random() - 0.5) * 2,
-                    (Math.random() - 0.5) * 2,
-                    (Math.random() - 0.5) * 2
-                ).normalize();
-                const releaseOffset = randomDirection.multiplyScalar(releaseDistance * releaseProgress);
-                satellite.userData.releasePosition = releaseOffset;
-            }
-            
-            satellite.userData.released = releaseProgress >= 1.0;
-        });
     }
 
     // ============================================
@@ -820,16 +857,25 @@ function init144SatellitesVisualization(containerId) {
     const releaseSatellites = () => {
         // Only release if satellites are expanded
         if (expansionProgress >= 1.0) {
-            // If already fully released, clicking again will restart the animation
-            if (releaseProgress >= 1.0) {
+            // Check if any satellite is already released
+            const alreadyReleased = satellites.some(s => s.userData.released);
+            
+            // If already released, reset and restart
+            if (alreadyReleased) {
                 releaseProgress = 0;
                 satellites.forEach(satellite => {
                     satellite.userData.releasePosition = null;
                     satellite.userData.released = false;
+                    satellite.userData.driftVelocity = null;
+                    satellite.userData.releaseStartPosition = null;
+                    satellite.userData.releaseStartTime = null;
                 });
+            } else {
+                // Start release animation (will initialize drift velocities)
+                if (releaseProgress === 0) {
+                    releaseProgress = 0.001; // Start the release process
+                }
             }
-            // Otherwise, animation will continue from current progress
-            // The updateRelease() function handles the animation
         }
     };
     
@@ -841,10 +887,13 @@ function init144SatellitesVisualization(containerId) {
     const resetReleaseBtn = document.getElementById('reset-144-release');
     const resetRelease = () => {
         releaseProgress = 0;
-        // Clear release positions
+        // Clear release positions and drift velocities
         satellites.forEach(satellite => {
             satellite.userData.releasePosition = null;
             satellite.userData.released = false;
+            satellite.userData.driftVelocity = null;
+            satellite.userData.releaseStartPosition = null;
+            satellite.userData.releaseStartTime = null;
         });
     };
     
@@ -927,6 +976,9 @@ function init144SatellitesVisualization(containerId) {
             satellites.forEach(satellite => {
                 satellite.userData.releasePosition = null;
                 satellite.userData.released = false;
+                satellite.userData.driftVelocity = null;
+                satellite.userData.releaseStartPosition = null;
+                satellite.userData.releaseStartTime = null;
             });
         }
     };
