@@ -557,29 +557,33 @@ function init144SatellitesVisualization(containerId) {
                 satellite.userData.releaseStartTime = time; // Track when release started
             }
             
-            // If released, continuously update position based on drift (even after progress = 1.0)
-            if (satellite.userData.driftVelocity && releaseProgress > 0) {
+            // If released, continuously update position based on drift
+            // Continue floating even if releaseProgress is reset (seeds keep floating)
+            if (satellite.userData.driftVelocity && satellite.userData.releaseStartTime !== null && satellite.userData.releaseStartTime !== undefined) {
                 // Calculate elapsed time since release started
-                const elapsedTime = time - (satellite.userData.releaseStartTime || time);
+                const elapsedTime = time - satellite.userData.releaseStartTime;
                 
-                // Calculate drift distance based on elapsed time (continuous floating)
-                const driftDistance = elapsedTime * 0.5; // Continuous drift speed
-                
-                // Add continuous floating motion (like wind currents)
-                const floatTime = time * 0.3; // Slower floating motion
-                const floatX = Math.sin(floatTime + index * 0.1) * 0.2;
-                const floatY = Math.cos(floatTime * 1.3 + index * 0.15) * 0.2;
-                const floatZ = Math.sin(floatTime * 0.7 + index * 0.12) * 0.2;
-                const floatOffset = new THREE.Vector3(floatX, floatY, floatZ);
-                
-                // Calculate release position: start position + continuous drift + floating motion
-                const driftOffset = satellite.userData.driftVelocity.clone().multiplyScalar(driftDistance);
-                const releasePos = satellite.userData.releaseStartPosition.clone()
-                    .add(driftOffset)
-                    .add(floatOffset);
-                
-                satellite.userData.releasePosition = releasePos;
-                satellite.userData.released = true; // Mark as released once drift is initialized
+                // Only continue if elapsed time is positive (safety check)
+                if (elapsedTime >= 0) {
+                    // Calculate drift distance based on elapsed time (continuous floating)
+                    const driftDistance = elapsedTime * 0.5; // Continuous drift speed
+                    
+                    // Add continuous floating motion (like wind currents)
+                    const floatTime = time * 0.3; // Slower floating motion
+                    const floatX = Math.sin(floatTime + index * 0.1) * 0.2;
+                    const floatY = Math.cos(floatTime * 1.3 + index * 0.15) * 0.2;
+                    const floatZ = Math.sin(floatTime * 0.7 + index * 0.12) * 0.2;
+                    const floatOffset = new THREE.Vector3(floatX, floatY, floatZ);
+                    
+                    // Calculate release position: start position + continuous drift + floating motion
+                    const driftOffset = satellite.userData.driftVelocity.clone().multiplyScalar(driftDistance);
+                    const releasePos = satellite.userData.releaseStartPosition.clone()
+                        .add(driftOffset)
+                        .add(floatOffset);
+                    
+                    satellite.userData.releasePosition = releasePos;
+                    satellite.userData.released = true; // Mark as released once drift is initialized
+                }
             }
         });
         
