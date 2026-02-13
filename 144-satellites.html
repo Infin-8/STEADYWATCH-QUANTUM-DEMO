@@ -79,7 +79,7 @@
             
             <!-- Controls -->
             <div class="visualization-controls">
-                <div style="display: flex; justify-content: space-evenly; width: 100%; align-items: center">
+                <div id="panel-controls">
                 <button id="expand-144-satellites" class="viz-button" style="color: lime;">Expand</button>
                 <button id="toggle-144-animation" class="viz-button">Pause</button>
                 <button id="toggle-144-connections" class="viz-button">Hide Connections</button>
@@ -89,20 +89,20 @@
                 <button id="reset-144-view" class="viz-button">Reset View</button>
                 </div>
                 
-                <div style="display: flex; justify-content: space-evenly; width: 100%; align-items: center">
-                <div class="viz-stat" style="font-size: small">
+                <div id="panel-stats">
+                <div class="viz-stat">
                     <span>Satellites:</span>
-                    <strong style="color: "white; text-shadow: 1px 1px 2px black;">144</strong>
+                    <strong style="color: white; text-shadow: 1px 1px 2px black;">144</strong>
                 </div>
-                <div class="viz-stat" style="font-size: small">
+                <div class="viz-stat">
                     <span>Prime Seed:</span>
                     <strong>p=5</strong>
                 </div>
-                <div class="viz-stat" style="font-size: small">
+                <div class="viz-stat">
                     <span>Norm:</span>
                     <strong>5</strong>
                 </div>
-                <div class="viz-stat" style="font-size: small">
+                <div class="viz-stat">
                     <span>Expression:</span>
                     <strong>?!z(p) * -144</strong>
                 </div>

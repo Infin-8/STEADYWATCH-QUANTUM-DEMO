@@ -1528,7 +1528,7 @@ footer a {
 #panel-controls {
     display: flex !important;
     justify-content: space-evenly !important;
-    width: 100%;
+    width: 100% !important;
     align-items: center !important;
     flex-wrap: wrap !important;
     gap: 10px !important;
