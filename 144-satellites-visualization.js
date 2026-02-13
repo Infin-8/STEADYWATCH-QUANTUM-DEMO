@@ -477,7 +477,9 @@ function init144SatellitesVisualization(containerId) {
     let animationRunning = true;
     let time = 0;
     let expansionProgress = 0; // 0 = collapsed, 1 = fully expanded
+    let expansionEnabled = false; // User must trigger expansion (don't auto-start)
     let releaseProgress = 0; // 0 = not released, 1 = fully released
+    let releaseEnabled = false; // Control whether release/floating should continue
     let showConnections = true;
     let expansionSpeed = 0.01;
     let releaseSpeed = 0.015;
@@ -487,7 +489,8 @@ function init144SatellitesVisualization(containerId) {
     // EXPANSION ANIMATION
     // ============================================
     function updateExpansion() {
-        if (expansionProgress < 1.0) {
+        // Only expand if user has enabled expansion
+        if (expansionEnabled && expansionProgress < 1.0) {
             expansionProgress = Math.min(1.0, expansionProgress + expansionSpeed);
         }
 
@@ -518,7 +521,7 @@ function init144SatellitesVisualization(containerId) {
             if (!satellite.userData.expanded) return; // Only release if expanded
             
             // Initialize drift velocity when release starts (one-time setup)
-            if (!satellite.userData.driftVelocity && releaseProgress > 0) {
+            if (!satellite.userData.driftVelocity && releaseProgress > 0 && releaseEnabled) {
                 const basePos = satellite.userData.basePosition;
                 const direction = basePos.clone();
                 const distance = direction.length();
@@ -558,8 +561,8 @@ function init144SatellitesVisualization(containerId) {
             }
             
             // If released, continuously update position based on drift
-            // Continue floating even if releaseProgress is reset (seeds keep floating)
-            if (satellite.userData.driftVelocity && satellite.userData.releaseStartTime !== null && satellite.userData.releaseStartTime !== undefined) {
+            // BUT only if release is enabled (can be stopped)
+            if (releaseEnabled && satellite.userData.driftVelocity && satellite.userData.releaseStartTime !== null && satellite.userData.releaseStartTime !== undefined) {
                 // Calculate elapsed time since release started
                 const elapsedTime = time - satellite.userData.releaseStartTime;
                 
@@ -588,7 +591,7 @@ function init144SatellitesVisualization(containerId) {
         });
         
         // Continue release progress (for initial animation, but floating continues after)
-        if (releaseProgress < 1.0) {
+        if (releaseEnabled && releaseProgress < 1.0) {
             releaseProgress = Math.min(1.0, releaseProgress + releaseSpeed);
         }
     }
@@ -846,10 +849,19 @@ function init144SatellitesVisualization(containerId) {
         });
     }
 
+    // Expand satellites (user-controlled)
+    const expandBtn = document.getElementById('expand-144-satellites');
+    if (expandBtn) {
+        expandBtn.addEventListener('click', () => {
+            expansionEnabled = true; // Enable expansion
+        });
+    }
+
     // Reset expansion
     const resetExpansionBtn = document.getElementById('reset-144-expansion');
     const resetExpansion = () => {
         expansionProgress = 0;
+        expansionEnabled = false; // Disable expansion
     };
     
     if (resetExpansionBtn) {
@@ -864,20 +876,20 @@ function init144SatellitesVisualization(containerId) {
             // Check if any satellite is already released
             const alreadyReleased = satellites.some(s => s.userData.released);
             
-            // If already released, reset and restart
-            if (alreadyReleased) {
-                releaseProgress = 0;
-                satellites.forEach(satellite => {
-                    satellite.userData.releasePosition = null;
-                    satellite.userData.released = false;
-                    satellite.userData.driftVelocity = null;
-                    satellite.userData.releaseStartPosition = null;
-                    satellite.userData.releaseStartTime = null;
-                });
+            // If already released and floating, toggle off (stop floating)
+            if (alreadyReleased && releaseEnabled) {
+                releaseEnabled = false; // Stop floating
+                if (releaseBtn) {
+                    releaseBtn.textContent = 'Release Satellites'; // Update button text
+                }
             } else {
-                // Start release animation (will initialize drift velocities)
+                // Start release animation
+                releaseEnabled = true; // Enable floating
                 if (releaseProgress === 0) {
                     releaseProgress = 0.001; // Start the release process
+                }
+                if (releaseBtn) {
+                    releaseBtn.textContent = 'Stop Floating'; // Update button text
                 }
             }
         }
@@ -891,6 +903,7 @@ function init144SatellitesVisualization(containerId) {
     const resetReleaseBtn = document.getElementById('reset-144-release');
     const resetRelease = () => {
         releaseProgress = 0;
+        releaseEnabled = false; // Stop floating
         // Clear release positions and drift velocities
         satellites.forEach(satellite => {
             satellite.userData.releasePosition = null;
@@ -899,6 +912,10 @@ function init144SatellitesVisualization(containerId) {
             satellite.userData.releaseStartPosition = null;
             satellite.userData.releaseStartTime = null;
         });
+        // Reset button text
+        if (releaseBtn) {
+            releaseBtn.textContent = 'Release Satellites';
+        }
     };
     
     if (resetReleaseBtn) {
@@ -963,20 +980,24 @@ function init144SatellitesVisualization(containerId) {
         },
         resetExpansion: () => {
             expansionProgress = 0;
+            expansionEnabled = false;
         },
         releaseSatellites: () => {
             if (expansionProgress >= 1.0) {
-                if (releaseProgress >= 1.0) {
-                    releaseProgress = 0;
-                    satellites.forEach(satellite => {
-                        satellite.userData.releasePosition = null;
-                        satellite.userData.released = false;
-                    });
+                const alreadyReleased = satellites.some(s => s.userData.released);
+                if (alreadyReleased && releaseEnabled) {
+                    releaseEnabled = false;
+                } else {
+                    releaseEnabled = true;
+                    if (releaseProgress === 0) {
+                        releaseProgress = 0.001;
+                    }
                 }
             }
         },
         resetRelease: () => {
             releaseProgress = 0;
+            releaseEnabled = false;
             satellites.forEach(satellite => {
                 satellite.userData.releasePosition = null;
                 satellite.userData.released = false;
