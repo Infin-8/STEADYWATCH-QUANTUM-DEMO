@@ -1519,3 +1519,89 @@ footer a {
         padding: 22px 24px;
     }
 }
+
+/* ============================================
+   Panel Controls and Stats - Responsive Design
+   ============================================ */
+
+/* Base styles for panel controls and stats */
+#panel-controls {
+    display: flex;
+    justify-content: space-evenly;
+    width: 100%;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+#panel-stats {
+    display: flex;
+    justify-content: space-evenly;
+    width: 100%;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+/* Tablet and smaller screens (768px and below) */
+@media (max-width: 768px) {
+    #panel-controls {
+        flex-direction: column;
+        gap: 12px;
+    }
+    
+    #panel-controls .viz-button {
+        width: 100%;
+        max-width: 300px;
+    }
+    
+    #panel-stats {
+        flex-direction: column;
+        gap: 10px;
+        align-items: flex-start;
+    }
+    
+    #panel-stats .viz-stat {
+        width: 100%;
+        justify-content: space-between;
+    }
+}
+
+/* Mobile screens (480px and below) */
+@media (max-width: 480px) {
+    #panel-controls {
+        flex-direction: column;
+        gap: 10px;
+        padding: 10px 0;
+    }
+    
+    #panel-controls .viz-button {
+        width: 100%;
+        padding: 10px 16px;
+        font-size: 0.9em;
+    }
+    
+    #panel-stats {
+        flex-direction: column;
+        gap: 8px;
+        padding: 10px 0;
+    }
+    
+    #panel-stats .viz-stat {
+        width: 100%;
+        font-size: 0.85em;
+        padding: 5px 0;
+    }
+}
+
+/* Very small screens (320px and below) */
+@media (max-width: 320px) {
+    #panel-controls .viz-button {
+        font-size: 0.85em;
+        padding: 8px 14px;
+    }
+    
+    #panel-stats .viz-stat {
+        font-size: 0.8em;
+    }
+}
