@@ -477,8 +477,11 @@ function init144SatellitesVisualization(containerId) {
     let animationRunning = true;
     let time = 0;
     let expansionProgress = 0; // 0 = collapsed, 1 = fully expanded
+    let releaseProgress = 0; // 0 = not released, 1 = fully released
     let showConnections = true;
     let expansionSpeed = 0.01;
+    let releaseSpeed = 0.015;
+    let releaseDistance = 3.0; // How far satellites move when released
 
     // ============================================
     // EXPANSION ANIMATION
@@ -508,16 +511,66 @@ function init144SatellitesVisualization(containerId) {
     }
 
     // ============================================
+    // RELEASE ANIMATION (Satellites move away from center)
+    // ============================================
+    function updateRelease() {
+        if (releaseProgress < 1.0) {
+            releaseProgress = Math.min(1.0, releaseProgress + releaseSpeed);
+        }
+
+        satellites.forEach((satellite, index) => {
+            if (!satellite.userData.expanded) return; // Only release if expanded
+
+            const basePos = satellite.userData.basePosition;
+            
+            // Calculate direction from center to base position
+            const direction = basePos.clone();
+            const distance = direction.length();
+            
+            // Only apply release if satellite is not at origin
+            if (distance > 0.001) {
+                direction.normalize();
+                
+                // Calculate release position (base position + direction * releaseDistance * progress)
+                const releaseOffset = direction.multiplyScalar(releaseDistance * releaseProgress);
+                const releasePos = basePos.clone().add(releaseOffset);
+                
+                // Store the release position for orbital animation
+                satellite.userData.releasePosition = releasePos;
+            } else {
+                // If at origin, use a random direction
+                const randomDirection = new THREE.Vector3(
+                    (Math.random() - 0.5) * 2,
+                    (Math.random() - 0.5) * 2,
+                    (Math.random() - 0.5) * 2
+                ).normalize();
+                const releaseOffset = randomDirection.multiplyScalar(releaseDistance * releaseProgress);
+                satellite.userData.releasePosition = releaseOffset;
+            }
+            
+            satellite.userData.released = releaseProgress >= 1.0;
+        });
+    }
+
+    // ============================================
     // ORBITAL AND PHASE ANIMATION
     // ============================================
     function updateSatelliteAnimation() {
         satellites.forEach((satellite, index) => {
             if (!satellite.userData.expanded) return;
 
-            // Get the expanded position (from expansion animation)
-            const expandedPos = satellite.position.clone();
-            const phase = satellite.userData.phase;
+            // Get the base position for orbital motion
+            // If released, use release position; otherwise use expanded position
             const basePos = satellite.userData.basePosition;
+            const phase = satellite.userData.phase;
+            
+            // Calculate target position (expanded or released)
+            let targetPos;
+            if (satellite.userData.releasePosition) {
+                targetPos = satellite.userData.releasePosition.clone();
+            } else {
+                targetPos = basePos.clone();
+            }
             
             // Calculate unified style for satellite
             const rotationAngle = time + phase;
@@ -531,11 +584,11 @@ function init144SatellitesVisualization(containerId) {
             const orbitY = Math.sin(time * orbitSpeed * 1.3 + style.teslaPhase) * orbitRadius;
             const orbitZ = Math.cos(time * orbitSpeed * 0.7 + style.teslaPhase) * orbitRadius;
 
-            // Apply orbital motion on top of expanded position with noise factor
+            // Apply orbital motion on top of target position (expanded or released) with noise factor
             satellite.position.set(
-                expandedPos.x + orbitX * style.noiseFactor,
-                expandedPos.y + orbitY * style.noiseFactor,
-                expandedPos.z + orbitZ * style.noiseFactor
+                targetPos.x + orbitX * style.noiseFactor,
+                targetPos.y + orbitY * style.noiseFactor,
+                targetPos.z + orbitZ * style.noiseFactor
             );
 
             // Apply unified styling to satellite material
@@ -705,6 +758,7 @@ function init144SatellitesVisualization(containerId) {
 
         if (animationRunning) {
             updateExpansion();
+            updateRelease();
             updateSatelliteAnimation();
             if (showConnections) {
                 // Use optimized connection update
@@ -761,6 +815,43 @@ function init144SatellitesVisualization(containerId) {
         resetExpansionBtn.addEventListener('click', resetExpansion);
     }
     
+    // Release satellites (move away from center)
+    const releaseBtn = document.getElementById('release-144-satellites');
+    const releaseSatellites = () => {
+        // Only release if satellites are expanded
+        if (expansionProgress >= 1.0) {
+            // If already fully released, clicking again will restart the animation
+            if (releaseProgress >= 1.0) {
+                releaseProgress = 0;
+                satellites.forEach(satellite => {
+                    satellite.userData.releasePosition = null;
+                    satellite.userData.released = false;
+                });
+            }
+            // Otherwise, animation will continue from current progress
+            // The updateRelease() function handles the animation
+        }
+    };
+    
+    if (releaseBtn) {
+        releaseBtn.addEventListener('click', releaseSatellites);
+    }
+    
+    // Reset release (bring satellites back)
+    const resetReleaseBtn = document.getElementById('reset-144-release');
+    const resetRelease = () => {
+        releaseProgress = 0;
+        // Clear release positions
+        satellites.forEach(satellite => {
+            satellite.userData.releasePosition = null;
+            satellite.userData.released = false;
+        });
+    };
+    
+    if (resetReleaseBtn) {
+        resetReleaseBtn.addEventListener('click', resetRelease);
+    }
+    
     // Keyboard shortcut for reset expansion (E key)
     document.addEventListener('keydown', (event) => {
         // Check if "E" key is pressed (case-insensitive)
@@ -770,18 +861,28 @@ function init144SatellitesVisualization(containerId) {
             // Reset expansion
             resetExpansion();
         }
+        // Check if "R" key is pressed for release (but not if it's the resize handler)
+        if (event.key.toLowerCase() === 'r' && !event.ctrlKey && !event.metaKey) {
+            // Only trigger if not in an input field
+            const target = event.target;
+            if (target.tagName !== 'INPUT' && target.tagName !== 'TEXTAREA') {
+                event.preventDefault();
+                releaseSatellites();
+            }
+        }
     });
 
+    // Handle window resize (Ctrl+R or Cmd+R for resize, plain R for release)
     document.addEventListener('keydown', (event) => {
-    // Option A: case-insensitive (most common)
-    if (event.key === 'r' || event.key === 'R') {
-        const newWidth = container.clientWidth;
-        const newHeight = container.clientHeight || 600;
-        camera.aspect = newWidth / newHeight;
-        camera.updateProjectionMatrix();
-        renderer.setSize(newWidth, newHeight);
-    }
-});
+        // Resize handler: Ctrl+R or Cmd+R
+        if ((event.ctrlKey || event.metaKey) && (event.key === 'r' || event.key === 'R')) {
+            const newWidth = container.clientWidth;
+            const newHeight = container.clientHeight || 600;
+            camera.aspect = newWidth / newHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(newWidth, newHeight);
+        }
+    });
 
     // Handle window resize
     window.addEventListener('resize', () => {
@@ -809,6 +910,24 @@ function init144SatellitesVisualization(containerId) {
         },
         resetExpansion: () => {
             expansionProgress = 0;
+        },
+        releaseSatellites: () => {
+            if (expansionProgress >= 1.0) {
+                if (releaseProgress >= 1.0) {
+                    releaseProgress = 0;
+                    satellites.forEach(satellite => {
+                        satellite.userData.releasePosition = null;
+                        satellite.userData.released = false;
+                    });
+                }
+            }
+        },
+        resetRelease: () => {
+            releaseProgress = 0;
+            satellites.forEach(satellite => {
+                satellite.userData.releasePosition = null;
+                satellite.userData.released = false;
+            });
         }
     };
 }
