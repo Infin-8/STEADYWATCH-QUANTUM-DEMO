@@ -501,7 +501,7 @@ function init144SatellitesVisualization(containerId) {
         if (bigBangProgress < 1.0) {
             // Use exponential easing for dramatic Big Bang effect
             const elapsed = time - bigBangStartTime;
-            const duration = 2.0; // 2 seconds for full expansion
+            const duration = 3.0; // 3 seconds for full universe expansion (longer than regular)
             bigBangProgress = Math.min(1.0, elapsed / duration);
             
             // Exponential easing: starts slow, accelerates rapidly (like Big Bang)
@@ -510,10 +510,28 @@ function init144SatellitesVisualization(containerId) {
             satellites.forEach((satellite, index) => {
                 const basePos = satellite.userData.basePosition;
                 const singularity = new THREE.Vector3(0, 0, 0); // All start at center (singularity)
-                const expandedPos = basePos.clone();
-
-                // Interpolate from singularity to final position
-                satellite.position.lerpVectors(singularity, expandedPos, easedProgress);
+                
+                // BIG BANG EXTENDS BEYOND NORMAL POSITIONS - Full Universe Projection
+                // Multiply base position by expansion factor to show full universe
+                const universeExpansionFactor = 2.5; // Extend 2.5x beyond normal positions
+                const fullUniversePos = basePos.clone().multiplyScalar(universeExpansionFactor);
+                
+                // Two-phase expansion:
+                // Phase 1 (0-0.6): Expand to normal positions (stellar formation)
+                // Phase 2 (0.6-1.0): Continue expanding beyond (full universe projection)
+                let targetPos;
+                if (bigBangProgress < 0.6) {
+                    // Phase 1: Normal expansion (stellar formation)
+                    const phase1Progress = bigBangProgress / 0.6;
+                    const easedPhase1 = 1 - Math.pow(1 - phase1Progress, 3);
+                    targetPos = basePos.clone();
+                    satellite.position.lerpVectors(singularity, targetPos, easedPhase1);
+                } else {
+                    // Phase 2: Extended expansion (full universe projection)
+                    const phase2Progress = (bigBangProgress - 0.6) / 0.4; // 0.6 to 1.0 maps to 0.0 to 1.0
+                    const easedPhase2 = 1 - Math.pow(1 - phase2Progress, 2); // Smooth easing
+                    satellite.position.lerpVectors(basePos, fullUniversePos, easedPhase2);
+                }
                 
                 // Add dramatic visual effects during Big Bang
                 const glow = satelliteGroup.children.find(child => 
@@ -522,32 +540,38 @@ function init144SatellitesVisualization(containerId) {
                 if (glow) {
                     glow.position.copy(satellite.position);
                     
-                    // Increase glow intensity during Big Bang (fade out as expansion completes)
-                    if (bigBangProgress < 0.5) {
-                        const intensity = 0.2 + (0.3 * (1 - bigBangProgress * 2)); // Bright at start
+                    // Increase glow intensity during early Big Bang (cosmic fire)
+                    if (bigBangProgress < 0.3) {
+                        const intensity = 0.2 + (0.4 * (1 - bigBangProgress / 0.3));
                         glow.material.emissiveIntensity = intensity;
-                        glow.material.opacity = 0.2 + (0.4 * (1 - bigBangProgress * 2));
+                        glow.material.opacity = 0.2 + (0.5 * (1 - bigBangProgress / 0.3));
+                    } else if (bigBangProgress < 0.6) {
+                        // Fade during stellar formation
+                        const fadeProgress = (bigBangProgress - 0.3) / 0.3;
+                        glow.material.emissiveIntensity = 0.6 - (0.4 * fadeProgress);
+                        glow.material.opacity = 0.7 - (0.5 * fadeProgress);
                     } else {
-                        // Return to normal glow
-                        glow.material.emissiveIntensity = 0.2;
-                        glow.material.opacity = 0.2;
+                        // Dim during universe expansion (stars become distant)
+                        const dimProgress = (bigBangProgress - 0.6) / 0.4;
+                        glow.material.emissiveIntensity = Math.max(0.1, 0.2 - (0.1 * dimProgress));
+                        glow.material.opacity = Math.max(0.1, 0.2 - (0.1 * dimProgress));
                     }
                 }
                 
-                // Increase satellite size slightly during Big Bang (cosmic expansion effect)
-                if (bigBangProgress < 0.3) {
-                    const scale = 1.0 + (0.5 * (1 - bigBangProgress / 0.3));
+                // Increase satellite size during early Big Bang (cosmic expansion effect)
+                if (bigBangProgress < 0.2) {
+                    const scale = 1.0 + (0.8 * (1 - bigBangProgress / 0.2));
                     satellite.scale.set(scale, scale, scale);
                 } else {
                     satellite.scale.set(1.0, 1.0, 1.0);
                 }
             });
             
-            // When Big Bang completes, enable regular expansion state
+            // When Big Bang completes, keep satellites at extended positions
             if (bigBangProgress >= 1.0) {
                 expansionProgress = 1.0;
-                expansionEnabled = false; // Big Bang takes over
-                bigBangEnabled = false; // Big Bang complete
+                expansionEnabled = false;
+                bigBangEnabled = false; // Big Bang complete, but satellites remain at extended positions
             }
         }
     }
@@ -950,7 +974,7 @@ function init144SatellitesVisualization(containerId) {
                 if (bigBangBtn) {
                     bigBangBtn.textContent = '🌌 Big Bang';
                 }
-            }, 2000);
+            }, 3000); // Updated to 3 seconds to match Big Bang duration
         });
     }
 
@@ -973,7 +997,7 @@ function init144SatellitesVisualization(containerId) {
         bigBangProgress = 0;
         bigBangEnabled = false; // Disable Big Bang
         
-        // Reset all satellites to center
+        // Reset all satellites to center (singularity)
         satellites.forEach((satellite) => {
             satellite.position.set(0, 0, 0);
             satellite.userData.expanded = false;
@@ -987,6 +1011,18 @@ function init144SatellitesVisualization(containerId) {
                 glow.position.set(0, 0, 0);
                 glow.material.emissiveIntensity = 0.2;
                 glow.material.opacity = 0.2;
+            }
+        });
+        
+        // Reset Big Bang extended positions (if any satellites are at extended positions)
+        satellites.forEach((satellite) => {
+            const basePos = satellite.userData.basePosition;
+            // If satellite is beyond base position, it was in Big Bang extended state
+            const currentDistance = satellite.position.length();
+            const baseDistance = basePos.length();
+            if (currentDistance > baseDistance * 1.1) {
+                // Reset to base position (though we already set to 0,0,0 above, this ensures cleanup)
+                satellite.position.set(0, 0, 0);
             }
         });
     };
