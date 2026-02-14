@@ -484,11 +484,81 @@ function init144SatellitesVisualization(containerId) {
     let expansionSpeed = 0.01;
     let releaseSpeed = 0.015;
     let releaseDistance = 3.0; // How far satellites move when released
+    
+    // Big Bang state
+    let bigBangEnabled = false;
+    let bigBangProgress = 0; // 0 = singularity, 1 = fully expanded
+    let bigBangSpeed = 0.05; // Faster than regular expansion (5x speed)
+    let bigBangStartTime = 0;
+
+    // ============================================
+    // BIG BANG ANIMATION (Universe-as-App)
+    // ============================================
+    function updateBigBang() {
+        if (!bigBangEnabled) return;
+        
+        // Update Big Bang progress (rapid expansion from singularity)
+        if (bigBangProgress < 1.0) {
+            // Use exponential easing for dramatic Big Bang effect
+            const elapsed = time - bigBangStartTime;
+            const duration = 2.0; // 2 seconds for full expansion
+            bigBangProgress = Math.min(1.0, elapsed / duration);
+            
+            // Exponential easing: starts slow, accelerates rapidly (like Big Bang)
+            const easedProgress = 1 - Math.pow(1 - bigBangProgress, 3);
+            
+            satellites.forEach((satellite, index) => {
+                const basePos = satellite.userData.basePosition;
+                const singularity = new THREE.Vector3(0, 0, 0); // All start at center (singularity)
+                const expandedPos = basePos.clone();
+
+                // Interpolate from singularity to final position
+                satellite.position.lerpVectors(singularity, expandedPos, easedProgress);
+                
+                // Add dramatic visual effects during Big Bang
+                const glow = satelliteGroup.children.find(child => 
+                    child.userData.satelliteIndex === index && child !== satellite
+                );
+                if (glow) {
+                    glow.position.copy(satellite.position);
+                    
+                    // Increase glow intensity during Big Bang (fade out as expansion completes)
+                    if (bigBangProgress < 0.5) {
+                        const intensity = 0.2 + (0.3 * (1 - bigBangProgress * 2)); // Bright at start
+                        glow.material.emissiveIntensity = intensity;
+                        glow.material.opacity = 0.2 + (0.4 * (1 - bigBangProgress * 2));
+                    } else {
+                        // Return to normal glow
+                        glow.material.emissiveIntensity = 0.2;
+                        glow.material.opacity = 0.2;
+                    }
+                }
+                
+                // Increase satellite size slightly during Big Bang (cosmic expansion effect)
+                if (bigBangProgress < 0.3) {
+                    const scale = 1.0 + (0.5 * (1 - bigBangProgress / 0.3));
+                    satellite.scale.set(scale, scale, scale);
+                } else {
+                    satellite.scale.set(1.0, 1.0, 1.0);
+                }
+            });
+            
+            // When Big Bang completes, enable regular expansion state
+            if (bigBangProgress >= 1.0) {
+                expansionProgress = 1.0;
+                expansionEnabled = false; // Big Bang takes over
+                bigBangEnabled = false; // Big Bang complete
+            }
+        }
+    }
 
     // ============================================
     // EXPANSION ANIMATION
     // ============================================
     function updateExpansion() {
+        // Skip regular expansion if Big Bang is active
+        if (bigBangEnabled) return;
+        
         // Only expand if user has enabled expansion
         if (expansionEnabled && expansionProgress < 1.0) {
             expansionProgress = Math.min(1.0, expansionProgress + expansionSpeed);
@@ -801,6 +871,7 @@ function init144SatellitesVisualization(containerId) {
         time += 0.02;
 
         if (animationRunning) {
+            updateBigBang(); // Big Bang takes priority (Universe-as-App)
             updateExpansion();
             updateRelease();
             updateSatelliteAnimation();
@@ -849,11 +920,48 @@ function init144SatellitesVisualization(containerId) {
         });
     }
 
+    // Big Bang expansion (Universe-as-App)
+    const bigBangBtn = document.getElementById('big-bang-144-satellites');
+    if (bigBangBtn) {
+        bigBangBtn.addEventListener('click', () => {
+            // Reset everything to singularity
+            expansionProgress = 0;
+            expansionEnabled = false;
+            releaseProgress = 0;
+            releaseEnabled = false;
+            bigBangProgress = 0;
+            bigBangStartTime = time;
+            bigBangEnabled = true;
+            
+            // Reset all satellites to center (singularity)
+            satellites.forEach((satellite) => {
+                satellite.position.set(0, 0, 0);
+                satellite.userData.expanded = false;
+                satellite.userData.released = false;
+                satellite.userData.driftVelocity = null;
+                satellite.userData.releaseStartPosition = null;
+                satellite.userData.releaseStartTime = null;
+                satellite.scale.set(1.0, 1.0, 1.0);
+            });
+            
+            // Update button text
+            bigBangBtn.textContent = '🌌 Big Bang...';
+            setTimeout(() => {
+                if (bigBangBtn) {
+                    bigBangBtn.textContent = '🌌 Big Bang';
+                }
+            }, 2000);
+        });
+    }
+
     // Expand satellites (user-controlled)
     const expandBtn = document.getElementById('expand-144-satellites');
     if (expandBtn) {
         expandBtn.addEventListener('click', () => {
-            expansionEnabled = true; // Enable expansion
+            // Don't allow regular expansion during Big Bang
+            if (!bigBangEnabled) {
+                expansionEnabled = true; // Enable expansion
+            }
         });
     }
 
@@ -862,6 +970,25 @@ function init144SatellitesVisualization(containerId) {
     const resetExpansion = () => {
         expansionProgress = 0;
         expansionEnabled = false; // Disable expansion
+        bigBangProgress = 0;
+        bigBangEnabled = false; // Disable Big Bang
+        
+        // Reset all satellites to center
+        satellites.forEach((satellite) => {
+            satellite.position.set(0, 0, 0);
+            satellite.userData.expanded = false;
+            satellite.scale.set(1.0, 1.0, 1.0);
+            
+            // Reset glow
+            const glow = satelliteGroup.children.find(child => 
+                child.userData.satelliteIndex === satellite.userData.index && child !== satellite
+            );
+            if (glow) {
+                glow.position.set(0, 0, 0);
+                glow.material.emissiveIntensity = 0.2;
+                glow.material.opacity = 0.2;
+            }
+        });
     };
     
     if (resetExpansionBtn) {
@@ -922,16 +1049,26 @@ function init144SatellitesVisualization(containerId) {
         resetReleaseBtn.addEventListener('click', resetRelease);
     }
     
-    // Keyboard shortcut for reset expansion (E key)
+    // Keyboard shortcuts
     document.addEventListener('keydown', (event) => {
-        // Check if "E" key is pressed (case-insensitive)
+        // Big Bang shortcut: 'b' key
+        if (event.key.toLowerCase() === 'b' && !event.ctrlKey && !event.metaKey) {
+            const target = event.target;
+            if (target.tagName !== 'INPUT' && target.tagName !== 'TEXTAREA') {
+                event.preventDefault();
+                if (bigBangBtn) {
+                    bigBangBtn.click();
+                }
+            }
+        }
+        // Reset expansion shortcut: 'e' key
         if (event.key.toLowerCase() === 'e') {
             // Prevent default behavior
             event.preventDefault();
             // Reset expansion
             resetExpansion();
         }
-        // Check if "R" key is pressed for release (but not if it's the resize handler)
+        // Release shortcut: 'r' key
         if (event.key.toLowerCase() === 'r' && !event.ctrlKey && !event.metaKey) {
             // Only trigger if not in an input field
             const target = event.target;
