@@ -788,18 +788,20 @@ function init144SatellitesVisualization(containerId) {
     const tooltip = document.createElement('div');
     tooltip.style.cssText = `
         position: absolute;
+        left: 0;
+        top: 0;
         background: rgba(102, 126, 234, 0.95);
         color: white;
         padding: 10px 15px;
         border-radius: 8px;
         pointer-events: none;
-        z-index: 1000;
+        z-index: 10;
         font-size: 14px;
         box-shadow: 0 4px 12px rgba(0,0,0,0.3);
         display: none;
         max-width: 250px;
     `;
-    document.body.appendChild(tooltip);
+    container.appendChild(tooltip);
 
     function onMouseMove(event) {
         const rect = renderer.domElement.getBoundingClientRect();
@@ -831,8 +833,9 @@ function init144SatellitesVisualization(containerId) {
                     Position: (${intersected.position.x.toFixed(2)}, ${intersected.position.y.toFixed(2)}, ${intersected.position.z.toFixed(2)})
                 `;
                 tooltip.style.display = 'block';
-                tooltip.style.left = (event.clientX + 10) + 'px';
-                tooltip.style.top = (event.clientY - 10) + 'px';
+                const containerRect = container.getBoundingClientRect();
+                tooltip.style.left = (event.clientX - containerRect.left + 10) + 'px';
+                tooltip.style.top = (event.clientY - containerRect.top - 10) + 'px';
             }
         } else {
             if (hoveredSatellite) {
