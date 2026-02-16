@@ -772,6 +772,19 @@ function init144SatellitesVisualization(containerId) {
     const raycaster = new THREE.Raycaster();
     const mouse = new THREE.Vector2();
     let hoveredSatellite = null;
+    const HOVER_SHININESS = 200;           // Sharper specular = more "lightning" (default 100)
+    const HOVER_SPECULAR = 0xaaccff;       // Visible specular tint (default 0x111111)
+    const DEFAULT_SHININESS = 100;
+    const DEFAULT_SPECULAR = 0x111111;
+
+    function resetSatelliteHoverEffect(satellite) {
+        if (!satellite || !satellite.material) return;
+        satellite.material.emissiveIntensity = 0.4;
+        satellite.material.shininess = DEFAULT_SHININESS;
+        satellite.material.specular.setHex(DEFAULT_SPECULAR);
+        satellite.scale.set(1, 1, 1);
+    }
+
     const tooltip = document.createElement('div');
     tooltip.style.cssText = `
         position: absolute;
@@ -799,12 +812,16 @@ function init144SatellitesVisualization(containerId) {
         if (intersects.length > 0) {
             const intersected = intersects[0].object;
             if (hoveredSatellite !== intersected) {
+                // Reset previous satellite if switching from one to another
+                if (hoveredSatellite) resetSatelliteHoverEffect(hoveredSatellite);
                 hoveredSatellite = intersected;
-                
-                // Highlight satellite
+
+                // Highlight satellite (scale + emissive + sharper specular "lightning")
                 intersected.material.emissiveIntensity = 1.0;
+                intersected.material.shininess = HOVER_SHININESS;
+                intersected.material.specular.setHex(HOVER_SPECULAR);
                 intersected.scale.set(1.5, 1.5, 1.5);
-                
+
                 // Show tooltip
                 const index = intersected.userData.index;
                 const phase = intersected.userData.phase;
@@ -819,9 +836,7 @@ function init144SatellitesVisualization(containerId) {
             }
         } else {
             if (hoveredSatellite) {
-                // Reset satellite
-                hoveredSatellite.material.emissiveIntensity = 0.4;
-                hoveredSatellite.scale.set(1, 1, 1);
+                resetSatelliteHoverEffect(hoveredSatellite);
                 hoveredSatellite = null;
                 tooltip.style.display = 'none';
             }
