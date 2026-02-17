@@ -150,19 +150,19 @@ function initEchoVisualization(containerId) {
     });
     scene.add(fullStarGroup);
 
-    // ---- echoGroup (coarse ring + optional blobs) ----
+    // ---- echoGroup (full 3D ring + optional blobs) ----
     const echoGroup = new THREE.Group();
-    const ringGeometry = new THREE.RingGeometry(10, 14, 64);
+    const torusRadius = 12;
+    const tubeRadius = 0.8;
+    const torusGeometry = new THREE.TorusGeometry(torusRadius, tubeRadius, 16, 64);
     const ringMaterial = new THREE.MeshPhongMaterial({
         color: 0x667eea,
         emissive: 0x667eea,
         emissiveIntensity: 0.2,
-        side: THREE.DoubleSide,
         transparent: true,
         opacity: 0.5
     });
-    const ring = new THREE.Mesh(ringGeometry, ringMaterial);
-    ring.rotation.x = Math.PI / 2;
+    const ring = new THREE.Mesh(torusGeometry, ringMaterial);
     echoGroup.add(ring);
     // A few blob spheres at subset of positions
     const blobIndices = [0, 24, 48, 72, 96, 120];
