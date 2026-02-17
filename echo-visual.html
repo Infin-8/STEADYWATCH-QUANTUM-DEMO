@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Echo Phases Visual | STEADYWATCH™</title>
+    <meta name="description" content="Six phases: Cold open, Full, Echo, GHZ, Superimpose, Out. Lightweight copy (echo) and structural match with GHZ path.">
+    <link rel="stylesheet" href="styles.css">
+</head>
+
+<!-- Three.js Library -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+<script src="echo-visualization.js"></script>
+
+<body>
+    <nav>
+        <div class="container">
+            <a href="https://apps.apple.com/us/app/steadywatch-handheld/id6755752518" class="nav-brand">
+                <img src="images/logo.png" alt="STEADYWATCH Logo">
+                <span><u>STEADYWATCH™</u></span>
+            </a>
+            <button class="mobile-menu-toggle" onclick="toggleMobileMenu()">☰</button>
+            <ul class="nav-links" id="navLinks">
+                <li><a href="index.html" class="quickShadow">Home</a></li>
+                <li><a href="index.html#research-papers" class="quickShadow">Research</a></li>
+                <li><a href="hardware-validation.html" class="quickShadow">Validation</a></li>
+                <li><a href="comparison.html" class="quickShadow">VS</a></li>
+                <li><a href="144-satellites.html" class="quickShadow">z(p)</a></li>
+                <li><a href="index.html#faq" class="quickShadow">FAQ</a></li>
+                <li><a href="consulting-services.html" class="quickShadow">Consulting</a></li>
+                <li><a href="contact.html" class="nav-cta">Contact</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <header style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); padding: 100px 0 60px; text-align: center; color: white;">
+        <div class="container">
+            <h1 style="text-shadow: 3px 2px 2px black; font-size: 2.5em; margin-bottom: 20px;">
+                Echo Phases
+            </h1>
+            <p class="subtitle" style="font-size: 1.2em; margin-bottom: 30px;">
+                Cold open → Full → Echo → GHZ → Superimpose → Out
+            </p>
+            <p style="max-width: 800px; margin: 0 auto; font-size: 1.1em; line-height: 1.8;">
+                Six phases: the full Hurwitz structure, the echo (lightweight copy), the GHZ path, and their superimposition. 
+                At the echo level, structures match.
+            </p>
+        </div>
+    </header>
+
+    <div class="section white">
+        <div class="container">
+            <h2 class="section-title">Phase selector</h2>
+            <p id="echo-caption" class="section-subtitle" style="min-height: 1.5em; margin-bottom: 15px; font-style: italic;">
+                One prime. One seed.
+            </p>
+
+            <div id="echo-visualization" class="visualization-container" style="height: 600px; margin: 30px 0;"></div>
+
+            <div class="visualization-controls" style="display: flex; flex-wrap: wrap; gap: 10px; align-items: center; margin-top: 20px;">
+                <button data-phase="0" class="viz-button phase-btn">Cold open</button>
+                <button data-phase="1" class="viz-button phase-btn">Full</button>
+                <button data-phase="2" class="viz-button phase-btn">Echo</button>
+                <button data-phase="3" class="viz-button phase-btn">GHZ</button>
+                <button data-phase="4" class="viz-button phase-btn">Superimpose</button>
+                <button data-phase="5" class="viz-button phase-btn">Out</button>
+                <button id="echo-play-btn" class="viz-button" style="margin-left: 10px;">Play</button>
+            </div>
+        </div>
+    </div>
+
+    <footer style="background: #1a1a2e; color: white; padding: 40px 0; text-align: center;">
+        <div class="container">
+            <p>&copy; 2026 STEADYWATCH™. All rights reserved.</p>
+            <p style="margin-top: 10px; opacity: 0.8;">
+                <a href="index.html" style="color: white; text-decoration: none;">Home</a> |
+                <a href="144-satellites.html" style="color: white; text-decoration: none;">144 Keyz</a> |
+                <a href="contact.html" style="color: white; text-decoration: none;">Contact</a> |
+                <a href="privacy-policy.html" style="color: white; text-decoration: none;">Privacy Policy</a>
+            </p>
+        </div>
+    </footer>
+
+    <script>
+        function toggleMobileMenu() {
+            const navLinks = document.getElementById('navLinks');
+            navLinks.classList.toggle('active');
+        }
+    </script>
+</body>
+</html>
