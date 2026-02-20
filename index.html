@@ -369,8 +369,9 @@
             <!-- THIS DIV IS WHERE THE 3D VISUALIZATION RENDERS -->
             <div id="ghz-visualization" class="visualization-container" style="height: 600px;"></div>
             
-      
-                <div class="visualization-controls">
+    <!-- Controls -->
+            
+                <!-- <div class="visualization-controls">
                     <button id="toggle-ghz-animation" class="viz-button">Pause</button>
                     <button id="eavesdropperBtn" class="viz-button eavesdropper-btn">Fire</button>
                     <button id="reset-ghz-view" class="viz-button">Reset View</button>
@@ -387,7 +388,32 @@
                             <span>Fidelity:</span>
                             <strong style="color: white; text-shadow: 2px 1px 2px black;">69%</strong>
                         </div>
+                </div> -->
+
+            <div class="visualization-controls">
+                <div id="panel-controls">
+                    <button id="toggle-ghz-animation" class="viz-button" style="color: lime;">Pause</button>
+                    <button id="eavesdropperBtn" class="viz-button">Fire</button>
+                    <button id="reset-ghz-view" class="viz-button">Reset View</button>
                 </div>
+                
+                <div id="panel-stats">
+                        <div class="viz-stat">
+                            <span>Qubits:</span>
+                             <strong style="color: white; text-shadow: 2px 1px 2px black;">12</strong>
+                        </div>
+                         <div class="viz-stat">
+                            <span>Connections:</span>
+                            <strong style="color: white; text-shadow: 2px 1px 2px black;">66</strong>
+                        </div>
+                        <div class="viz-stat">
+                            <span>Fidelity:</span>
+                            <strong style="color: white; text-shadow: 2px 1px 2px black;">69%</strong>
+                        </div>
+                </div>
+            </div>
+
+            
                <div id="detectionStatus" class="detection-status" style="font-size: medium; text-align: center;"></div>
                 
             </div>
