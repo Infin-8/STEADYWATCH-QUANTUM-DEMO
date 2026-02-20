@@ -24,6 +24,81 @@
       { "text": "Research Paper", "url": "https://github.com/Infin-8/STEADYWATCH-QUANTUM-DEMO/blob/main/docs/research/GHZ_NETWORK_AUTHENTICATION_GUIDE.md" }
     ]
   },
+    {
+    "id": "hurwitz_p2",
+    "category": "ghz",
+    "title": "Hurwitz p=2 (Ramified) — 24 satellites",
+    "backend": "ibm_marrakesh",
+    "qubits": 10,
+    "fidelity": "100%",
+    "jobId": "d663a4hv6o8c73d3nfhg",
+    "date": "2026-02-11",
+    "executionTime": "~1s",
+    "description": "Prime seed p=2 (ramified case) expands to 24 Hurwitz quaternion satellites. Architecture and key uniqueness validated on hardware; 100% uniqueness rate, 10/10 error-mitigation corrections.",
+    "isImportant": true,
+    "media": {
+      "type": "screenshot",
+      "path": "images/hurwitz_p2.png"
+    },
+    "video": {
+      "path": "images/hurwitz_p2_video.mov",
+      "available": true
+    },
+    "links": [
+      { "text": "View on IBM Quantum", "url": "https://quantum.ibm.com/jobs/d663a4hv6o8c73d3nfhg" },
+      { "text": "Research Paper", "url": "https://github.com/Infin-8/STEADYWATCH-QUANTUM-DEMO/blob/main/docs/research/HURWITZ_DUALITY_EXPRESSION_MATHEMATICAL_VALIDATION.md" }
+    ]
+  },
+    {
+    "id": "hurwitz_p5",
+    "category": "ghz",
+    "title": "Hurwitz p=5 (Split) — 144 satellites",
+    "backend": "ibm_marrakesh",
+    "qubits": 10,
+    "fidelity": "100%",
+    "jobId": "d663a69v6o8c73d3nfkg",
+    "date": "2026-02-11",
+    "executionTime": "~1s",
+    "description": "Prime seed p=5 (split case) expands to 144 satellites (24×(p+1)). Hardware-validated deterministic key diversity: one prime → 144 unique seeds. 100% uniqueness, fastest of the three runs.",
+    "isImportant": true,
+    "media": {
+      "type": "screenshot",
+      "path": "images/hurwitz_p5.png"
+    },
+    "video": {
+      "path": "images/hurwitz_p5_video.mov",
+      "available": true
+    },
+    "links": [
+      { "text": "View on IBM Quantum", "url": "https://quantum.ibm.com/jobs/d663a69v6o8c73d3nfkg" },
+      { "text": "Research Paper", "url": "https://github.com/Infin-8/STEADYWATCH-QUANTUM-DEMO/blob/main/docs/research/HURWITZ_DUALITY_EXPRESSION_MATHEMATICAL_VALIDATION.md" }
+    ]
+  },
+    {
+    "id": "hurwitz_p13",
+    "category": "ghz",
+    "title": "Hurwitz p=13 (Split) — 336 satellites",
+    "backend": "ibm_marrakesh",
+    "qubits": 10,
+    "fidelity": "100%",
+    "jobId": "d663a81v6o8c73d3nfmg",
+    "date": "2026-02-11",
+    "executionTime": "~1s",
+    "description": "Prime seed p=13 expands to 336 satellites (24×14). Validates scalability: same formula, larger key set. 100% uniqueness and full architecture validation on hardware.",
+    "isImportant": true,
+    "media": {
+      "type": "screenshot",
+      "path": "images/hurwitz_p13.png"
+    },
+    "video": {
+      "path": "images/hurwitz_p13_video.mov",
+      "available": true
+    },
+    "links": [
+      { "text": "View on IBM Quantum", "url": "https://quantum.ibm.com/jobs/d663a81v6o8c73d3nfmg" },
+      { "text": "Research Paper", "url": "https://github.com/Infin-8/STEADYWATCH-QUANTUM-DEMO/blob/main/docs/research/HURWITZ_DUALITY_EXPRESSION_MATHEMATICAL_VALIDATION.md" }
+    ]
+  },
   {
     "id": "ghz-2",
     "category": "ghz",
