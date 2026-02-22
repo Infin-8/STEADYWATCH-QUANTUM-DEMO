@@ -879,6 +879,29 @@ footer a {
     animation: none;
 }
 
+#contact-btn {
+    background: linear-gradient(135deg, #ffffff, #6178df);
+    color: white;
+    box-shadow: 0 4px 15px rgba(255, 71, 87, 0.4);
+    animation: pulse-danger 2s infinite;
+}
+
+#contact-btn:hover {
+  background: linear-gradient(135deg, #ff4757, #c44569);
+  box-shadow: 0 6px 20px rgb(97, 120, 223);
+  transform: translateY(-2px);
+}
+
+#contact-btn:active {
+    transform: translateY(0);
+}
+
+#contact-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    animation: none;
+}
+
 @keyframes pulse-danger {
     0%, 100% { box-shadow: 0 4px 15px rgba(255, 71, 87, 0.4); }
     50% { box-shadow: 0 4px 25px rgba(255, 71, 87, 0.8); }
