@@ -883,7 +883,7 @@ footer a {
     background: linear-gradient(135deg, #ffffff, #6178df);
     color: white;
     box-shadow: 0 4px 15px rgba(71, 126, 255, 0.76);
-    animation: pulse-danger 2s infinite;
+    animation: #contact-btn 2s infinite;
 }
 
 #contact-btn:hover {
