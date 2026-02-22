@@ -882,13 +882,13 @@ footer a {
 #contact-btn {
     background: linear-gradient(135deg, #ffffff, #6178df);
     color: white;
-    box-shadow: 0 4px 15px rgba(255, 71, 87, 0.4);
+    box-shadow: 0 4px 15px rgba(71, 126, 255, 0.76);
     animation: pulse-danger 2s infinite;
 }
 
 #contact-btn:hover {
   background: linear-gradient(135deg, #ff4757, #c44569);
-  box-shadow: 0 6px 20px rgb(97, 120, 223);
+  box-shadow: 0 4px 15px rgba(71, 126, 255, 0.76);
   transform: translateY(-2px);
 }
 
