@@ -1061,7 +1061,7 @@ function init144SatellitesVisualization(containerId) {
             if (alreadyReleased && releaseEnabled) {
                 releaseEnabled = false; // Stop floating
                 if (releaseBtn) {
-                    releaseBtn.textContent = 'Release Satellites'; // Update button text
+                    releaseBtn.textContent = 'Release Keyz' // Update button text
                 }
             } else {
                 // Start release animation
