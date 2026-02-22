@@ -889,9 +889,7 @@ footer a {
     100% { background-position: -200% 0; }
 }
 
-#contact-btn.shimmer {
-    background: linear-gradient(90deg, #6178df, #ffffff, #6178df);
-    background-size: 200% 100%;
+#contact-btn {
     animation: shimmer 3s infinite linear;
 }
 
