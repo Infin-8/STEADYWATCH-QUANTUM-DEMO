@@ -879,6 +879,10 @@ footer a {
     animation: none;
 }
 
+#contact-btn {
+    animation: shimmer 3s infinite linear;
+}
+
 @keyframes pulse-danger {
     0%, 100% { box-shadow: 0 4px 15px rgba(255, 71, 87, 0.4); }
     50% { box-shadow: 0 4px 25px rgba(255, 71, 87, 0.8); }
@@ -889,9 +893,7 @@ footer a {
     100% { background-position: -200% 0; }
 }
 
-#contact-btn {
-    animation: shimmer 3s infinite linear;
-}
+
 
 
 .detection-status {
