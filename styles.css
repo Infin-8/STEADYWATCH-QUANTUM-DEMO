@@ -907,6 +907,11 @@ footer a {
     50% { box-shadow: 0 4px 25px rgba(255, 71, 87, 0.8); }
 }
 
+@keyframes #contact-btn {
+    0%, 100% { box-shadow: 0 2px 1px rgba(71, 212, 255, 0.4); }
+    50% { box-shadow: 0 5px 5px rgba(71, 151, 255, 0.26) }
+}
+
 .detection-status {
     position: relative;
     top: 50%;
