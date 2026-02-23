@@ -126,7 +126,8 @@ header {
     text-align: center;
 }
 
-#header-hurwitz-bg {
+/* Hurwitz dots: CSS-only background (no canvas) */
+.header-hurwitz-dots {
     position: absolute;
     top: 0;
     left: 0;
@@ -134,6 +135,40 @@ header {
     height: 100%;
     z-index: 0;
     pointer-events: none;
+    overflow: hidden;
+}
+
+.header-hurwitz-dot {
+    position: absolute;
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.14);
+    transform: translate(-50%, -50%);
+}
+
+.header-hurwitz-dot.center {
+    width: 8px;
+    height: 8px;
+    background: rgba(255, 255, 255, 0.18);
+}
+
+/* Subtle pulse; off when user prefers reduced motion */
+@media (prefers-reduced-motion: no-preference) {
+    .header-hurwitz-dot {
+        animation: header-hurwitz-pulse 4s ease-in-out infinite;
+    }
+    .header-hurwitz-dot.center {
+        animation: header-hurwitz-pulse 5s ease-in-out infinite;
+    }
+    .header-hurwitz-dot:nth-child(n+2) {
+        animation-delay: calc(var(--i, 0) * 0.08s);
+    }
+}
+
+@keyframes header-hurwitz-pulse {
+    0%, 100% { opacity: 0.6; }
+    50% { opacity: 1; }
 }
 
 header .header-content {
