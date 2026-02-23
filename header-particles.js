@@ -9,9 +9,9 @@
     var particleCount = 220;
     var lineDistance = 0.5;
     var driftSpeed = 0.12;
-    var particleSize = 0.06;
-    var particleOpacity = 0.28;
-    var lineOpacity = 0.10;
+    var particleSize = 0.08;
+    var particleOpacity = 0.55;
+    var lineOpacity = 0.22;
 
     function initHeaderParticles(headerEl) {
         if (!headerEl || typeof THREE === 'undefined') return null;
@@ -56,7 +56,7 @@
 
         var material = new THREE.PointsMaterial({
             size: particleSize,
-            color: 0x667eea,
+            color: 0xe8ecff,
             transparent: true,
             opacity: particleOpacity,
             sizeAttenuation: true,
@@ -95,7 +95,7 @@
             lineSegments = new THREE.LineSegments(
                 lineGeometry,
                 new THREE.LineBasicMaterial({
-                    color: 0x764ba2,
+                    color: 0xd4dcff,
                     transparent: true,
                     opacity: lineOpacity,
                     depthWrite: false,
