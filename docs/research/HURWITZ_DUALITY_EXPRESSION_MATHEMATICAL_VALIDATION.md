@@ -37,6 +37,11 @@ Hurwitz quaternion satellite architecture enables the expansion of a single prim
 ?!z(p) / 144 = Normalized expansion
 ```
 
+**Notation (February 2026):** The duality expression is also written as **`?!z(|>) * -(144)`** where:
+- **`|>`** denotes the **decomposed or "unzipped" prime** — the prime in its expanded form (the satellite/keyz structure), not the raw integer p.
+- **`(144)`** denotes an **absolute number** — the constant 144 (scalar); parentheses indicate a fixed value.
+- So `?!z(|>)` is the duality expression applied to the unzipped prime; `* -(144)` is multiplication by the negative of that absolute constant.
+
 The duality expression establishes that:
 1. **Expansion** (positive direction): Seed → Satellites
 2. **Compression** (negative direction): Satellites → Seed

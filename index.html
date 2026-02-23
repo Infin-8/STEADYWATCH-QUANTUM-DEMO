@@ -8,6 +8,7 @@
     <link rel="stylesheet" href="styles.css"></link>
     <link rel="icon" href="images/logo.png" type="image/png">
     <script src="app.js" defer></script>
+    <script src="header-particles.js"></script>
 </head>
 
     <!-- Three.js Library -->
@@ -19,6 +20,9 @@
     <script>
         // This runs when page finishes loading
         document.addEventListener('DOMContentLoaded', function() {
+            if (typeof initHeaderParticles === 'function') {
+                initHeaderParticles(document.getElementById('site-header'));
+            }
             const vizControls = initGHZVisualization('ghz-visualization');
             
             if (vizControls) {
@@ -80,7 +84,8 @@
         </div>
     </nav>
     
-    <header>
+    <header id="site-header">
+        <div class="header-content">
         <div class="container" class="nav-brand">
             <h1 style="text-shadow: 3px 2px 2px black"><u><strong>STEADYWATCH™</strong></u></h1>
             <p class="subtitle">Precision Monitoring</p>
@@ -101,6 +106,7 @@
                 <a href="https://github.com/Infin-8/STEADYWATCH-QUANTUM-DEMO/releases/tag/v1.0.0" class="cta-button">View Release Notes</a>
                 <a href="https://github.com/Infin-8/STEADYWATCH-QUANTUM-DEMO" class="cta-button secondary">View Repository</a>
             </div>
+        </div>
         </div>
     </header>
 
