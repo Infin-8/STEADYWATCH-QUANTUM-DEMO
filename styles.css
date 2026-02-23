@@ -167,8 +167,8 @@ header {
 }
 
 @keyframes header-hurwitz-pulse {
-    0%, 100% { opacity: 0.75; }
-    50% { opacity: 1; }
+    0%, 100% { opacity: calc(0.75 * var(--opacity-scale, 1)); }
+    50% { opacity: var(--opacity-scale, 1); }
 }
 
 header .header-content {
