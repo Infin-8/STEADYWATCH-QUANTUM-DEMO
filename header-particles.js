@@ -1,17 +1,14 @@
 /**
- * STEADYWATCH™ Header particle field – subtle quantum/SHQKD vibe.
- * Sparse drifting particles with optional faint "entanglement" lines.
+ * STEADYWATCH™ Header – small Hurwitz quaternion-inspired tetrahedra.
+ * 144 units in a ring/lattice layout (24-unit group × expansion), subtle rotation.
  * Uses Three.js (expects THREE on global).
  */
 (function () {
     'use strict';
 
-    var particleCount = 220;
-    var lineDistance = 0.4;
-    var driftSpeed = 0.12;
-    var particleSize = 0.04;
-    var particleOpacity = 0.9;
-    var lineOpacity = 0.18;
+    var count = 144;
+    var driftSpeed = 0.06;
+    var baseScale = 0.018;
 
     function initHeaderParticles(headerEl) {
         if (!headerEl || typeof THREE === 'undefined') return null;
@@ -37,103 +34,70 @@
         wrapper.appendChild(renderer.domElement);
         headerEl.insertBefore(wrapper, headerEl.firstChild);
 
-        // Particle positions and drift phases (x: -aspect..aspect, y: -1..1)
-        var positions = new Float32Array(particleCount * 3);
-        var phases = new Float32Array(particleCount * 3);
-        var i, j;
-        for (i = 0; i < particleCount; i++) {
-            positions[i * 3 + 0] = (Math.random() - 0.5) * 2 * aspect;
-            positions[i * 3 + 1] = (Math.random() - 0.5) * 2;
-            positions[i * 3 + 2] = (Math.random() - 0.5) * 0.4;
-            phases[i * 3 + 0] = Math.random() * Math.PI * 2;
-            phases[i * 3 + 1] = Math.random() * Math.PI * 2;
-            phases[i * 3 + 2] = Math.random() * Math.PI * 2;
-        }
-
-        var geometry = new THREE.BufferGeometry();
-        geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
-        geometry.attributes.position.needsUpdate = true;
-
-        var material = new THREE.PointsMaterial({
-            size: particleSize,
+        var geometry = new THREE.TetrahedronGeometry(1, 0);
+        var material = new THREE.MeshBasicMaterial({
             color: 0xffffff,
             transparent: true,
-            opacity: particleOpacity,
-            sizeAttenuation: true,
+            opacity: 0.65,
             depthWrite: false,
         });
 
-        var points = new THREE.Points(geometry, material);
-        scene.add(points);
+        var mesh = new THREE.InstancedMesh(geometry, material, count);
+        mesh.count = count;
 
-        // Sparse "entanglement" lines between nearby particles (store pairs of indices)
-        var linePairs = [];
-        var maxLines = 25;
-        var added = 0;
-        for (i = 0; i < particleCount && added < maxLines; i++) {
-            var xi = positions[i * 3 + 0];
-            var yi = positions[i * 3 + 1];
-            var zi = positions[i * 3 + 2];
-            for (j = i + 1; j < particleCount && added < maxLines; j++) {
-                var dx = positions[j * 3 + 0] - xi;
-                var dy = positions[j * 3 + 1] - yi;
-                var dz = positions[j * 3 + 2] - zi;
-                var d = Math.sqrt(dx * dx + dy * dy + dz * dz);
-                if (d > 0 && d < lineDistance) {
-                    linePairs.push(i, j);
-                    added++;
+        var dummy = new THREE.Object3D();
+        var phases = [];
+        var i, ring, n, radius, angle, x, y;
+
+        for (i = 0; i < count; i++) {
+            phases.push(Math.random() * Math.PI * 2, Math.random() * Math.PI * 2);
+        }
+
+        function updatePositions() {
+            var time = Date.now() * 0.001;
+            var idx = 0;
+            for (ring = 0; ring < 5; ring++) {
+                n = ring === 0 ? 24 : (ring === 1 ? 24 : (ring === 2 ? 36 : (ring === 3 ? 30 : 30)));
+                radius = 0.15 + ring * 0.22 + 0.04 * Math.sin(time * 0.3 + ring);
+                for (i = 0; i < n && idx < count; i++) {
+                    angle = (i / n) * Math.PI * 2 + time * 0.02 * (ring % 2 === 0 ? 1 : -1);
+                    x = (radius * Math.cos(angle)) * aspect;
+                    y = radius * Math.sin(angle);
+                    dummy.position.set(x, y, (Math.random() - 0.5) * 0.2);
+                    dummy.scale.setScalar(baseScale * (0.85 + 0.3 * Math.sin(time + phases[idx * 2])));
+                    dummy.rotation.set(
+                        time * driftSpeed + phases[idx * 2],
+                        time * driftSpeed * 0.7 + phases[idx * 2 + 1],
+                        0
+                    );
+                    dummy.updateMatrix();
+                    mesh.setMatrixAt(idx, dummy.matrix);
+                    idx++;
                 }
             }
+            while (idx < count) {
+                x = (Math.random() - 0.5) * 1.2 * aspect;
+                y = (Math.random() - 0.5) * 1.2;
+                dummy.position.set(x, y, (Math.random() - 0.5) * 0.2);
+                dummy.scale.setScalar(baseScale * (0.9 + 0.2 * Math.sin(time + idx)));
+                dummy.rotation.set(time * driftSpeed, time * 0.5 * driftSpeed, 0);
+                dummy.updateMatrix();
+                mesh.setMatrixAt(idx, dummy.matrix);
+                idx++;
+            }
+            mesh.instanceMatrix.needsUpdate = true;
         }
 
-        var lineGeometry = null;
-        var lineSegments = null;
-        if (linePairs.length >= 2) {
-            var linePosArray = new Float32Array(linePairs.length * 3);
-            lineGeometry = new THREE.BufferGeometry();
-            lineGeometry.setAttribute('position', new THREE.BufferAttribute(linePosArray, 3));
-            lineSegments = new THREE.LineSegments(
-                lineGeometry,
-                new THREE.LineBasicMaterial({
-                    color: 0xffffff,
-                    transparent: true,
-                    opacity: lineOpacity,
-                    depthWrite: false,
-                })
-            );
-            scene.add(lineSegments);
-        }
+        updatePositions();
+        scene.add(mesh);
 
-        var time = 0;
+        var requestId;
         function animate() {
-            time += 0.016;
-            var pos = geometry.attributes.position.array;
-            for (i = 0; i < particleCount; i++) {
-                pos[i * 3 + 0] = positions[i * 3 + 0] + 0.08 * Math.sin(phases[i * 3 + 0] + time * driftSpeed);
-                pos[i * 3 + 1] = positions[i * 3 + 1] + 0.06 * Math.sin(phases[i * 3 + 1] + time * driftSpeed * 0.9);
-                pos[i * 3 + 2] = positions[i * 3 + 2] + 0.02 * Math.sin(phases[i * 3 + 2] + time * driftSpeed * 0.7);
-            }
-            geometry.attributes.position.needsUpdate = true;
-            if (lineGeometry && lineSegments && linePairs.length >= 2) {
-                var linePos = lineGeometry.attributes.position.array;
-                var idx = 0;
-                for (i = 0; i < linePairs.length; i += 2) {
-                    var a = linePairs[i] * 3;
-                    var b = linePairs[i + 1] * 3;
-                    linePos[idx++] = pos[a];
-                    linePos[idx++] = pos[a + 1];
-                    linePos[idx++] = pos[a + 2];
-                    linePos[idx++] = pos[b];
-                    linePos[idx++] = pos[b + 1];
-                    linePos[idx++] = pos[b + 2];
-                }
-                lineGeometry.attributes.position.needsUpdate = true;
-            }
+            updatePositions();
             renderer.render(scene, camera);
             requestId = requestAnimationFrame(animate);
         }
-
-        var requestId = requestAnimationFrame(animate);
+        requestId = requestAnimationFrame(animate);
 
         function resize() {
             var w = headerEl.offsetWidth;
@@ -148,7 +112,6 @@
             camera.bottom = -1;
             camera.updateProjectionMatrix();
         }
-
         window.addEventListener('resize', resize);
 
         return {
@@ -158,13 +121,10 @@
                 renderer.dispose();
                 material.dispose();
                 geometry.dispose();
-                if (lineGeometry) lineGeometry.dispose();
-                if (lineSegments && lineSegments.material) lineSegments.material.dispose();
                 if (wrapper.parentNode) wrapper.parentNode.removeChild(wrapper);
             },
         };
     }
 
-    // Export for use on index.html
     window.initHeaderParticles = initHeaderParticles;
 })();
