@@ -20,7 +20,7 @@ a {
 
 /* 2. Explicitly match visited to look the same as unvisited */
 a:visited {
-  color: #0066cc;           /* ← same as normal */
+  color: #8598ee;           /* ← same as normal */
   text-decoration: underline; /* ← same */
   /* copy ALL other relevant properties from a {} or a:link {} */
 }
