@@ -7,11 +7,11 @@
     'use strict';
 
     var particleCount = 220;
-    var lineDistance = 0.5;
+    var lineDistance = 0.4;
     var driftSpeed = 0.12;
-    var particleSize = 0.12;
-    var particleOpacity = 0.88;
-    var lineOpacity = 0.45;
+    var particleSize = 0.04;
+    var particleOpacity = 0.9;
+    var lineOpacity = 0.18;
 
     function initHeaderParticles(headerEl) {
         if (!headerEl || typeof THREE === 'undefined') return null;
@@ -68,7 +68,7 @@
 
         // Sparse "entanglement" lines between nearby particles (store pairs of indices)
         var linePairs = [];
-        var maxLines = 45;
+        var maxLines = 25;
         var added = 0;
         for (i = 0; i < particleCount && added < maxLines; i++) {
             var xi = positions[i * 3 + 0];
