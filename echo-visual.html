@@ -16,7 +16,7 @@
 <script src="echo-visualization.js"></script>
 
 <body>
-    <nav>
+    <nav style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;">
         <div class="container">
             <a href="https://apps.apple.com/us/app/steadywatch-handheld/id6755752518" class="nav-brand">
                 <img src="images/logo.png" alt="STEADYWATCH Logo">
@@ -25,13 +25,12 @@
             <button class="mobile-menu-toggle" onclick="toggleMobileMenu()">☰</button>
             <ul class="nav-links" id="navLinks">
                 <li><a href="index.html" class="quickShadow">Home</a></li>
-                <li><a href="index.html#research-papers" class="quickShadow">Research</a></li>
                 <li><a href="hardware-validation.html" class="quickShadow">Validation</a></li>
                 <li><a href="comparison.html" class="quickShadow">VS</a></li>
                 <li style="font-size: x-small; !important"><a href="144-satellites.html" class="quickShadow">(P == |&gt;)</a></li>
-                <li><a href="index.html#faq" class="quickShadow">FAQ</a></li>
+                 <li><a href="index.html#faq" class="quickShadow">FAQ</a></li>
                 <li><a href="consulting-services.html" class="quickShadow">Consulting</a></li>
-                <li><a href="contact.html" class="nav-cta" style="background: linear-gradient(135deg, #fdfdfd 0%, #6e85eb 100%); color: white; !important">Contact</a></li>
+                <li><a href="contact.html" class="viz-button" style="background: linear-gradient(140deg, #fdfdfd 0%, #6e85eb 100%); padding: 10px; border-radius: 25px; text-shadow: 2px 1px 1px black; border: none !important;">Contact</a></li>
             </ul>
         </div>
     </nav>
@@ -41,12 +40,12 @@
             <h1 style="text-shadow: 3px 2px 2px black; font-size: 2.5em;"><strong>Echo Phases</strong></h1>
             <p class="subtitle">The full Hurwitz structure, the Echo (lightweight copy), the GHZ path, and their superimposition.</p>
             <div style="margin-top: 30px;">
-                <span class="badge">Cold Open</span>=&gt;
-                <span class="badge">Full</span>=&gt;
-                <span class="badge">|&gt;</span>=&gt;
-                <span class="badge">GHZ</span>=&gt;
-                <span class="badge" style="font-size: x-small; !important">Compress (?!z(|&gt;) * -(144))</span>=&gt;
-                <span class="badge">Out</span>
+                <span style="text-shadow: 1px 1px 1px black; background: linear-gradient(135deg, #fdfdfd 0%, #6e85eb 100%); color: white; !important" class="badge">Cold Open</span>=&gt;
+                <span style="text-shadow: 1px 1px 1px black; background: linear-gradient(135deg, #fdfdfd 0%, #6e85eb 100%); color: white; !important" class="badge">Full</span>=&gt;
+                <span style="text-shadow: 1px 1px 1px black; background: linear-gradient(135deg, #fdfdfd 0%, #6e85eb 100%); color: white; !important" class="badge">|&gt;</span>=&gt;
+                <span style="text-shadow: 1px 1px 1px black; background: linear-gradient(135deg, #fdfdfd 0%, #6e85eb 100%); color: white; !important" class="badge">GHZ</span>=&gt;
+                <span class="badge" style="font-size: x-small !important; text-shadow: 1px 1px 1px black; background: linear-gradient(135deg, #fdfdfd 0%, #6e85eb 100%); color: white; !important">Compress (?!z(|&gt;) * -(144))</span>=&gt;
+                <span style="text-shadow: 1px 1px 1px black; background: linear-gradient(135deg, #fdfdfd 0%, #6e85eb 100%); color: white; !important" class="badge">Out</span>
             </div>
         </div>
     </header>

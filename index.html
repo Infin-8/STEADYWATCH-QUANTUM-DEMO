@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SHQKD API v1.0.0 | STEADYWATCH™</title>
+    <title>SHQKD v1.0.0 | STEADYWATCH™</title>
     <meta name="description" content="First complete end-to-end QKD protocol validated on real quantum hardware. Production-ready QKD API v1.0.0 with 14 operational endpoints. Hardware validated on IBM Quantum ibm_fez (156 qubits).">
     <link rel="stylesheet" href="styles.css"></link>
     <link rel="icon" href="images/logo.png" type="image/png">
@@ -62,7 +62,7 @@
     </script>
     
 <body>
-    <nav>
+    <nav style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;">
         <div class="container">
             <a href="https://apps.apple.com/us/app/steadywatch-handheld/id6755752518" class="nav-brand">
                 <img src="images/logo.png" alt="STEADYWATCH Logo">
@@ -71,15 +71,13 @@
             <button class="mobile-menu-toggle" onclick="toggleMobileMenu()">☰</button>
             <ul class="nav-links" id="navLinks">
                 <li><a href="index.html" class="quickShadow">Home</a></li>
-                <li><a href="#research-papers" class="quickShadow">Research</a></li>
                 <li><a href="hardware-validation.html" class="quickShadow">Validation</a></li>
                 <li><a href="comparison.html" class="quickShadow">VS</a></li>
                 <li style="font-size: x-small; !important"><a href="144-satellites.html" class="quickShadow">(P == |&gt;)</a></li>
                 <li><a href="echo-visual.html" class="quickShadow">Echo</a></li>
                 <li><a href="#faq" class="quickShadow">FAQ</a></li>
                 <li><a href="consulting-services.html" class="quickShadow">Consulting</a></li>
-                <li><a href="contact.html" class="nav-cta" style="background: linear-gradient(135deg, #fdfdfd 0%, #6e85eb 100%); color: white; !important">Contact</a></li>
-
+                <li><a href="contact.html" class="viz-button" style="background: linear-gradient(140deg, #fdfdfd 0%, #6e85eb 100%); padding: 10px; border-radius: 25px; text-shadow: 2px 1px 1px black; border: none !important;">Contact</a></li>
             </ul>
         </div>
     </nav>
@@ -89,22 +87,25 @@
         <div class="container" class="nav-brand">
             <h1 style="text-shadow: 3px 2px 2px black"><u><strong>STEADYWATCH™</strong></u></h1>
             <p class="subtitle">Precision Monitoring</p>
-            <h2><span>Quantum Computing Research</span></h2>
-            <h3>First Complete QKD Protocol Validated on Real Quantum Hardware</h3>
+            <h2>Hybrid Quantum Key Distribution Protocol (SHQKD)</h2>
+            <h3><span>Quantum Computing Research</span></h3>
+            
             <div style="margin-top: 30px;">
+                <!-- <span class="badge">✅ SHQKD v1.0.0</span> -->
                 <span class="badge">✅ Production Ready</span>
+                <a href="hardware-validation.html" target="_blank" style="text-decoration: none; color: #ffffff !important;">
                 <span class="badge">✅ Hardware Validated</span>
-                <span class="badge">✅ SHQKD API v1.0.0</span>
-                <a href="https://quantum.ibm.com/" target="_blank" style="text-decoration: none;">
+                </a>
+                <a href="https://quantum.ibm.com/" target="_blank" style="text-decoration: none; color: #ffffff !important;">
                 <span class="badge">✅ IBM Quantum</span>
                 </a>
-                <a href="https://console.aws.amazon.com/braket/" target="_blank" style="text-decoration: none;">
+                <a href="https://console.aws.amazon.com/braket/" target="_blank" style="text-decoration: none; color: #ffffff !important;">
                     <span class="badge">✅ AWS Braket</span>
                 </a>
             </div>
             <div style="margin-top: 30px;">
                 <a href="https://github.com/Infin-8/STEADYWATCH-QUANTUM-DEMO/releases/tag/v1.0.0" class="cta-button">View Release Notes</a>
-                <a href="https://github.com/Infin-8/STEADYWATCH-QUANTUM-DEMO" class="cta-button secondary">View Repository</a>
+                <a href="https://github.com/Infin-8/STEADYWATCH-QUANTUM-DEMO" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);" class="cta-button secondary">View Repository</a>
             </div>
         </div>
         </div>
@@ -113,9 +114,10 @@
     <!-- Stats Section -->
     <div class="stats">
         <div class="container">
-            <h2 class="section-title">🎉 SHQKD API v1.0.0 - Production Ready</h2>
+            <h2 class="section-title">🎉 - SHQKD SDK v1.0.0 - </h2>
             <p class="section-subtitle">
-                <strong>Historic Milestone:</strong> First complete end-to-end validation of hybrid quantum key distribution (QKD) protocol on real quantum hardware, combining information-theoretic security (GHZ entanglement) with computational security (Echo Resonance). Think of it as an un-hackable vault for all your digit assets and transactions. <strong>It's not a claim—that's a fact provable by the laws of physics.</strong>Today's security is literally based on computational "assumptions." These assumptions create vulnerabilities that <u>attackers are already exploiting.</u> 
+                <strong>Historic Computing Milestone: </strong>Complete end-to-end validation of hybrid quantum key distribution protocol on actual quantum hardware,
+                combining information-theoretic security (GHZ entanglement) with computational security (Echo Resonance). It's like an un-hackable vault that nature provides; Only for all your digit assets and transactions. <strong>It's not a claim—that's a fact provable by the laws of physics.</strong>Today's security is literally based on computational "assumptions." These assumptions create vulnerabilities that <u>attackers are already exploiting.</u> 
                 Ever hear of <i>"harvest now, decrypt later"?</i> <strong>It's an actual hacking technique, and many attackers have already accumulated your data.</strong>
             </p>
 
@@ -132,7 +134,7 @@
                 </div>
                 <div class="stat-card">
                     <div class="number" style="text-shadow: 5px 2px 8px black;">156</div>
-                        <div class="label">Qubits (IBM Quantum ibm_fez)
+                        <div class="label">Qubits (ibm_fez/marrakesh)
                         <br>
                         <a href="hardware-validation.html" target="_blank" style="color: #667eea; font-size: 0.8em; text-decoration: none;" class="quickShadow">View Job →</a>
                         </div>
@@ -182,7 +184,7 @@
             <div class="feature-card">
                 <h3>IBM Quantum</h3>
                 <ul>
-                    <li><strong>Backend:</strong> IBM Quantum ibm_fez</li>
+                    <li><strong>Backend:</strong> IBM Quantum (156 qubits)</li>
                     <li><strong>Processor:</strong> Heron R2 (156 qubits)</li>
                     <li><strong>Fidelity:</strong> 69% (12-qubit GHZ state)</li>
                     <li><strong>Job ID:</strong> <a href="hardware-validation.html" target="_blank" style="color: #667eea;">d5gs5mkpe0pc73alki40</a> (verifiable)</li>
@@ -367,7 +369,7 @@
             The qubit positions, their natural spacing, and entanglement connections reveal prime relationships 
             through quantum-mechanical and geometric principles.
         </p>
-        <p class="section-subtitle" style="text-align: center; font-size: small; text-shadow: 1px 1px 1px black; font-weight: 100;">
+        <p class="section-subtitle" style="text-align: center; font-size: small; text-shadow: 1px 2px 7px black; font-weight: 100;">
             (Primes naturally distributed become cryptographic keyz through satellite expansion) =&gt; <strong>?!z(|&gt;)</strong>
         </p>
 
@@ -409,19 +411,11 @@
          
             
             <div class="visualization-info" style="display: flex; justify-content: center; flex-direction: column; align-items:center;">
-                <p style="font-size: small; text-shadow: 1px 1px 2px black"><strong style="font-size: small; font-weight: 100">State:</strong> |GHZ₁₂⟩ = (|000000000000⟩ + |111111111111⟩) / √2</p>
-                <p style="text-shadow: 1px 1px 2px black";><strong style="font-weight: 100">Hardware:</strong> IBM Quantum ibm_fez (156 qubits)</p>
-                <p style="text-shadow: 1px 1px 2px black"><strong style="font-weight: 100">Job ID:</strong> <a href="https://quantum.ibm.com/jobs/d5gs5mkpe0pc73alki40" target="_blank" style="color: #667eea;">d5gs5mkpe0pc73alki40</a></p>
+                <p style="font-size: small; text-shadow: 1px 2px 7px black"><strong style="font-size: small; font-weight: 100">State:</strong> |GHZ₁₂⟩ = (|000000000000⟩ + |111111111111⟩) / √2</p>
+                <p style="text-shadow: 1px 2px 7px black";><strong style="font-weight: 100">Hardware:</strong> IBM Quantum (156 qubits)</p>
+                <p style="text-shadow: 1px 2px 7px black"><strong style="font-weight: 100">Job ID:</strong> <a href="https://quantum.ibm.com/jobs/d5gs5mkpe0pc73alki40" target="_blank" style="color: #667eea;">d5gs5mkpe0pc73alki40</a></p>
             </div>
 
-        <div style="margin-top: 20px; padding: 15px; background: rgba(102, 126, 234, 0.1); border-radius: 8px; border-left: 3px solid #667eea;">
-            <p style="margin: 0; font-size: 0.9em; line-height: 1.6;">
-                <strong>Mathematical Insight:</strong> The golden angle spiral (θ = π × (3 - √5) × i) creates 
-                optimal natural spacing on the sphere, mathematically equivalent to prime number distribution 
-                patterns but in 4D rather than traditional 1D representation. This reveals a profound connection 
-                between number theory, quantum entanglement, and natural distribution patterns.
-            </p>
-        </div>
     </div>
 
     <!-- Research Papers -->
