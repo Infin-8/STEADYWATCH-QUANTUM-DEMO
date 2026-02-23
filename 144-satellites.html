@@ -7,6 +7,7 @@
     <meta name="description" content="Interactive 3D visualization of 144 Hurwitz Quaternion Keyz generated from prime seed p=5. Demonstrates Keyz architecture, 4D-to-3D projection, and quantum entropy generation.">
     <link rel="icon" href="images/logo.png" type="image/png">
     <link rel="stylesheet" href="styles.css">
+    <script src="header-hurwitz-bg.js" defer></script>
     <script src="app.js" defer></script>
 </head>
 
@@ -35,7 +36,9 @@
     </nav>
 
     <!-- Header Section -->
-    <header style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); padding: 100px 0 60px; text-align: center; color: white;">
+    <header style="background: black !important;">
+        <div class="header-hurwitz-dots" id="header-hurwitz-dots" aria-hidden="true"></div>
+        <div class="header-content">
         <div class="container">
             <h1 style="text-shadow: 3px 2px 2px black; font-size: 2.5em; margin-bottom: 20px;">
                 🔮 <strong>144 Hurwitz Quaternion Keyz</strong>
@@ -50,6 +53,7 @@
                 <span class="badge">✅ Hardware Validated</span>
                 <span class="badge">✅ 100% Uniqueness</span>
             </div>
+        </div>
         </div>
     </header>
 
