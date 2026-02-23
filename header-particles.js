@@ -53,18 +53,19 @@
             phases.push(Math.random() * Math.PI * 2, Math.random() * Math.PI * 2);
         }
 
+        var maxRadius = 0.72;
         function updatePositions() {
             var time = Date.now() * 0.001;
             var idx = 0;
             for (ring = 0; ring < 5; ring++) {
                 n = ring === 0 ? 24 : (ring === 1 ? 24 : (ring === 2 ? 36 : (ring === 3 ? 30 : 30)));
-                radius = 0.15 + ring * 0.22 + 0.04 * Math.sin(time * 0.3 + ring);
+                radius = (maxRadius * (0.2 + (ring / 5) * 0.8)) + 0.02 * Math.sin(time * 0.3 + ring);
                 for (i = 0; i < n && idx < count; i++) {
                     angle = (i / n) * Math.PI * 2 + time * 0.02 * (ring % 2 === 0 ? 1 : -1);
                     x = (radius * Math.cos(angle)) * aspect;
                     y = radius * Math.sin(angle);
-                    dummy.position.set(x, y, (Math.random() - 0.5) * 0.2);
-                    dummy.scale.setScalar(baseScale * (0.85 + 0.3 * Math.sin(time + phases[idx * 2])));
+                    dummy.position.set(x, y, (Math.random() - 0.5) * 0.15);
+                    dummy.scale.setScalar(baseScale * (0.92 + 0.12 * Math.sin(time + phases[idx * 2])));
                     dummy.rotation.set(
                         time * driftSpeed + phases[idx * 2],
                         time * driftSpeed * 0.7 + phases[idx * 2 + 1],
@@ -76,10 +77,10 @@
                 }
             }
             while (idx < count) {
-                x = (Math.random() - 0.5) * 1.2 * aspect;
-                y = (Math.random() - 0.5) * 1.2;
-                dummy.position.set(x, y, (Math.random() - 0.5) * 0.2);
-                dummy.scale.setScalar(baseScale * (0.9 + 0.2 * Math.sin(time + idx)));
+                x = (Math.random() - 0.5) * 0.85 * aspect;
+                y = (Math.random() - 0.5) * 0.85;
+                dummy.position.set(x, y, (Math.random() - 0.5) * 0.15);
+                dummy.scale.setScalar(baseScale * (0.92 + 0.12 * Math.sin(time + idx)));
                 dummy.rotation.set(time * driftSpeed, time * 0.5 * driftSpeed, 0);
                 dummy.updateMatrix();
                 mesh.setMatrixAt(idx, dummy.matrix);
