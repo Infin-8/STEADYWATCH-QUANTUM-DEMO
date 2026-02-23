@@ -69,17 +69,32 @@
         if (!container || !container.closest('header')) return;
 
         var goldenAngle = Math.PI * (3 - Math.sqrt(5));
-        var pointCount = 144;
+        var pointCount = 24;
         var maxR = 0.52;
         var noiseScale = 2.5;
         var sizeNoiseScale = 0.4;
         var time = 0;
 
-        function createDot(className, leftPct, topPct, animationIndex, sizeScale, opacityScale, style) {
+        // Brand colors (header gradient: #667eea, #764ba2) for visible tint
+        var color1 = { r: 102, g: 126, b: 234 };
+        var color2 = { r: 118, g: 75, b: 162 };
+        function rgbLerp(t) {
+            return 'rgb(' + Math.round(color1.r + t * (color2.r - color1.r)) + ',' +
+                Math.round(color1.g + t * (color2.g - color1.g)) + ',' +
+                Math.round(color1.b + t * (color2.b - color1.b)) + ')';
+        }
+        function createDot(className, leftPct, topPct, animationIndex, sizeScale, opacityScale, style, colorT) {
             var dot = document.createElement('div');
             dot.className = 'header-hurwitz-dot ' + (className || '');
             dot.style.left = leftPct + '%';
             dot.style.top = topPct + '%';
+            if (colorT != null) {
+                var r = Math.round(color1.r + colorT * (color2.r - color1.r));
+                var g = Math.round(color1.g + colorT * (color2.g - color1.g));
+                var b = Math.round(color1.b + colorT * (color2.b - color1.b));
+                var fillA = className === 'center' ? 0.65 : 0.5;
+                dot.style.background = 'rgba(' + r + ',' + g + ',' + b + ',' + fillA + ')';
+            }
             if (animationIndex != null) {
                 dot.style.setProperty('--i', String(animationIndex));
             }
@@ -91,9 +106,11 @@
             }
             if (style) {
                 var g = style.glowIntensity;
-                var r = style.shadowRadius;
-                var glowPx = Math.round(r * 4);
-                dot.style.boxShadow = '0 0 ' + glowPx + 'px rgba(255,255,255,' + (g * 1.2) + ')';
+                var glowPx = Math.round(style.shadowRadius * 4);
+                var glowRgb = colorT != null ? rgbLerp(colorT) : 'rgb(255,255,255)';
+                var glowA = Math.min(1, g * 1.2);
+                var glowRgba = glowRgb.replace('rgb(', 'rgba(').replace(')', ',' + glowA + ')');
+                dot.style.boxShadow = '0 0 ' + glowPx + 'px ' + glowRgba;
             }
             return dot;
         }
@@ -101,7 +118,7 @@
         var centerNx = perlin1D(0) * 0.5;
         var centerNy = perlin1D(100) * 0.5;
         var centerStyle = calculateUnifiedStyle(0, time, 0, { x: 0, y: 0 });
-        container.appendChild(createDot('center', 50 + centerNx * noiseScale, 50 + centerNy * noiseScale, null, 1 + perlin1D(200) * sizeNoiseScale, 0.85 + perlin1D(300) * 0.15, centerStyle));
+        container.appendChild(createDot('center', 50 + centerNx * noiseScale, 50 + centerNy * noiseScale, null, 1 + perlin1D(200) * sizeNoiseScale, 0.85 + perlin1D(300) * 0.15, centerStyle, 0.5));
 
         for (var i = 0; i < pointCount; i++) {
             var theta = goldenAngle * i;
@@ -116,7 +133,8 @@
             var sizeScale = 1 + perlin1D(i * 3.1 + 1000) * sizeNoiseScale;
             var opacityScale = 0.85 + perlin1D(i * 4.7 + 2000) * 0.15;
             var style = calculateUnifiedStyle(i, time + i * 0.01, rotationAngle, { x: x, y: y });
-            container.appendChild(createDot('', leftPct, topPct, i, sizeScale, opacityScale, style));
+            var colorT = i / Math.max(1, pointCount - 1);
+            container.appendChild(createDot('', leftPct, topPct, i, sizeScale, opacityScale, style, colorT));
         }
     }
 
