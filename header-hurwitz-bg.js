@@ -11,8 +11,8 @@
         if (!container || !container.closest('header')) return;
 
         var goldenAngle = Math.PI * (3 - Math.sqrt(5));
-        var pointCount = 24;
-        var maxR = 0.48;
+        var pointCount = 144;
+        var maxR = 0.52;
 
         function createDot(className, leftPct, topPct, animationIndex) {
             var dot = document.createElement('div');

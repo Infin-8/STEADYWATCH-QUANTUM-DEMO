@@ -143,14 +143,14 @@ header {
     width: 6px;
     height: 6px;
     border-radius: 50%;
-    background: rgba(255, 255, 255, 0.14);
+    background: rgba(255, 255, 255, 0.35);
     transform: translate(-50%, -50%);
 }
 
 .header-hurwitz-dot.center {
     width: 8px;
     height: 8px;
-    background: rgba(255, 255, 255, 0.18);
+    background: rgba(255, 255, 255, 0.5);
 }
 
 /* Subtle pulse; off when user prefers reduced motion */
@@ -167,7 +167,7 @@ header {
 }
 
 @keyframes header-hurwitz-pulse {
-    0%, 100% { opacity: 0.6; }
+    0%, 100% { opacity: 0.75; }
     50% { opacity: 1; }
 }
 
