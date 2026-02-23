@@ -12,29 +12,6 @@ body {
     padding-top: 70px; /* Space for fixed nav */
 }
 
-a {
-  color: #8598ee;           /* or whatever your normal link color is */
-  text-decoration: underline;
-  /* any other styles you want on ALL links */
-}
-
-/* 2. Explicitly match visited to look the same as unvisited */
-a:visited {
-  color: #8598ee;           /* ← same as normal */
-  text-decoration: underline; /* ← same */
-  /* copy ALL other relevant properties from a {} or a:link {} */
-}
-
-/* 3. Hover comes AFTER visited */
-a:hover {
-  color: #ff6600;
-  text-decoration: none;
-}
-
-/* 4. Active last */
-a:active {
-  color: #990000;
-}
 
 .quickShadow {
     text-shadow: 1px 2px 2px black;
