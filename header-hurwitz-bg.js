@@ -37,17 +37,26 @@
         return positions;
     }
 
+    var maxCanvasDim = 4096; // stay under browser canvas max to avoid setTransform error
+
     function sizeCanvas() {
         var rect = header.getBoundingClientRect();
         var w = rect.width;
         var h = rect.height;
         if (w <= 0 || h <= 0) return;
         var dpr = Math.min(window.devicePixelRatio || 1, 2);
-        canvas.width = w * dpr;
-        canvas.height = h * dpr;
+        var bufferW = Math.round(w * dpr);
+        var bufferH = Math.round(h * dpr);
+        if (bufferW > maxCanvasDim || bufferH > maxCanvasDim) {
+            var scale = Math.min(maxCanvasDim / bufferW, maxCanvasDim / bufferH);
+            bufferW = Math.max(1, Math.floor(bufferW * scale));
+            bufferH = Math.max(1, Math.floor(bufferH * scale));
+        }
+        canvas.width = bufferW;
+        canvas.height = bufferH;
         canvas.style.width = w + 'px';
         canvas.style.height = h + 'px';
-        ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+        ctx.setTransform(bufferW / w, 0, 0, bufferH / h, 0, 0);
         draw();
     }
 
