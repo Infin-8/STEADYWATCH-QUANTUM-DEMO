@@ -45,7 +45,7 @@ function initNISTComparison(containerId) {
         },
         {
             aspect: "Proof of Security",
-            nist: "Theoretical + standardization",
+            nist: "Theoretical",
             hybrid: "Empirical hardware validation",
             category: "text"
         },
