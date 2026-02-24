@@ -90,7 +90,7 @@ function initNISTComparison(containerId) {
         .attr("font-size", "24px")
         .attr("font-weight", "700")
         .attr("fill", "#333")
-        .text("NIST PQC vs Our Hybrid System");
+        .text("NIST PQC vs SHQKD");
 
     // Separate numeric and text data
     const numericData = data.filter(d => d.category === "numeric");
@@ -263,7 +263,7 @@ function initNISTComparison(containerId) {
             .attr("font-size", "11px")
             .attr("font-weight", "700")
             .attr("fill", colors.hybrid)
-            .text("Our Hybrid");
+            .text("SHQKD");
         
         // Wrap text for Hybrid
         const hybridWords = d.hybrid.split(' ');
@@ -380,7 +380,7 @@ function initNISTComparison(containerId) {
         .attr("font-size", "11px")
         .attr("font-weight", "600")
         .attr("fill", colors.hybrid)
-        .text("Our Hybrid");
+        .text("SHQKD");
 
     // Animate on load
     svg.selectAll("rect")
