@@ -20,7 +20,7 @@ function initNISTComparison(containerId) {
     const data = [
         {
             aspect: "Security Basis",
-            nist: "Computational hardness",
+            nist: "Computational",
             hybrid: "GHZ + Computational",
             category: "text"
         },
