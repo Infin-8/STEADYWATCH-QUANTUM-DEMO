@@ -78,7 +78,7 @@ function initNISTComparison(containerId) {
 
     const colors = {
         nist: "#9e9e9e",
-        hybrid: "#754da5",
+        hybrid: "#667eea",
         highlight: "#764ba2"
     };
 
