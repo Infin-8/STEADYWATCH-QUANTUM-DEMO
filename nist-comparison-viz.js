@@ -1,4 +1,4 @@
-// NIST PQC Comparison Visualization with D3.js - FIXED VERSION
+// NIST-PQC Comparison Visualization with D3.js - FIXED VERSION
 function initNISTComparison(containerId) {
     const container = document.getElementById(containerId);
     if (!container) {
@@ -90,7 +90,7 @@ function initNISTComparison(containerId) {
         .attr("font-size", "24px")
         .attr("font-weight", "700")
         .attr("fill", "#333")
-        .text("NIST PQC vs SHQKD");
+        .text("NIST-PQC vs SHQKD");
 
     // Separate numeric and text data
     const numericData = data.filter(d => d.category === "numeric");
@@ -197,7 +197,7 @@ function initNISTComparison(containerId) {
             .attr("font-size", "11px")
             .attr("font-weight", "700")
             .attr("fill", colors.nist)
-            .text("NIST PQC");
+            .text("NIST-PQC");
         
         // Wrap text for NIST
         const nistWords = d.nist.split(' ');
@@ -363,7 +363,7 @@ function initNISTComparison(containerId) {
         .attr("y", 30)
         .attr("font-size", "11px")
         .attr("fill", "#666")
-        .text("NIST PQC");
+        .text("NIST-PQC");
 
     legend.append("rect")
         .attr("x", 12)
