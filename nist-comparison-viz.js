@@ -21,7 +21,7 @@ function initNISTComparison(containerId) {
         {
             aspect: "Security Basis",
             nist: "Computational hardness",
-            hybrid: "Information-theoretic + Computational",
+            hybrid: "GHZ + Computational",
             category: "text"
         },
         {
