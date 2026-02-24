@@ -262,7 +262,7 @@ function initNISTComparison(containerId) {
             .attr("text-anchor", "middle")
             .attr("font-size", "11px")
             .attr("font-weight", "700")
-            .attr("fill", colors.hybrid)
+            .attr("fill", "black")
             .text("SHQKD");
         
         // Wrap text for Hybrid
