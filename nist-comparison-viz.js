@@ -138,6 +138,14 @@ function initNISTComparison(containerId) {
             .attr("fill", colors.hybrid)
             .attr("opacity", 0.9)
             .attr("rx", 5)
+             .style("cursor", "pointer")
+            .on("mouseover", function() {
+                d3.select(this).attr("opacity", 0.9);
+            })
+            .on("mouseout", function() {
+                d3.select(this).attr("opacity", 0.7);
+            });
+        
         
         svg.append("text")
             .attr("x", centerX + barWidth / 2)
@@ -183,13 +191,7 @@ function initNISTComparison(containerId) {
             .attr("rx", 8)
             .attr("stroke", colors.nist)
             .attr("stroke-width", 1.5);
-            .style("cursor", "pointer")
-            .on("mouseover", function() {
-                d3.select(this).attr("opacity", 1);
-            })
-            .on("mouseout", function() {
-                d3.select(this).attr("opacity", 0.9);
-            });
+
         
         nistCard.append("text")
             .attr("x", x + 10 + cardWidth / 2)
