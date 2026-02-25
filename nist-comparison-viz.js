@@ -138,13 +138,6 @@ function initNISTComparison(containerId) {
             .attr("fill", colors.hybrid)
             .attr("opacity", 0.9)
             .attr("rx", 5)
-            .style("cursor", "pointer")
-            .on("mouseover", function() {
-                d3.select(this).attr("opacity", 1);
-            })
-            .on("mouseout", function() {
-                d3.select(this).attr("opacity", 0.9);
-            });
         
         svg.append("text")
             .attr("x", centerX + barWidth / 2)
