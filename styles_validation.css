@@ -176,7 +176,8 @@
             top: 50%;
             left: 50%;
             transform: translate(-50%, -50%);
-            background: rgba(102, 126, 234, 0.9);
+            /* background: rgba(102, 126, 234, 0.9); */
+            background: linear-gradient(140deg, #fdfdfd 0%, #6e85eb 100%);
             color: white;
             padding: 15px 25px;
             border-radius: 50%;
