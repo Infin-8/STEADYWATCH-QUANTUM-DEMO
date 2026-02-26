@@ -76,7 +76,7 @@
         var time = 0;
 
         // Brand colors (header gradient: #667eea, #764ba2) for visible tint
-        var color1 = { r: 102, g: 126, b: 234 };
+        var color1 = { r: 128, g: 148, b: 237 };
         var color2 = { r: 118, g: 75, b: 162 };
         function rgbLerp(t) {
             return 'rgb(' + Math.round(color1.r + t * (color2.r - color1.r)) + ',' +
