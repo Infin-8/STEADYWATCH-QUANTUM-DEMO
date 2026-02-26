@@ -35,7 +35,6 @@
     "date": "2026-02-11",
     "executionTime": "~1s",
     "description": "Prime seed p=2 (ramified case) expands to 24 Hurwitz quaternion satellites. Architecture and key uniqueness validated on hardware; 100% uniqueness rate, 10/10 error-mitigation corrections.",
-    "isImportant": true,
     "media": {
       "type": "screenshot",
       "path": "images/hurwitz_p2.png"
