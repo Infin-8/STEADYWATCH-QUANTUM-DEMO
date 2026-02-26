@@ -26,7 +26,7 @@
   },
     {
     "id": "hurwitz_p2",
-    "category": "ghz",
+    "category": "seed",
     "title": "Hurwitz p=2 (Ramified) — 24 satellites",
     "backend": "ibm_marrakesh",
     "qubits": 10,
@@ -50,7 +50,7 @@
   },
     {
     "id": "hurwitz_p5",
-    "category": "ghz",
+    "category": "seed",
     "title": "Hurwitz p=5 (Split) — 144 satellites",
     "backend": "ibm_marrakesh",
     "qubits": 10,
@@ -75,7 +75,7 @@
   },
     {
     "id": "hurwitz_p13",
-    "category": "ghz",
+    "category": "seed",
     "title": "Hurwitz p=13 (Split) — 336 satellites",
     "backend": "ibm_marrakesh",
     "qubits": 10,
