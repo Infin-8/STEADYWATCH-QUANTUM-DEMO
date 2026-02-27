@@ -214,7 +214,7 @@ def extract_seed_from_counts(counts, satellite_index):
 - ✅ **Uniqueness rate:** 100.00% (144/144 seeds unique) - **Perfect uniqueness**
 - ✅ **Hardware execution:** Average 7.31 seconds per seed
 - ✅ **Total execution time:** ~17.6 minutes for all 144 seeds
-- ✅ **Job IDs:** All 144 job IDs recorded (e.g., `d664ihgqbmes739dmk20`, `d664ij0qbmes739dmk50`, ...)
+- ✅ **Job IDs:** All 144 job IDs recorded (verifiable on IBM Quantum; examples redacted for IP protection)
 
 **Mathematical Validation:**
 - ✅ Formula verified: 24 × (5 + 1) = 144
@@ -243,13 +243,13 @@ def extract_seed_from_counts(counts, satellite_index):
 - ✅ **Bit Balance:** 0.0249 (excellent - nearly perfect 50/50 split)
 - ✅ **Uniformity Score:** 0.9751 (excellent - target ≥ 0.9)
 
-**Sample Seeds Generated:**
+**Sample Seeds Generated (format only; actual values withheld for IP protection):**
 ```
-Satellite 0: 16b3623e778b6d3a450680d4548935d0497f508a67d92bae67fbccea1d3b883f
-Satellite 1: e2af2ac479786b8ca94a777a6c2122e37972055749b376f1d7c2da18ab0909de
-Satellite 2: 185f2a92edbb31672ea962d3bdeacc5dbb314e73c000bdca612e932ab285cd16
-Satellite 3: b21c03eeb4a4fb569c90fb29221ffb82437758300f53dbff660bf44b5aaaa39a
-Satellite 4: 279a77410296881ddd54d7678e9c9163ddd3959f7410e11942b880cb24cea620
+Satellite 0: [32-byte hex, 256-bit quantum-derived seed]
+Satellite 1: [32-byte hex, 256-bit quantum-derived seed]
+Satellite 2: [32-byte hex, 256-bit quantum-derived seed]
+Satellite 3: [32-byte hex, 256-bit quantum-derived seed]
+Satellite 4: [32-byte hex, 256-bit quantum-derived seed]
 ```
 
 **Hardware Execution Details:**
@@ -258,7 +258,7 @@ Satellite 4: 279a77410296881ddd54d7678e9c9163ddd3959f7410e11942b880cb24cea620
 - **Shots per Circuit:** 1024
 - **Total Execution Time:** 1,125.86 seconds (~18.8 minutes)
 - **Pure Execution Time:** 1,053.09 seconds (~17.6 minutes)
-- **Job IDs:** All 144 job IDs recorded in `seed_run_144_job_ids_1770802602.txt`
+- **Job IDs:** All 144 job IDs recorded in results package (format: `seed_run_144_job_ids_<timestamp>.txt`)
 
 ### 4.3 Comparison with Baseline
 
