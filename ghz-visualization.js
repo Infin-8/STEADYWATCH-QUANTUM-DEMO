@@ -299,7 +299,7 @@ class EavesdropperDetector {
 }
     
     fireLaser() {
-        console.log("egg_4", "T1000")
+        console.log("egg_4", "T1000 => eavsdropper, SARAH => GHZ, CYBERDYNE SYSTEMS MODEL 101 => Echo Resonance (https://www.youtube.com/watch?v=GK6FLjUdLN8)")
         
         if (this.isFiring) return;
         this.isFiring = true;
