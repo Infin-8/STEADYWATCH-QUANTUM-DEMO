@@ -35,7 +35,7 @@ Our hardware validation campaign had four primary objectives:
 All tests follow the complete 5-phase QKD protocol:
 1. **Phase 1 - Session Initiation & Authentication:** Alice initiates a QKD session with a shared secret; Bob authenticates using challenge-response
 2. **Phase 2 - Quantum Key Generation:** Alice generates a GHZ state on hardware; Bob reuses the same state; both parties extract keys from the shared GHZ measurement
-3. **Phase 3 - Error Correction:** Correct any errors in the raw keys using LDPC, Quantum-Amplified, or Cascade methods
+3. **Phase 3 - Error Correction:** Correct any errors in the raw keys using LDPC, Quantum-Amplified, or Cascade methods (redundancy-based correction follows Shannon 1948; LDPC from Gallager 1962)
 4. **Phase 4 - Privacy Amplification:** Amplify privacy of corrected keys using universal hashing (Toeplitz matrix)
 5. **Phase 5 - Key Verification:** Verify that both parties have matching final secure keys
 
@@ -514,13 +514,17 @@ This hardware validation paper **extends and validates** the theoretical framewo
 
 ## 10. References
 
-1. SteadyWatch Research Team. "Single-Platform Quantum Key Distribution with Shared GHZ State: A Novel Approach to Practical QKD Implementation." *Research Paper*, January 19, 2026. (`RESEARCH_PAPER_QKD_PROTOCOL.md`)
+1. Shannon, C. E. (1948). "A Mathematical Theory of Communication." *Bell System Technical Journal*, 27(3), 379–423; 27(4), 623–656.
 
-2. IBM Quantum. "Heron r2 Processor Specifications." https://quantum.ibm.com/services/resources
+2. Gallager, R. G. (1962). "Low-density parity-check codes." *IRE Transactions on Information Theory*, 8(1), 21–28.
 
-3. AWS Braket. "Rigetti Ankaa-3 Device Specifications." https://aws.amazon.com/braket/
+3. SteadyWatch Research Team. "Single-Platform Quantum Key Distribution with Shared GHZ State: A Novel Approach to Practical QKD Implementation." *Research Paper*, January 19, 2026. (`RESEARCH_PAPER_QKD_PROTOCOL.md`)
 
-4. Qiskit-Braket Provider. "Cross-Platform Quantum Computing." https://github.com/qiskit-community/qiskit-braket-provider
+4. IBM Quantum. "Heron r2 Processor Specifications." https://quantum.ibm.com/services/resources
+
+5. AWS Braket. "Rigetti Ankaa-3 Device Specifications." https://aws.amazon.com/braket/
+
+6. Qiskit-Braket Provider. "Cross-Platform Quantum Computing." https://github.com/qiskit-community/qiskit-braket-provider
 
 ---
 
