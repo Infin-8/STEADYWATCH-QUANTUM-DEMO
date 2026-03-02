@@ -156,13 +156,13 @@ header {
 /* Subtle pulse; off when user prefers reduced motion */
 @media (prefers-reduced-motion: no-preference) {
     .header-hurwitz-dot {
-        animation: header-hurwitz-pulse 4s ease-in-out infinite;
+        animation: header-hurwitz-pulse 2s ease-in-out infinite;
     }
     .header-hurwitz-dot.center {
-        animation: header-hurwitz-pulse 5s ease-in-out infinite;
+        animation: header-hurwitz-pulse 3s ease-in-out infinite;
     }
     .header-hurwitz-dot:nth-child(n+2) {
-        animation-delay: calc(var(--i, 0) * 0.08s);
+        animation-delay: calc(var(--i, 0) * 0.04s);
     }
 }
 
