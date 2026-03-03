@@ -1204,6 +1204,7 @@ function init144SatellitesVisualization(containerId) {
 if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', () => {
         init144SatellitesVisualization('144-satellites-visualization');
+        console.log("egg_7", "i^2 = j^2 = k^2 = ijk = -1")
     });
 } else {
     init144SatellitesVisualization('144-satellites-visualization');
