@@ -4,11 +4,14 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>336 Hurwitz Key — Layers View | STEADYWATCH™</title>
-    <meta name="description" content="336 Hurwitz Key as Safari Layers: prime seed (single point) left, unzipped wave (336 dots) right. Same header-dots implementation, Layers-style layout.">
+    <meta name="description" content="336 Hurwitz Key: full 3D view with real quaternion math. Left plane (seed), middle (cylinder of keys), right plane (wave). Interactive Three.js.">
     <link rel="icon" href="images/logo.png" type="image/png">
     <link rel="stylesheet" href="styles.css">
     <script src="app.js" defer></script>
-    <script src="layers-hurwitz-336.js" defer></script>
+    <!-- Three.js for full 3D Layers view (left | middle cylinder | right wave) -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js" defer></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js" defer></script>
+    <script src="layers-336-three.js" defer></script>
 </head>
 <body>
     <nav style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;">
@@ -34,23 +37,23 @@
             <div class="container">
                 <h1 style="text-shadow: 3px 2px 2px black; font-size: 2em;">336 Hurwitz Key — Layers View</h1>
                 <p class="subtitle" style="max-width: 800px; margin: 20px auto 0;">
-                    Safari Layers–style: prime seed (single point) on the left, unzipped prime (336 Keyz) as wave on the right. Same implementation as the header dots; layout mimics the browser Layers tab.
+                    Full 3D view: left plane (single key), middle (cylinder of 336 Hurwitz keys), right plane (wave-like pattern). Real quaternion math (p=13 → 336). Drag to rotate.
                 </p>
                 <div style="margin-top: 20px;">
                     <span style="text-shadow: 1px 1px 1px black; background: linear-gradient(135deg, #fdfdfd 0%, #6e85eb 100%); color: white !important" class="badge">p=13</span>
                     <span style="text-shadow: 1px 1px 1px black; background: linear-gradient(135deg, #fdfdfd 0%, #6e85eb 100%); color: white !important" class="badge">336 Keyz</span>
-                    <span style="text-shadow: 1px 1px 1px black; background: linear-gradient(135deg, #fdfdfd 0%, #6e85eb 100%); color: white !important" class="badge">Point | Wave</span>
+                    <span style="text-shadow: 1px 1px 1px black; background: linear-gradient(135deg, #fdfdfd 0%, #6e85eb 100%); color: white !important" class="badge">Point | Cylinder | Wave</span>
                 </div>
             </div>
         </div>
     </header>
 
-    <!-- Layers-style visualization: left = seed (point), right = 336 dots (wave) -->
-    <section class="section" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); min-height: 420px; padding: 40px 0; position: relative;">
-        <div id="layers-hurwitz-336" class="header-hurwitz-dots" aria-hidden="true" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%;"></div>
-        <div class="container" style="position: relative; z-index: 1;">
-            <p class="section-subtitle" style="color: rgba(255,255,255,0.95); text-align: center; margin-top: 0;">
-                start (prime seed — single point) —————————————————— end (unzipped wave, 336)
+    <!-- Full Three.js canvas: left slit (seed) | middle (336 keys) | right slit (wave) -->
+    <section class="section" style="background: #0a0a1a; min-height: 500px; padding: 0; position: relative;">
+        <div id="layers-hurwitz-336" aria-label="336 Hurwitz Key 3D visualization" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; min-height: 420px;"></div>
+        <div class="container" style="position: absolute; bottom: 12px; left: 0; right: 0; z-index: 2; pointer-events: none;">
+            <p class="section-subtitle" style="color: rgba(255,255,255,0.85); text-align: center; margin: 0;">
+                left (seed) ——— cylinder of keys ——— right (wave)
             </p>
         </div>
     </section>
@@ -59,7 +62,7 @@
         <div class="container">
             <h2 class="section-title">About this view</h2>
             <p class="section-subtitle">
-                When viewing the Hurwitz visualization in the browser’s <strong>Layers</strong> tab (dev tools), the layout appears like a double-slit: one side shows the prime seed as a single point, the other shows the unzipped prime as a wave. This page reproduces that layout using the same <code>.header-hurwitz-dots</code> implementation: one dot (seed) on the left, 336 dots (Keyz) on the right. Expression: <strong>?!z(|&gt;) * -(336)</strong> for p=13.
+                This view uses <strong>actual Hurwitz quaternion math</strong>: the 336 keys are enumerated from the prime seed p=13 (24×(13+1)=336). Left plane shows the single key (seed); the middle is a cylinder of keys in 3D (4D→3D stereographic projection); the right plane shows the same keys as a wave-like pattern. Drag to rotate. Expression: <strong>?!z(|&gt;) * -(336)</strong> for p=13.
             </p>
         </div>
     </div>
