@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>336 Hurwitz Key — Layers View | STEADYWATCH™</title>
+    <meta name="description" content="336 Hurwitz Key as Safari Layers: prime seed (single point) left, unzipped wave (336 dots) right. Same header-dots implementation, Layers-style layout.">
+    <link rel="icon" href="images/logo.png" type="image/png">
+    <link rel="stylesheet" href="styles.css">
+    <script src="app.js" defer></script>
+    <script src="layers-hurwitz-336.js" defer></script>
+</head>
+<body>
+    <nav style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;">
+        <div class="container">
+            <a href="https://apps.apple.com/us/app/steadywatch-handheld/id6755752518" class="nav-brand">
+                <img src="images/logo.png" alt="STEADYWATCH Logo">
+                <span><u>STEADYWATCH™</u></span>
+            </a>
+            <button class="mobile-menu-toggle" onclick="toggleMobileMenu()">☰</button>
+            <ul class="nav-links" id="navLinks">
+                <li><a href="index.html" class="quickShadow">Home</a></li>
+                <li><a href="echo-visual.html" class="quickShadow">Echo</a></li>
+                <li><a href="144-satellites.html" class="quickShadow">144 Keyz</a></li>
+                <li><a href="layers-336.html" class="quickShadow">Layers 336</a></li>
+                <li><a href="consulting-services.html" class="quickShadow">Consulting</a></li>
+                <li><a href="contact.html" class="viz-button" style="background: linear-gradient(140deg, #fdfdfd 0%, #6e85eb 100%); padding: 10px; border-radius: 25px; text-shadow: 2px 1px 1px black; border: none !important;">⭐︎ Contact</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <header style="background: black !important;">
+        <div class="header-content">
+            <div class="container">
+                <h1 style="text-shadow: 3px 2px 2px black; font-size: 2em;">336 Hurwitz Key — Layers View</h1>
+                <p class="subtitle" style="max-width: 800px; margin: 20px auto 0;">
+                    Safari Layers–style: prime seed (single point) on the left, unzipped prime (336 Keyz) as wave on the right. Same implementation as the header dots; layout mimics the browser Layers tab.
+                </p>
+                <div style="margin-top: 20px;">
+                    <span style="text-shadow: 1px 1px 1px black; background: linear-gradient(135deg, #fdfdfd 0%, #6e85eb 100%); color: white !important" class="badge">p=13</span>
+                    <span style="text-shadow: 1px 1px 1px black; background: linear-gradient(135deg, #fdfdfd 0%, #6e85eb 100%); color: white !important" class="badge">336 Keyz</span>
+                    <span style="text-shadow: 1px 1px 1px black; background: linear-gradient(135deg, #fdfdfd 0%, #6e85eb 100%); color: white !important" class="badge">Point | Wave</span>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Layers-style visualization: left = seed (point), right = 336 dots (wave) -->
+    <section class="section" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); min-height: 420px; padding: 40px 0; position: relative;">
+        <div id="layers-hurwitz-336" class="header-hurwitz-dots" aria-hidden="true" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%;"></div>
+        <div class="container" style="position: relative; z-index: 1;">
+            <p class="section-subtitle" style="color: rgba(255,255,255,0.95); text-align: center; margin-top: 0;">
+                start (prime seed — single point) —————————————————— end (unzipped wave, 336)
+            </p>
+        </div>
+    </section>
+
+    <div class="section white">
+        <div class="container">
+            <h2 class="section-title">About this view</h2>
+            <p class="section-subtitle">
+                When viewing the Hurwitz visualization in the browser’s <strong>Layers</strong> tab (dev tools), the layout appears like a double-slit: one side shows the prime seed as a single point, the other shows the unzipped prime as a wave. This page reproduces that layout using the same <code>.header-hurwitz-dots</code> implementation: one dot (seed) on the left, 336 dots (Keyz) on the right. Expression: <strong>?!z(|&gt;) * -(336)</strong> for p=13.
+            </p>
+        </div>
+    </div>
+
+    <footer style="background: #1a1a2e; color: white; padding: 40px 0; text-align: center;">
+        <div class="container">
+            <p>&copy; 2025 <u>Quantum V^ LLC</u></p>
+            <p>All Rights Reserved.</p>
+            <p style="margin-top: 10px; opacity: 0.8;">
+                <a href="index.html" style="color: white; text-decoration: none;">| Home</a> |
+                <a href="echo-visual.html" style="color: white; text-decoration: none;">Echo</a> |
+                <a href="144-satellites.html" style="color: white; text-decoration: none;">144 Keyz</a> |
+                <a href="layers-336.html" style="color: white; text-decoration: none;">Layers 336</a> |
+                <a href="consulting-services.html" style="color: white; text-decoration: none;">Consulting</a> |
+                <a href="contact.html" style="color: white; text-decoration: none;">Contact</a> |
+            </p>
+        </div>
+    </footer>
+</body>
+</html>
