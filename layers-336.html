@@ -7,6 +7,7 @@
     <meta name="description" content="336 Hurwitz Key: full 3D view with real quaternion math. Left plane (seed), middle (cylinder of keys), right plane (wave). Interactive Three.js.">
     <link rel="icon" href="images/logo.png" type="image/png">
     <link rel="stylesheet" href="styles.css">
+    <script src="header-hurwitz-bg.js" defer></script>
     <script src="app.js" defer></script>
     <!-- Three.js for full 3D Layers view (left | middle cylinder | right wave) -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js" defer></script>
@@ -33,6 +34,8 @@
     </nav>
 
     <header style="background: black !important;">
+        <div class="header-hurwitz-dots" id="header-hurwitz-dots" aria-hidden="true"></div>
+        <div class="header-content">
         <div class="header-content">
             <div class="container">
                 <h1 style="text-shadow: 3px 2px 2px black; font-size: 2em;">336 Hurwitz Key — Layers View</h1>
@@ -45,6 +48,7 @@
                     <span style="text-shadow: 1px 1px 1px black; background: linear-gradient(135deg, #fdfdfd 0%, #6e85eb 100%); color: white !important" class="badge">Point | Cylinder | Wave</span>
                 </div>
             </div>
+        </div>
         </div>
     </header>
 
