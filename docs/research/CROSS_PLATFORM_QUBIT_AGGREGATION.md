@@ -301,15 +301,6 @@ We have demonstrated that **cross-platform qubit aggregation** enables large-sca
 
 ---
 
-## 9. Acknowledgments
-
-We acknowledge:
-- **IBM Quantum** for providing access to quantum hardware (ibm_fez, ibm_marrakesh, ibm_torino)
-- **AWS Braket** for providing access to quantum hardware (Rigetti Ankaa-3, QuEra Aquila)
-- The quantum computing community for open-source tools and frameworks
-
----
-
 ## 10. References
 
 [1] Kimble, H. J. (2008). The quantum internet. *Nature*, 453(7198), 1023-1030.
@@ -373,16 +364,7 @@ For SHA-256 (256-bit): ~258 qubits
 
 ---
 
-**Paper Status:** 📝 Draft - Ready for peer review and submission to quantum computing conferences/journals
-
-**Suggested Venues:**
-- Quantum Information Processing (QIP)
-- Physical Review A
-- Quantum Science and Technology
-- IEEE Quantum Engineering
-- Quantum Computing conferences (QCE, QIP, etc.)
+**Last Updated:** March 5 2026  
+**Version:** 1.0
 
 ---
-
-**Last Updated:** January 2026  
-**Version:** 1.0
