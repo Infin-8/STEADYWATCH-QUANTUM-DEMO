@@ -213,14 +213,12 @@ Multiple techniques applied to improve fidelity:
 
 ## 🎉 Conclusion
 
-**We have achieved a complete breakthrough:**
-
 ✅ **Freedom-of-Choice Loophole: CLOSED**  
 ✅ **Bell Inequality Violation: DETECTED**  
 ✅ **Quantum Nonlocality: CONFIRMED**  
 ✅ **93% of Theoretical Maximum: ACHIEVED**
 
-This is a **major achievement** for fundamental quantum mechanics research and validates:
+This achievement is fundamental for quantum mechanics research and validates:
 - The effectiveness of error mitigation
 - The robustness of GHZ states on NISQ hardware
 - The ability to close loopholes in Bell inequality tests
