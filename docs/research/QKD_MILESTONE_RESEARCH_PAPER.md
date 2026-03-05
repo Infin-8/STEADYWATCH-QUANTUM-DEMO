@@ -909,8 +909,6 @@ This work demonstrates that practical, production-ready quantum key distribution
 
 The hybrid architecture offers the best of both worlds: unconditional security from GHZ entanglement and massive key space from Echo Resonance computational security. With 69% fidelity on 12-qubit GHZ states and 7.69-second execution time, our system is production-ready for protecting critical digital assets.
 
-**Status:** ✅ **HARDWARE VALIDATED - PRODUCTION READY**
-
 ---
 
 ## Acknowledgments
