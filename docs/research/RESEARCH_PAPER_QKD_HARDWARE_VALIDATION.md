@@ -1,6 +1,6 @@
 # Cross-Platform Quantum Key Distribution Hardware Validation: Comprehensive Test Results from IBM Quantum and AWS Braket
 
-**Authors:** SteadyWatch Research Team  
+**Authors:** STEADYWATCH™ Research Team  
 **Date:** January 19, 2026  
 **Status:** Research Paper - Complete  
 **Category:** Quantum Key Distribution, Hardware Validation, Cross-Platform Quantum Computing
