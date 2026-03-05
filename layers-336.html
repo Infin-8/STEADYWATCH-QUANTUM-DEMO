@@ -55,18 +55,43 @@
     <!-- Full Three.js canvas: left slit (seed) | middle (336 keys) | right slit (wave) -->
     <div class="section white">
         <div class="container">
+            <p class="section-subtitle" text-align: center; margin: 0;">
+                left (seed) ——— cylinder of keyz ——— right (wave)
+            </p>
             <div id="layers-hurwitz-336" aria-label="336 Hurwitz Key 3D visualization" class="visualization-container" style="height: 600px;"></div>
-             <p class="section-subtitle" text-align: center; margin: 0;">
-                    left (seed) ——— cylinder of keyz ——— right (wave)
-                </p>
+            <p class="section-subtitle" text-align: center; margin: 0;">
+                - Rotate / Spin -
+            </p>
         </div>
     </div>
 
-     <div class="section white">
+    <!-- Statistics Section -->
+    <div class="section" style="background: #f8f9fa;">
         <div class="container">
-            <p class="section-subtitle" style="text-align: center;">
-           - Rotate / Spin - 
-            </p>
+            <h2 class="section-title">Quaternion Key Architecture Statistics</h2>
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 30px; margin-top: 30px;">
+                <div class="stat-card" style="background: white; padding: 30px; border-radius: 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.1);">
+                    <h3 style="color: #667eea; margin-bottom: 10px; text-shadow: 1px 1px 1px black;">Total Keyz</h3>
+                    <p style="font-size: 2em; font-weight: bold; color: white; text-shadow: 5px 2px 3px black;">336</p>
+                    <p style="color: #666; margin-top: 10px;">Unique Hurwitz Quaternionz with norm = 13</p>
+                </div>
+                <div class="stat-card" style="background: white; padding: 30px; border-radius: 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.1);">
+                    <h3 style="color: #667eea; margin-bottom: 10px; text-shadow: 1px 1px 1px black;">Prime Seed</h3>
+                    <p style="font-size: 2em; font-weight: bold; color: white; text-shadow: 5px 2px 3px black;">p=13</p>
+                    <p style="color: #666; margin-top: 10px;">Split case (p ≡ 1 mod 4)</p>
+                </div>
+                <div class="stat-card" style="background: white; padding: 30px; border-radius: 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.1);">
+                    <h3 style="color: #667eea; margin-bottom: 10px; text-shadow: 1px 1px 1px black;">Expression</h3>
+                    <p style="font-size: 1.5em; font-weight: bold; color: white; text-shadow: 5px 2px 3px black;">?!z(|&gt;) * -(336)</p>
+                    <p style="color: #666; margin-top: 10px;">|&gt; = Unzipped Prime</p>
+                    <p style="color: #666; margin-top: 10px;">(336) = Quaternionz</p>
+                </div>
+                <div class="stat-card" style="background: white; padding: 30px; border-radius: 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.1);">
+                    <h3 style="color: #667eea; margin-bottom: 10px; text-shadow: 1px 1px 1px black;">Uniqueness</h3>
+                    <p style="font-size: 2em; font-weight: bold; color: white; text-shadow: 5px 2px 3px black;">100%</p>
+                    <p style="color: #666; margin-top: 10px;">336/336 seeds unique <span><strong>(hardware validated)</strong></span></p>
+                </div>
+            </div>
         </div>
     </div>
     
