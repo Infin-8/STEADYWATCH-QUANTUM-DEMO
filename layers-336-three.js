@@ -1,7 +1,7 @@
 /**
  * 336 Hurwitz Key — Full Three.js Layers View
- * Real quaternion math: left plane (seed), middle (cylinder of keys), right plane (wave capture).
- * Cylinder uses same golden-angle spiral + Perlin + Tesla as header-hurwitz-bg.js.
+ * Left plane (seed), middle (cylinder of keys), right plane (wave).
+ * Cylinder: golden-angle + Perlin + Tesla. All keys use UnifiedQubitStyling (animated glow/pulse like 144).
  */
 (function () {
     'use strict';
@@ -209,6 +209,62 @@
         return value * m;
     }
 
+    // UnifiedQubitStyling (same as 144-satellites, ES5)
+    function UnifiedQubitStyling() {
+        this.noiseState = { lastNoiseUpdateTime: 0, smoothedNoiseValue: 0, noiseSmoothingTimeConstant: 0.5 };
+        this.shadowParams = { baseGlowIntensity: 0.15, glowIntensityRange: 0.12 };
+        this.teslaMultipliers = { base: 1, harmonic3: 1 / 3, harmonic6: 1 / 6 };
+    }
+    UnifiedQubitStyling.prototype.hash = function (x) {
+        var w = (x % 2147483647 + 2147483647) % 2147483647;
+        w = ((w * 1103515245) + 12345) & 0x7fffffff;
+        w = ((w * 1103515245) + 12345) & 0x7fffffff;
+        return (w % 2000000000) / 1000000000 - 1;
+    };
+    UnifiedQubitStyling.prototype.smoothstep = function (t) {
+        t = Math.max(0, Math.min(1, t));
+        return t * t * t * (t * (t * 6 - 15) + 10);
+    };
+    UnifiedQubitStyling.prototype.lerp = function (a, b, t) { return a + (b - a) * t; };
+    UnifiedQubitStyling.prototype.gradient = function (x, t) { return this.hash(x) * (t - x); };
+    UnifiedQubitStyling.prototype.perlin1D = function (x) {
+        x = x % 1000000;
+        var x0 = Math.floor(x), x1 = x0 + 1, fx = x - x0;
+        return this.lerp(this.gradient(x0, x), this.gradient(x1, x), this.smoothstep(fx));
+    };
+    UnifiedQubitStyling.prototype.generateNoise = function (time, freq) {
+        freq = freq || 1;
+        var v = this.perlin1D(time * freq * 0.5) * 0.6 + this.perlin1D(time * freq * 2) * 0.25 + this.perlin1D(time * freq * 4) * 0.15;
+        return Math.max(-1, Math.min(1, v));
+    };
+    UnifiedQubitStyling.prototype.smoothNoiseWithTime = function (raw, cur, last, prev, tc) {
+        var alpha = Math.min(1, (cur - last) / tc);
+        return alpha * raw + (1 - alpha) * prev;
+    };
+    UnifiedQubitStyling.prototype.calculateLightingFactor = function (angle) { return (Math.cos(angle) + 1) / 2; };
+    UnifiedQubitStyling.prototype.applyTeslaPattern = function (value, idx) {
+        var m = idx % 3 === 0 ? this.teslaMultipliers.base : idx % 3 === 1 ? this.teslaMultipliers.harmonic3 : this.teslaMultipliers.harmonic6;
+        return value * m;
+    };
+    UnifiedQubitStyling.prototype.calculateUnifiedStyle = function (idx, time, rotationAngle, basePosition) {
+        var rawNoise = this.generateNoise(time, 0.25);
+        var lastUpdate = this.noiseState.lastNoiseUpdateTime || time;
+        var smoothed = this.smoothNoiseWithTime(rawNoise, time, lastUpdate, this.noiseState.smoothedNoiseValue, this.noiseState.noiseSmoothingTimeConstant);
+        this.noiseState.smoothedNoiseValue = smoothed;
+        this.noiseState.lastNoiseUpdateTime = time;
+        var noiseFactor = 1 + smoothed * 0.05;
+        var lightingFactor = this.calculateLightingFactor(rotationAngle);
+        var glowIntensity = (this.shadowParams.baseGlowIntensity + lightingFactor * this.shadowParams.glowIntensityRange) * noiseFactor;
+        glowIntensity = Math.max(0.12, Math.min(0.3, glowIntensity));
+        return {
+            noiseFactor: noiseFactor,
+            glowIntensity: glowIntensity,
+            lightingFactor: lightingFactor,
+            teslaPhase: this.applyTeslaPattern(rotationAngle, idx),
+            teslaMultiplier: this.applyTeslaPattern(1, idx)
+        };
+    };
+
     // ========== Three.js scene ==========
     function initLayers336Visualization(containerId) {
         var container = document.getElementById(containerId);
@@ -268,13 +324,17 @@
         seedMesh.userData.type = 'seed';
         scene.add(seedMesh);
 
-        // Middle: cylinder of keys — same golden-angle + Perlin + Tesla as header-hurwitz-bg.js
+        var unifiedStyling = new UnifiedQubitStyling();
+        var keySphereGeom = new THREE.SphereGeometry(0.12, 12, 12);
+
+        // Middle: cylinder of keys as 336 meshes (golden-angle + Perlin), animated with UnifiedQubitStyling
         var goldenAngle = Math.PI * (3 - Math.sqrt(13));
         var pointCount = keys.length;
         var maxR = 0.52;
         var noiseScale = 0.5;
-        var middlePositions = [];
-        var middleColors = [];
+        var middleGroup = new THREE.Group();
+        middleGroup.userData.type = 'middle';
+        var middleKeys = [];
         for (var i = 0; i < keys.length; i++) {
             var theta = goldenAngle * i;
             var r = maxR * Math.sqrt((i + 1) / pointCount);
@@ -286,55 +346,53 @@
             var z = middleScale * (z0 + ny * noiseScale);
             var t = (i + 1) / (keys.length + 1);
             var x = -slitDistance + t * (2 * slitDistance);
-            middlePositions.push(x, y, z);
+            var basePos = new THREE.Vector3(x, y, z);
             var hue = (i / keys.length) * 0.7 + 0.55;
-            var teslaFactor = 0.85 + applyTesla(0.15, i);
-            var c = new THREE.Color().setHSL(hue, 0.75, 0.6);
-            c.r *= teslaFactor;
-            c.g *= teslaFactor;
-            c.b *= teslaFactor;
-            middleColors.push(c.r, c.g, c.b);
+            var mat = new THREE.MeshPhongMaterial({
+                color: new THREE.Color().setHSL(hue, 0.75, 0.6),
+                emissive: new THREE.Color().setHSL(hue, 0.7, 0.2),
+                emissiveIntensity: 0.4,
+                shininess: 100,
+                transparent: true,
+                opacity: 0.92
+            });
+            var mesh = new THREE.Mesh(keySphereGeom, mat);
+            mesh.position.copy(basePos);
+            mesh.userData.index = i;
+            mesh.userData.basePosition = basePos;
+            middleKeys.push(mesh);
+            middleGroup.add(mesh);
         }
-        var middleGeom = new THREE.BufferGeometry();
-        middleGeom.setAttribute('position', new THREE.Float32BufferAttribute(middlePositions, 3));
-        middleGeom.setAttribute('color', new THREE.Float32BufferAttribute(middleColors, 3));
-        var middleMat = new THREE.PointsMaterial({
-            size: 0.25,
-            vertexColors: true,
-            sizeAttenuation: true,
-            transparent: true,
-            opacity: 0.92
-        });
-        var middlePoints = new THREE.Points(middleGeom, middleMat);
-        middlePoints.userData.type = 'middle';
-        scene.add(middlePoints);
+        scene.add(middleGroup);
 
-        // Right plane: wave-like pattern (same 336 keys, y = index-based, z = wave from quaternion phase)
-        var rightPositions = [];
-        var rightColors = [];
+        // Right plane: wave-like pattern as 336 meshes, animated with UnifiedQubitStyling
+        var rightGroup = new THREE.Group();
+        rightGroup.userData.type = 'right';
+        var rightKeys = [];
         for (var j = 0; j < keys.length; j++) {
             var qr = keys[j];
             var phase = Math.atan2(qr.b + qr.c, qr.a + qr.d) + j * 0.1;
             var y = (j / keys.length - 0.5) * 2 * rightWaveAmplitude * 1.2;
             var z = Math.sin(phase * 2) * rightWaveAmplitude + Math.cos(j * rightWaveScale * 200) * 0.8;
-            rightPositions.push(slitDistance, y, z);
+            var rx = slitDistance;
+            var basePosR = new THREE.Vector3(rx, y, z);
             var hueR = (j / keys.length) * 0.3 + 0.75;
-            var cr = new THREE.Color().setHSL(hueR, 0.8, 0.65);
-            rightColors.push(cr.r, cr.g, cr.b);
+            var matR = new THREE.MeshPhongMaterial({
+                color: new THREE.Color().setHSL(hueR, 0.8, 0.65),
+                emissive: new THREE.Color().setHSL(hueR, 0.7, 0.15),
+                emissiveIntensity: 0.4,
+                shininess: 100,
+                transparent: true,
+                opacity: 0.9
+            });
+            var meshR = new THREE.Mesh(keySphereGeom, matR);
+            meshR.position.copy(basePosR);
+            meshR.userData.index = j;
+            meshR.userData.basePosition = basePosR;
+            rightKeys.push(meshR);
+            rightGroup.add(meshR);
         }
-        var rightGeom = new THREE.BufferGeometry();
-        rightGeom.setAttribute('position', new THREE.Float32BufferAttribute(rightPositions, 3));
-        rightGeom.setAttribute('color', new THREE.Float32BufferAttribute(rightColors, 3));
-        var rightMat = new THREE.PointsMaterial({
-            size: 0.22,
-            vertexColors: true,
-            sizeAttenuation: true,
-            transparent: true,
-            opacity: 0.9
-        });
-        var rightPoints = new THREE.Points(rightGeom, rightMat);
-        rightPoints.userData.type = 'right';
-        scene.add(rightPoints);
+        scene.add(rightGroup);
 
         // Optional: subtle plane guides at slit positions
         var planeGeom = new THREE.PlaneGeometry(0.3, 12, 1, 1);
@@ -353,9 +411,47 @@
         rightPlane.rotation.y = -Math.PI / 2;
         scene.add(rightPlane);
 
+        var time = 0;
         function animate() {
             requestAnimationFrame(animate);
+            time += 0.016;
             controls.update();
+
+            var seedRotationAngle = time * 1.5;
+            var seedBasePos = new THREE.Vector3(-slitDistance, 0, 0);
+            var seedStyle = unifiedStyling.calculateUnifiedStyle(0, time, seedRotationAngle, seedBasePos);
+            seedMesh.material.emissiveIntensity = 0.5 + seedStyle.glowIntensity * 0.3;
+
+            for (var mi = 0; mi < middleKeys.length; mi++) {
+                var m = middleKeys[mi];
+                var basePos = m.userData.basePosition;
+                var rotationAngle = Math.atan2(basePos.z, basePos.y) + time * 0.3;
+                var style = unifiedStyling.calculateUnifiedStyle(m.userData.index, time, rotationAngle, basePos);
+                var orbitRadius = 0.08 * style.teslaMultiplier;
+                var orbitSpeed = 0.5 * style.teslaMultiplier;
+                m.position.set(
+                    basePos.x + Math.cos(time * orbitSpeed + style.teslaPhase) * orbitRadius * style.noiseFactor,
+                    basePos.y + Math.sin(time * orbitSpeed * 1.3 + style.teslaPhase) * orbitRadius * style.noiseFactor,
+                    basePos.z + Math.cos(time * orbitSpeed * 0.7 + style.teslaPhase) * orbitRadius * style.noiseFactor
+                );
+                m.material.emissiveIntensity = 0.4 + style.glowIntensity * 0.3;
+                var hue = (m.userData.index / keys.length) * 0.7 + 0.55 + time * 0.02;
+                m.material.color.setHSL(hue % 1, 0.75, 0.6 * (0.9 + style.lightingFactor * 0.2));
+                m.material.emissive.setHSL(hue % 1, 0.7, style.glowIntensity * 2);
+            }
+
+            for (var ri = 0; ri < rightKeys.length; ri++) {
+                var r = rightKeys[ri];
+                var basePosR = r.userData.basePosition;
+                var rotR = Math.atan2(basePosR.z, basePosR.y) + time * 0.2;
+                var styleR = unifiedStyling.calculateUnifiedStyle(r.userData.index, time, rotR, basePosR);
+                r.position.copy(basePosR);
+                r.material.emissiveIntensity = 0.4 + styleR.glowIntensity * 0.3;
+                var hueR = (r.userData.index / keys.length) * 0.3 + 0.75 + time * 0.01;
+                r.material.color.setHSL(hueR % 1, 0.8, 0.65 * (0.9 + styleR.lightingFactor * 0.2));
+                r.material.emissive.setHSL(hueR % 1, 0.7, styleR.glowIntensity * 2);
+            }
+
             renderer.render(scene, camera);
         }
         animate();
