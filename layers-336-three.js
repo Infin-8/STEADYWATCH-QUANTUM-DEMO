@@ -1,7 +1,7 @@
 /**
  * 336 Hurwitz Key — Full Three.js Layers View
  * Real quaternion math: left plane (seed), middle (cylinder of keys), right plane (wave capture).
- * Uses actual Hurwitz enumeration (a²+b²+c²+d²=p, ×24 units) and 4D→3D stereographic projection.
+ * Cylinder uses same golden-angle spiral + Perlin + Tesla as header-hurwitz-bg.js.
  */
 (function () {
     'use strict';
@@ -182,6 +182,33 @@
         return { x: a * scale, y: b * scale, z: c * scale, w: w };
     }
 
+    // ========== Golden-angle + Perlin + Tesla (same as header-hurwitz-bg.js) ==========
+    function hash(x) {
+        var w = (x % 2147483647 + 2147483647) % 2147483647;
+        w = ((w * 1103515245) + 12345) & 0x7fffffff;
+        w = ((w * 1103515245) + 12345) & 0x7fffffff;
+        return (w % 2000000000) / 1000000000.0 - 1.0;
+    }
+    function smoothstep(t) {
+        t = Math.max(0, Math.min(1, t));
+        return t * t * t * (t * (t * 6 - 15) + 10);
+    }
+    function perlin1D(x) {
+        var x0 = Math.floor(x);
+        var x1 = x0 + 1;
+        var fx = x - x0;
+        var t = smoothstep(fx);
+        var g0 = hash(x0) * (x - x0);
+        var g1 = hash(x1) * (x - x1);
+        return (1 - t) * g0 + t * g1;
+    }
+    var teslaMultipliers = { base: 1, harmonic3: 1 / 3, harmonic6: 1 / 6 };
+    function applyTesla(value, index) {
+        var g = index % 3;
+        var m = g === 0 ? teslaMultipliers.base : g === 1 ? teslaMultipliers.harmonic3 : teslaMultipliers.harmonic6;
+        return value * m;
+    }
+
     // ========== Three.js scene ==========
     function initLayers336Visualization(containerId) {
         var container = document.getElementById(containerId);
@@ -241,17 +268,31 @@
         seedMesh.userData.type = 'seed';
         scene.add(seedMesh);
 
-        // Middle: cylinder of keys (336 points, x spread left→right, y,z from quaternion)
+        // Middle: cylinder of keys — same golden-angle + Perlin + Tesla as header-hurwitz-bg.js
+        var goldenAngle = Math.PI * (3 - Math.sqrt(13));
+        var pointCount = keys.length;
+        var maxR = 0.52;
+        var noiseScale = 0.5;
         var middlePositions = [];
         var middleColors = [];
         for (var i = 0; i < keys.length; i++) {
-            var q = keys[i];
-            var proj = project4Dto3D(q.a, q.b, q.c, q.d, middleScale);
+            var theta = goldenAngle * i;
+            var r = maxR * Math.sqrt((i + 1) / pointCount);
+            var y0 = Math.cos(theta) * r;
+            var z0 = Math.sin(theta) * r;
+            var nx = perlin1D(i * 1.7);
+            var ny = perlin1D(i * 2.3 + 500);
+            var y = middleScale * (y0 + nx * noiseScale);
+            var z = middleScale * (z0 + ny * noiseScale);
             var t = (i + 1) / (keys.length + 1);
             var x = -slitDistance + t * (2 * slitDistance);
-            middlePositions.push(x, proj.y, proj.z);
+            middlePositions.push(x, y, z);
             var hue = (i / keys.length) * 0.7 + 0.55;
+            var teslaFactor = 0.85 + applyTesla(0.15, i);
             var c = new THREE.Color().setHSL(hue, 0.75, 0.6);
+            c.r *= teslaFactor;
+            c.g *= teslaFactor;
+            c.b *= teslaFactor;
             middleColors.push(c.r, c.g, c.b);
         }
         var middleGeom = new THREE.BufferGeometry();
