@@ -209,6 +209,19 @@
         return value * m;
     }
 
+    // Echo frequencies (SteadyWatch): 336 keys as samples of multi-frequency wave (same as layers-hurwitz-336.js)
+    var echoFreqs = [1, 1 / 3, 1 / 6];
+    var echoAmplitudes = [0.4, 0.25, 0.2];
+    function echoWaveAtKey(index, time, totalKeys) {
+        totalKeys = totalKeys || 336;
+        var phi = (index / totalKeys) * Math.PI * 2;
+        var sum = 0;
+        for (var f = 0; f < echoFreqs.length; f++) {
+            sum += echoAmplitudes[f] * Math.sin(time * echoFreqs[f] + phi * (f + 1));
+        }
+        return sum;
+    }
+
     // UnifiedQubitStyling (same as 144-satellites, ES5)
     function UnifiedQubitStyling() {
         this.noiseState = { lastNoiseUpdateTime: 0, smoothedNoiseValue: 0, noiseSmoothingTimeConstant: 0.5 };
@@ -365,17 +378,17 @@
         }
         scene.add(middleGroup);
 
-        // Right plane: wave-like pattern as 336 meshes, animated with UnifiedQubitStyling
+        // Right plane: wave-like pattern as 336 meshes; base Y/Z stored for echo-wave offset in animate()
         var rightGroup = new THREE.Group();
         rightGroup.userData.type = 'right';
         var rightKeys = [];
         for (var j = 0; j < keys.length; j++) {
             var qr = keys[j];
             var phase = Math.atan2(qr.b + qr.c, qr.a + qr.d) + j * 0.1;
-            var y = (j / keys.length - 0.5) * 2 * rightWaveAmplitude * 1.2;
-            var z = Math.sin(phase * 2) * rightWaveAmplitude + Math.cos(j * rightWaveScale * 200) * 0.8;
+            var baseY = (j / keys.length - 0.5) * 2 * rightWaveAmplitude * 1.2;
+            var baseZ = Math.sin(phase * 2) * rightWaveAmplitude + Math.cos(j * rightWaveScale * 200) * 0.8;
             var rx = slitDistance;
-            var basePosR = new THREE.Vector3(rx, y, z);
+            var basePosR = new THREE.Vector3(rx, baseY, baseZ);
             var hueR = (j / keys.length) * 0.3 + 0.75;
             var matR = new THREE.MeshPhongMaterial({
                 color: new THREE.Color().setHSL(hueR, 0.8, 0.65),
@@ -389,6 +402,8 @@
             meshR.position.copy(basePosR);
             meshR.userData.index = j;
             meshR.userData.basePosition = basePosR;
+            meshR.userData.baseY = baseY;
+            meshR.userData.baseZ = baseZ;
             rightKeys.push(meshR);
             rightGroup.add(meshR);
         }
@@ -443,9 +458,12 @@
             for (var ri = 0; ri < rightKeys.length; ri++) {
                 var r = rightKeys[ri];
                 var basePosR = r.userData.basePosition;
-                var rotR = Math.atan2(basePosR.z, basePosR.y) + time * 0.2;
+                var baseY = r.userData.baseY;
+                var baseZ = r.userData.baseZ;
+                var waveY = echoWaveAtKey(r.userData.index, time, keys.length);
+                r.position.set(slitDistance, baseY + waveY * 0.8, baseZ);
+                var rotR = Math.atan2(baseZ, baseY) + time * 0.2;
                 var styleR = unifiedStyling.calculateUnifiedStyle(r.userData.index, time, rotR, basePosR);
-                r.position.copy(basePosR);
                 r.material.emissiveIntensity = 0.4 + styleR.glowIntensity * 0.3;
                 var hueR = (r.userData.index / keys.length) * 0.3 + 0.75 + time * 0.01;
                 r.material.color.setHSL(hueR % 1, 0.8, 0.65 * (0.9 + styleR.lightingFactor * 0.2));

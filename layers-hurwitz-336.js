@@ -36,6 +36,19 @@
     };
     var teslaMultipliers = { base: 1, harmonic3: 1 / 3, harmonic6: 1 / 6 };
 
+    // Echo frequencies (SteadyWatch: Tesla 1, 1/3, 1/6 — 336 keys as samples of multi-frequency wave)
+    var echoFreqs = [1, 1 / 3, 1 / 6];
+    var echoAmplitudes = [0.4, 0.25, 0.2];
+    function echoWaveAtKey(index, time, totalKeys) {
+        totalKeys = totalKeys || 336;
+        var phi = (index / totalKeys) * Math.PI * 2;
+        var sum = 0;
+        for (var f = 0; f < echoFreqs.length; f++) {
+            sum += echoAmplitudes[f] * Math.sin(time * echoFreqs[f] + phi * (f + 1));
+        }
+        return sum;
+    }
+
     function generateNoise(time, freq) {
         var b = perlin1D(time * freq * 0.5) * 0.6;
         var d = perlin1D(time * freq * 2) * 0.25;
@@ -118,7 +131,9 @@
         var centerStyle = calculateUnifiedStyle(0, time, 0, { x: 0, y: 0 });
         container.appendChild(createDot('center', 15, 50, null, 1 + perlin1D(200) * sizeNoiseScale, 0.85 + perlin1D(300) * 0.15, centerStyle, 0.5));
 
-        // Right: 336 dots — same spiral math, remapped to right half (50–100% width, vertical spread 50 ± 40%)
+        // Right: 336 dots — same spiral math, remapped to right half; vertical offset from echo wave (multi-frequency)
+        var dots = [];
+        var waveSpreadPct = 8;
         for (var i = 0; i < pointCount; i++) {
             var theta = goldenAngle * i;
             var r = maxR * Math.sqrt((i + 1) / pointCount);
@@ -127,19 +142,43 @@
             var rotationAngle = Math.atan2(y, x);
             var nx = perlin1D(i * 1.7);
             var ny = perlin1D(i * 2.3 + 500);
-            // Remap: x in [-1,1] -> left 50–100%; y in [-1,1] -> top 10–90%
             var leftPct = 50 + 50 * (0.5 + x * 0.5) + nx * noiseScale * 0.5;
-            var topPct = 50 + y * 40 + ny * noiseScale * 0.5;
+            var baseTopPct = 50 + y * 40 + ny * noiseScale * 0.5;
             leftPct = Math.max(50, Math.min(100, leftPct));
-            topPct = Math.max(5, Math.min(95, topPct));
             var sizeScale = 1 + perlin1D(i * 3.1 + 1000) * sizeNoiseScale;
             var opacityScale = 0.85 + perlin1D(i * 4.7 + 2000) * 0.15;
             var style = calculateUnifiedStyle(i, time + i * 0.01, rotationAngle, { x: x, y: y });
             var colorT = i / Math.max(1, pointCount - 1);
+            var wave = echoWaveAtKey(i, time, pointCount);
+            var topPct = Math.max(5, Math.min(95, baseTopPct + wave * waveSpreadPct));
             var dot = createDot('', leftPct, topPct, i, sizeScale, opacityScale, style, colorT);
             dot.setAttribute('data-index', String(i));
+            dot.setAttribute('data-base-top', String(baseTopPct));
+            dot.setAttribute('data-size-scale', String(sizeScale));
+            dot.setAttribute('data-opacity-scale', String(opacityScale));
+            dots.push(dot);
             container.appendChild(dot);
         }
+
+        function animateDots() {
+            time += 0.016;
+            for (var i = 0; i < dots.length; i++) {
+                var d = dots[i];
+                var idx = parseInt(d.getAttribute('data-index'), 10);
+                var baseTopPct = parseFloat(d.getAttribute('data-base-top'), 10);
+                var sizeScale = parseFloat(d.getAttribute('data-size-scale'), 10);
+                var opacityScale = parseFloat(d.getAttribute('data-opacity-scale'), 10);
+                var wave = echoWaveAtKey(idx, time, pointCount);
+                var topPct = Math.max(5, Math.min(95, baseTopPct + wave * waveSpreadPct));
+                d.style.top = topPct + '%';
+                var sizeMod = 0.9 + wave * 0.2;
+                var opacityMod = 0.85 + (wave + 1) * 0.15;
+                d.style.setProperty('transform', 'translate(-50%, -50%) scale(' + (sizeScale * sizeMod) + ')');
+                d.style.setProperty('--opacity-scale', String(opacityScale * opacityMod));
+            }
+            requestAnimationFrame(animateDots);
+        }
+        requestAnimationFrame(animateDots);
     }
 
     if (document.readyState === 'loading') {
