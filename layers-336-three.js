@@ -2,6 +2,9 @@
  * 336 Hurwitz Key — Full Three.js Layers View
  * Left plane (seed), middle (cylinder of keys), right plane (wave).
  * Cylinder: golden-angle + Perlin + Tesla. All keys use UnifiedQubitStyling (animated glow/pulse like 144).
+ *
+ * Structural parallel: George Gamow quantum tunneling (alpha decay, 1928) — single source (left),
+ * barrier/transition region (middle), emerged wave (right). See docs/research/LAYERS_336_GAMOW_TUNNELING.md.
  */
 (function () {
     'use strict';
@@ -426,13 +429,128 @@
         rightPlane.rotation.y = -Math.PI / 2;
         scene.add(rightPlane);
 
+        // ---------- Schrödinger mode: drive spheres from 1D tunneling export ----------
+        var schrodingerMode = false;
+        var schrodingerData = null;
+        var schrodingerDataUrl = 'data/schrodinger_tunneling_export.json';
+
+        function sampleDensityForRegions(data, timeIndex) {
+            var x = data.x;
+            var density = data.probability_density[timeIndex];
+            if (!density || density.length !== x.length) return null;
+            var params = data.metadata && data.metadata.params ? data.metadata.params : {};
+            var xBarrierLeft = params.x_barrier_left != null ? params.x_barrier_left : 0;
+            var xBarrierRight = params.x_barrier_right != null ? params.x_barrier_right : 2;
+            var barrierLeftI = 0;
+            var barrierRightI = x.length - 1;
+            for (var i = 0; i < x.length; i++) {
+                if (x[i] >= xBarrierLeft) { barrierLeftI = i; break; }
+            }
+            for (var i = x.length - 1; i >= 0; i--) {
+                if (x[i] <= xBarrierRight) { barrierRightI = i; break; }
+            }
+            var wellSum = 0;
+            for (i = 0; i < barrierLeftI; i++) wellSum += density[i];
+            var dx = x.length > 1 ? (x[1] - x[0]) : 1;
+            wellSum *= dx;
+
+            function sampleAtIndices(startI, endI, count) {
+                var out = [];
+                for (var c = 0; c < count; c++) {
+                    var fi = startI + (endI - startI) * (c / (count - 1 || 1));
+                    var i0 = Math.floor(fi);
+                    var i1 = Math.min(i0 + 1, density.length - 1);
+                    var t = fi - i0;
+                    out.push((1 - t) * density[i0] + t * (density[i1] || density[i0]));
+                }
+                return out;
+            }
+            var middleDensities = sampleAtIndices(barrierLeftI, barrierRightI, 336);
+            var rightStart = Math.min(barrierRightI + 1, x.length - 1);
+            var rightDensities = rightStart <= x.length - 1
+                ? sampleAtIndices(rightStart, x.length - 1, 336)
+                : Array(336).fill(0);
+            return { wellSum: wellSum, middleDensities: middleDensities, rightDensities: rightDensities };
+        }
+
+        function applySchrodingerDensity(sampled) {
+            if (!sampled) return;
+            var maxM = 0;
+            var maxR = 0;
+            for (var i = 0; i < 336; i++) {
+                if (sampled.middleDensities[i] > maxM) maxM = sampled.middleDensities[i];
+                if (sampled.rightDensities[i] > maxR) maxR = sampled.rightDensities[i];
+            }
+            maxM = maxM || 1;
+            maxR = maxR || 1;
+            var wellScale = Math.min(2, 0.3 + sampled.wellSum * 2);
+            seedMesh.scale.setScalar(wellScale);
+            seedMesh.material.emissiveIntensity = 0.4 + Math.min(0.5, sampled.wellSum * 3);
+            for (var mi = 0; mi < middleKeys.length; mi++) {
+                var s = Math.max(0.15, Math.min(1.5, (sampled.middleDensities[mi] / maxM) * 1.2));
+                middleKeys[mi].scale.setScalar(s);
+                middleKeys[mi].material.opacity = 0.3 + 0.65 * (sampled.middleDensities[mi] / maxM);
+            }
+            for (var ri = 0; ri < rightKeys.length; ri++) {
+                var sr = Math.max(0.15, Math.min(1.5, (sampled.rightDensities[ri] / maxR) * 1.2));
+                rightKeys[ri].scale.setScalar(sr);
+                rightKeys[ri].material.opacity = 0.3 + 0.65 * (sampled.rightDensities[ri] / maxR);
+            }
+        }
+
+        function resetSchrodingerScales() {
+            seedMesh.scale.setScalar(1);
+            for (var mi = 0; mi < middleKeys.length; mi++) {
+                middleKeys[mi].scale.setScalar(1);
+                middleKeys[mi].material.opacity = 0.92;
+            }
+            for (var ri = 0; ri < rightKeys.length; ri++) {
+                rightKeys[ri].scale.setScalar(1);
+                rightKeys[ri].material.opacity = 0.9;
+            }
+        }
+
+        window.toggleLayers336SchrodingerMode = function () {
+            schrodingerMode = !schrodingerMode;
+            if (schrodingerMode && !schrodingerData) {
+                fetch(schrodingerDataUrl)
+                    .then(function (r) { return r.json(); })
+                    .then(function (d) {
+                        schrodingerData = d;
+                        var cap = document.getElementById('layers-336-caption');
+                        if (cap) cap.textContent = 'Schrödinger mode: Gamow-style 1D tunneling |ψ|² (data loaded).';
+                    })
+                    .catch(function () {
+                        schrodingerMode = false;
+                        var cap = document.getElementById('layers-336-caption');
+                        if (cap) cap.textContent = 'Schrödinger data not found. Run quantum_computing/schrodinger_tunneling.py and place export in data/.';
+                    });
+            }
+            if (!schrodingerMode) {
+                resetSchrodingerScales();
+                var cap = document.getElementById('layers-336-caption');
+                if (cap) cap.textContent = 'left (seed) ——— tunnel of keyz ——— right (wave)';
+            }
+            var btn = document.getElementById('layers-336-schrodinger-btn');
+            if (btn) {
+                btn.textContent = schrodingerMode ? 'Schrödinger mode ON' : 'Schrödinger mode';
+                btn.classList.toggle('active', schrodingerMode);
+            }
+        };
+
         var time = 0;
         function animate() {
             requestAnimationFrame(animate);
             time += 0.016;
             controls.update();
 
-            var seedRotationAngle = time * 1.5;
+            if (schrodingerMode && schrodingerData && schrodingerData.probability_density) {
+                var numFrames = schrodingerData.probability_density.length;
+                var timeIndex = Math.floor((time * 1.2) % numFrames);
+                var sampled = sampleDensityForRegions(schrodingerData, timeIndex);
+                applySchrodingerDensity(sampled);
+            } else {
+                var seedRotationAngle = time * 1.5;
             var seedBasePos = new THREE.Vector3(-slitDistance, 0, 0);
             var seedStyle = unifiedStyling.calculateUnifiedStyle(0, time, seedRotationAngle, seedBasePos);
             seedMesh.material.emissiveIntensity = 0.5 + seedStyle.glowIntensity * 0.3;
@@ -468,6 +586,7 @@
                 var hueR = (r.userData.index / keys.length) * 0.3 + 0.75 + time * 0.01;
                 r.material.color.setHSL(hueR % 1, 0.8, 0.65 * (0.9 + styleR.lightingFactor * 0.2));
                 r.material.emissive.setHSL(hueR % 1, 0.7, styleR.glowIntensity * 2);
+            }
             }
 
             renderer.render(scene, camera);

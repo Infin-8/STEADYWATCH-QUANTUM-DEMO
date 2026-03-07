@@ -849,6 +849,12 @@ footer a {
     box-shadow: 0 0 12px rgba(102, 126, 234, 0.5);
 }
 
+.viz-button.active {
+    background: rgba(102, 126, 234, 0.7);
+    border-color: rgba(255, 255, 255, 0.8);
+    box-shadow: 0 0 12px rgba(102, 126, 234, 0.5);
+}
+
 .viz-stat {
     display: flex;
     align-items: center;
