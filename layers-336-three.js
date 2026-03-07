@@ -554,7 +554,7 @@
             }
             var btn = document.getElementById('layers-336-schrodinger-btn');
             if (btn) {
-                btn.textContent = schrodingerMode ? 'Schrödinger mode ON' : 'Schrödinger mode';
+                btn.textContent = schrodingerMode ? 'Disengage' : 'Schrödinger mode';
                 btn.classList.toggle('active', schrodingerMode);
             }
         };
