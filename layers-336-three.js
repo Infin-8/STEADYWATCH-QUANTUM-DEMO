@@ -434,6 +434,12 @@
         var schrodingerData = null;
         var schrodingerDataUrl = 'data/schrodinger_tunneling_export.json';
 
+        function smoothstepSchrod(t) {
+            t = Math.max(0, Math.min(1, t));
+            return t * t * t * (t * (t * 6 - 15) + 10);
+        }
+        function lerpSchrod(a, b, t) { return a + (b - a) * t; }
+
         function sampleDensityForRegions(data, timeIndex) {
             var x = data.x;
             var density = data.probability_density[timeIndex];
@@ -471,6 +477,21 @@
                 ? sampleAtIndices(rightStart, x.length - 1, 336)
                 : Array(336).fill(0);
             return { wellSum: wellSum, middleDensities: middleDensities, rightDensities: rightDensities };
+        }
+
+        function interpolateDensitySamples(s0, s1, tSmooth) {
+            if (!s0 || !s1) return s0 || s1;
+            var mid = [];
+            var right = [];
+            for (var i = 0; i < 336; i++) {
+                mid.push(lerpSchrod(s0.middleDensities[i], s1.middleDensities[i], tSmooth));
+                right.push(lerpSchrod(s0.rightDensities[i], s1.rightDensities[i], tSmooth));
+            }
+            return {
+                wellSum: lerpSchrod(s0.wellSum, s1.wellSum, tSmooth),
+                middleDensities: mid,
+                rightDensities: right
+            };
         }
 
         function applySchrodingerDensity(sampled) {
@@ -539,16 +560,33 @@
         };
 
         var time = 0;
+        var lastFrameTime = null;
+        var schrodingerPlaybackSpeed = 0.8;
+
         function animate() {
             requestAnimationFrame(animate);
-            time += 0.016;
+            var now = typeof performance !== 'undefined' ? performance.now() * 0.001 : time + 0.016;
+            if (lastFrameTime != null) time += (now - lastFrameTime);
+            lastFrameTime = now;
             controls.update();
 
             if (schrodingerMode && schrodingerData && schrodingerData.probability_density) {
                 var numFrames = schrodingerData.probability_density.length;
-                var timeIndex = Math.floor((time * 1.2) % numFrames);
-                var sampled = sampleDensityForRegions(schrodingerData, timeIndex);
-                applySchrodingerDensity(sampled);
+                if (numFrames < 2) {
+                    var sampled = sampleDensityForRegions(schrodingerData, 0);
+                    applySchrodingerDensity(sampled);
+                } else {
+                    var framePos = (time * schrodingerPlaybackSpeed) % numFrames;
+                    if (framePos < 0) framePos += numFrames;
+                    var timeIndex0 = Math.floor(framePos) % numFrames;
+                    var timeIndex1 = (timeIndex0 + 1) % numFrames;
+                    var t = framePos - Math.floor(framePos);
+                    var tSmooth = smoothstepSchrod(t);
+                    var s0 = sampleDensityForRegions(schrodingerData, timeIndex0);
+                    var s1 = sampleDensityForRegions(schrodingerData, timeIndex1);
+                    var sampled = interpolateDensitySamples(s0, s1, tSmooth);
+                    applySchrodingerDensity(sampled);
+                }
             } else {
                 var seedRotationAngle = time * 1.5;
             var seedBasePos = new THREE.Vector3(-slitDistance, 0, 0);
