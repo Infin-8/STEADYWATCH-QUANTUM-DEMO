@@ -95,6 +95,45 @@
         </div>
     </div>
 
+        <!-- Technical Details Section -->
+    <div class="section white">
+        <div class="container">
+            <h2 class="section-title">- Technical Details -</h2>
+            <div style="max-width: 900px; margin: 0 auto;">
+                <h3 style="color: #667eea; margin-top: 30px; margin-bottom: 15px; text-shadow: 1px 1px 1px black;">Key Architecture</h3>
+                <p style="line-height: 1.8; margin-bottom: 20px;">
+                    The 336 keyz are generated from a single prime seed (p=13) using the Hurwitz quaternion formula. 
+                    Each key has unique 4D coordinates (a, b, c, d) with norm = 13, arranged radially around the central seed.
+                </p>
+                
+                <h3 style="color: #667eea; margin-top: 30px; margin-bottom: 15px; text-shadow: 1px 1px 1px black;">4D-to-3D Projection</h3>
+                <p style="line-height: 1.8; margin-bottom: 20px;">
+                    The visualization uses stereographic projection to map 4D Hurwitz quaternion coordinates to 3D space. 
+                    This allows us to visualize the key architecture while preserving the mathematical relationships.
+                </p>
+                
+                <h3 style="color: #667eea; margin-top: 30px; margin-bottom: 15px; text-shadow: 1px 1px 1px black;">Quantum Entropy Generation</h3>
+                <p style="line-height: 1.8; margin-bottom: 20px;">
+                    Each key generates a unique 256-bit quantum entropy seed via hardware-validated quantum circuits. 
+                    The key-specific phase rotations ensure uniqueness, achieving 100% uniqueness. One prime → 336 unique seeds, 
+                    validated on real quantum hardware. That’s a genuine differentiator over post-quantum projects that rely on 
+                    software randomness alone. STEADYWATCH™ is a hardware-validated entropy source that can serve as the seed layer 
+                    underneath protocols and systems—not a replacement, a foundation.
+                </p>
+                <h3 style="color: #667eea; margin-top: 30px; margin-bottom: 15px; text-shadow: 1px 1px 1px black;">Scalability Elegance</h3>
+                <p style="line-height: 1.8; margin-bottom: 20px;">
+                     The architecture scales with the number of primes you use. One prime, one quantum batch; more primes, more uniquely-seeded nodes—no redesign.
+                        \(p=5\) → 144 nodes
+                        \(p=13\) → 336 nodes
+                        \(p=17\) → 432 nodes
+                    Three primes = 912 uniquely-seeded nodes from 3 quantum batch jobs. Each node gets a deterministic, 
+                    hardware-validated entropy seed. Add primes as you need capacity; the math stays the same.
+                </p>
+          
+            </div>
+        </div>
+    </div>
+
         <div class="section" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; text-align: center;">
         <div class="container">
             <h2 class="section-title" style="color: white; text-shadow: 2px 2px 4px rgba(0,0,0,0.3);">
