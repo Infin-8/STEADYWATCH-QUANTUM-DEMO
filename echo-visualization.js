@@ -34,7 +34,7 @@ var PHASE_CAPTIONS = [
     'The full structure. 144 keys from one seed.',
     'The echo. Same structure, reduced. Ready to match.',
     'The path. One chain. Five nodes.',
-    'Superimposed. At the echo, they match.',
+    'The full Hurwitz structure, the Echo (lightweight copy), the GHZ path, and their super-position.',
     'One prime. Recoverable from any key.'
 ];
 
