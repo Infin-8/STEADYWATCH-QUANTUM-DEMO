@@ -154,11 +154,11 @@
                     setBlock(i, 0, j, BLOCK.GROUND);
                 }
             }
-            setBlock(0, 1, 0, BLOCK.KEY_ORE_P5);
-            setBlock(2, 1, 1, BLOCK.KEY_ORE_P5);
-            setBlock(-1, 1, 2, BLOCK.KEY_ORE_P13);
-            setBlock(1, 1, -2, BLOCK.KEY_ORE_P13);
-            setBlock(-2, 1, -1, BLOCK.KEY_ORE_P5);
+            for (i = -4; i <= 4; i++) {
+                for (j = -4; j <= 4; j++) {
+                    setBlock(i, 1, j, BLOCK.KEY_ORE_P5);
+                }
+            }
         }
 
         buildWorld();
