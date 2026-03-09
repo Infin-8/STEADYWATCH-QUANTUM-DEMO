@@ -201,6 +201,8 @@
                 var apiKey = vaultKey.value;
                 if (base && apiKey) {
                     var slotIndex = worldToSlotIndex(bx, bz);
+                    if (vaultStatus) vaultStatus.textContent = 'Requesting…';
+                    if (labelEl) labelEl.textContent = 'Vault: Requesting key for slot ' + slotIndex + '…';
                     fetch(base + '/api/vault/request', {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json', 'X-Vault-Api-Key': apiKey },
