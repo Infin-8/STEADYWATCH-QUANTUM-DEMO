@@ -539,22 +539,22 @@
                     .then(function (d) {
                         schrodingerData = d;
                         var cap = document.getElementById('layers-336-caption');
-                        if (cap) cap.textContent = 'Schrödinger mode: Gamow-style 1D tunneling |ψ|² (data loaded).';
+                        
                     })
                     .catch(function () {
                         schrodingerMode = false;
                         var cap = document.getElementById('layers-336-caption');
-                        if (cap) cap.textContent = 'Schrödinger data not found. Run quantum_computing/schrodinger_tunneling.py and place export in data/.';
+                       
                     });
             }
             if (!schrodingerMode) {
                 resetSchrodingerScales();
                 var cap = document.getElementById('layers-336-caption');
-                if (cap) cap.textContent = 'left (seed) ——— tunnel of keyz ——— right (wave)';
+             
             }
             var btn = document.getElementById('layers-336-schrodinger-btn');
             if (btn) {
-                btn.textContent = schrodingerMode ? 'Schrödinger mode ON' : 'Schrödinger mode';
+                btn.textContent = schrodingerMode ? 'Disengage' : 'Schrödinger mode';
                 btn.classList.toggle('active', schrodingerMode);
             }
         };
