@@ -513,8 +513,15 @@
         if (loadDefaultConfigBtn) {
             loadDefaultConfigBtn.addEventListener('click', function () {
                 var base = (vaultConfigBase && vaultConfigBase.value ? vaultConfigBase.value : '').trim().replace(/\/$/, '');
-                if (!base) base = 'http://localhost:5003';
+                if (!base) base = window.location.origin;
                 var apiKey = (vaultConfigKey && vaultConfigKey.value) ? vaultConfigKey.value : 'vault-demo-key-change-in-production';
+                // HTTPS pages cannot load HTTP (mixed content blocked). Use same-origin or an HTTPS API URL.
+                var pageSecure = window.location.protocol === 'https:';
+                var baseSecure = base.indexOf('https:') === 0;
+                if (pageSecure && !baseSecure) {
+                    if (vaultConfigStatus) vaultConfigStatus.textContent = 'Use an HTTPS API URL when this page is on HTTPS. For local API, open this page via http://localhost.';
+                    return;
+                }
                 if (vaultConfigStatus) vaultConfigStatus.textContent = 'Loading…';
                 fetch(base + '/api/vault/configs/default', {
                     method: 'GET',
