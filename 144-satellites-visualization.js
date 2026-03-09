@@ -406,7 +406,7 @@ function init144SatellitesVisualization(containerId) {
         satellite.userData.index = index;
         satellite.userData.basePosition = new THREE.Vector3(pos.x, pos.y, pos.z);
         satellite.userData.phase = pos.phase;
-        satellite.userData.expanded = false;
+        satellite.userData.expanded = true; // Start fully expanded on load
         satellites.push(satellite);
         satelliteGroup.add(satellite);
 
@@ -476,8 +476,9 @@ function init144SatellitesVisualization(containerId) {
     // ============================================
     let animationRunning = true;
     let time = 0;
-    let expansionProgress = 0; // 0 = collapsed, 1 = fully expanded
-    let expansionEnabled = false; // User must trigger expansion (don't auto-start)
+    let expansionProgress = 1; // 1 = fully expanded on load
+    let expansionEnabled = true; // Start expanded
+    let expansionClosing = false; // True when animating back to center (Close)
     let releaseProgress = 0; // 0 = not released, 1 = fully released
     let releaseEnabled = false; // Control whether release/floating should continue
     let showConnections = true;
@@ -582,9 +583,13 @@ function init144SatellitesVisualization(containerId) {
     function updateExpansion() {
         // Skip regular expansion if Big Bang is active
         if (bigBangEnabled) return;
-        
-        // Only expand if user has enabled expansion
-        if (expansionEnabled && expansionProgress < 1.0) {
+
+        // Close: animate from expanded back to center (reverse animation)
+        if (expansionClosing && expansionProgress > 0) {
+            expansionProgress = Math.max(0, expansionProgress - expansionSpeed);
+        }
+        // Expand: animate from center to expanded
+        else if (expansionEnabled && expansionProgress < 1.0) {
             expansionProgress = Math.min(1.0, expansionProgress + expansionSpeed);
         }
 
@@ -593,18 +598,36 @@ function init144SatellitesVisualization(containerId) {
             const collapsedPos = new THREE.Vector3(0, 0, 0); // Start at seed
             const expandedPos = basePos.clone();
 
-            // Interpolate between collapsed and expanded positions
+            // Interpolate between collapsed and expanded positions (same lerp for both directions)
             satellite.position.lerpVectors(collapsedPos, expandedPos, expansionProgress);
             satellite.userData.expanded = expansionProgress >= 1.0;
 
+            // When close animation finishes, clear closing flag
+            if (expansionProgress <= 0) {
+                expansionClosing = false;
+            }
+
             // Update glow position
-            const glow = satelliteGroup.children.find(child => 
+            const glow = satelliteGroup.children.find(child =>
                 child.userData.satelliteIndex === index && child !== satellite
             );
             if (glow) {
                 glow.position.copy(satellite.position);
             }
         });
+
+        // Update Expand/Close button label
+        updateExpandButtonLabel();
+    }
+
+    function updateExpandButtonLabel() {
+        const expandBtn = document.getElementById('expand-144-satellites');
+        if (!expandBtn) return;
+        if (expansionProgress >= 1.0 && !expansionClosing) {
+            expandBtn.textContent = 'Close';
+        } else if (expansionProgress <= 0) {
+            expandBtn.textContent = 'Expand';
+        }
     }
 
     // ============================================
@@ -996,13 +1019,20 @@ function init144SatellitesVisualization(containerId) {
         });
     }
 
-    // Expand satellites (user-controlled)
+    // Expand / Close satellites (toggle: Expand when collapsed, Close when expanded)
     const expandBtn = document.getElementById('expand-144-satellites');
     if (expandBtn) {
         expandBtn.addEventListener('click', () => {
-            // Don't allow regular expansion during Big Bang
-            if (!bigBangEnabled) {
-                expansionEnabled = true; // Enable expansion
+            if (bigBangEnabled) return;
+            // If fully expanded, start close (reverse animation)
+            if (expansionProgress >= 1.0 && !expansionClosing) {
+                expansionClosing = true;
+                expansionEnabled = false;
+            }
+            // If collapsed, start expand
+            else if (expansionProgress <= 0) {
+                expansionEnabled = true;
+                expansionClosing = false;
             }
         });
     }
@@ -1043,6 +1073,8 @@ function init144SatellitesVisualization(containerId) {
                 satellite.position.set(0, 0, 0);
             }
         });
+
+        updateExpandButtonLabel();
     };
     
     if (resetExpansionBtn) {
