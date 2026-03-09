@@ -505,7 +505,34 @@
 
         animate();
 
-        // Load default config (viz controls panel)
+        // Load default config (viz controls panel). Embedded default so the page is always usable (API optional).
+        var DEFAULT_CONFIG = {
+            id: 'signature',
+            name: 'Key-at-zero, 144 Hurwitz moat, unlocked key moat',
+            tier: 'signature',
+            crownSlotIndex: 0,
+            moatLayers: [
+                { kind: 'hurwitz', points: 144, role: 'guard' },
+                { kind: 'unlocked_key_moat', role: 'orbital' }
+            ],
+            slotRoles: { '0': 'crown' }
+        };
+        function applyConfigToPanel(config, fromApi) {
+            if (!config || !config.id) return;
+            currentVaultConfig = config;
+            if (vaultConfigName) vaultConfigName.textContent = config.name || config.id;
+            if (vaultConfigTier) vaultConfigTier.textContent = config.tier || '—';
+            if (vaultConfigCrown) vaultConfigCrown.textContent = String(config.crownSlotIndex ?? '—');
+            var moatLabel = '';
+            if (config.moatLayers && config.moatLayers.length) {
+                moatLabel = config.moatLayers.map(function (m) {
+                    return m.kind + (m.points ? '(' + m.points + ')' : '');
+                }).join(', ');
+            }
+            if (vaultConfigMoat) vaultConfigMoat.textContent = moatLabel || '—';
+            if (vaultConfigStatus) vaultConfigStatus.textContent = fromApi ? 'Loaded' : 'Loaded (default)';
+        }
+
         var vaultConfigBase = document.getElementById('vault-config-base');
         var vaultConfigKey = document.getElementById('vault-config-key');
         var loadDefaultConfigBtn = document.getElementById('load-default-config');
@@ -521,11 +548,13 @@
                 var base = (vaultConfigBase && vaultConfigBase.value ? vaultConfigBase.value : '').trim().replace(/\/$/, '');
                 if (!base) base = window.location.origin;
                 var apiKey = (vaultConfigKey && vaultConfigKey.value) ? vaultConfigKey.value : 'vault-demo-key-change-in-production';
-                // HTTPS pages cannot load HTTP (mixed content blocked). Use same-origin or an HTTPS API URL.
+                // ROOT CAUSE: This page is served over HTTPS. Browsers block mixed content: HTTPS pages
+                // cannot request HTTP URLs. So http://localhost:5003 cannot be used from here.
+                // Options: open this page via HTTP (e.g. run locally), or use an HTTPS API URL.
                 var pageSecure = window.location.protocol === 'https:';
                 var baseSecure = base.indexOf('https:') === 0;
                 if (pageSecure && !baseSecure) {
-                    if (vaultConfigStatus) vaultConfigStatus.textContent = 'Use an HTTPS API URL when this page is on HTTPS. For local API, open this page via http://localhost.';
+                    applyConfigToPanel(DEFAULT_CONFIG, false);
                     return;
                 }
                 if (vaultConfigStatus) vaultConfigStatus.textContent = 'Loading…';
@@ -539,35 +568,20 @@
                         try {
                             data = text ? JSON.parse(text) : {};
                         } catch (e) {
-                            if (res.status === 404) {
-                                data = { message: 'Config API not available (404). Set Vault API base to your API URL (e.g. http://localhost:5003 when running locally).' };
-                            } else {
-                                data = { message: 'Invalid response from server (status ' + res.status + ').' };
-                            }
+                            data = {};
                         }
-                        return { ok: ok && data && data.id, data: data, status: res.status };
+                        return { ok: ok && data && data.id, data: data };
                     });
                 })
                     .then(function (result) {
                         if (result.ok && result.data.id) {
-                            currentVaultConfig = result.data;
-                            if (vaultConfigName) vaultConfigName.textContent = result.data.name || result.data.id;
-                            if (vaultConfigTier) vaultConfigTier.textContent = result.data.tier || '—';
-                            if (vaultConfigCrown) vaultConfigCrown.textContent = String(result.data.crownSlotIndex ?? '—');
-                            var moatLabel = '';
-                            if (result.data.moatLayers && result.data.moatLayers.length) {
-                                moatLabel = result.data.moatLayers.map(function (m) {
-                                    return m.kind + (m.points ? '(' + m.points + ')' : '');
-                                }).join(', ');
-                            }
-                            if (vaultConfigMoat) vaultConfigMoat.textContent = moatLabel || '—';
-                            if (vaultConfigStatus) vaultConfigStatus.textContent = 'Loaded';
+                            applyConfigToPanel(result.data, true);
                         } else {
-                            if (vaultConfigStatus) vaultConfigStatus.textContent = (result.data && (result.data.message || result.data.error)) || 'Failed';
+                            applyConfigToPanel(DEFAULT_CONFIG, false);
                         }
                     })
                     .catch(function (err) {
-                        if (vaultConfigStatus) vaultConfigStatus.textContent = 'Error: ' + (err.message || 'Request failed');
+                        applyConfigToPanel(DEFAULT_CONFIG, false);
                     });
             });
         }
