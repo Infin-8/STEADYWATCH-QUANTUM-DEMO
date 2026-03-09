@@ -234,7 +234,7 @@
                 labelEl.textContent = 'Key #' + drop.keyIndex + ' (p=' + drop.prime + ') ' + q + ' — click key ore to mine';
             } else {
                 var n = keyDrops.length;
-                labelEl.textContent = n + ' key drop(s). Click key ore (glowing blocks) to mine.';
+                labelEl.textContent = n + ' key drop(z). Click key ore (glowing blockz) to mine.';
             }
         }
 
