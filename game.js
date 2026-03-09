@@ -123,6 +123,7 @@
         var worldPosVortex = new THREE.Vector3();
         var correctedWorldVortex = new THREE.Vector3();
         var bouncePushDir = new THREE.Vector3();
+        var groupInvWorld = new THREE.Matrix4();
 
         function setBlock(bx, by, bz, blockType) {
             var key = blockKey(bx, by, bz);
@@ -423,6 +424,8 @@
                 }
 
                 // BOUNCE PASS — push particles off ore so they don't pass through
+                d.group.updateMatrixWorld(true);
+                groupInvWorld.getInverse(d.group.matrixWorld);
                 var nearestBlock, b, blockMesh, minDist, dist;
                 for (c = 0; c < d.group.children.length; c++) {
                     child = d.group.children[c];
@@ -441,7 +444,7 @@
                     if (nearestBlock && minDist < BOUNCE_RADIUS) {
                         bouncePushDir.copy(worldPosVortex).sub(nearestBlock.position).normalize();
                         correctedWorldVortex.copy(worldPosVortex).add(bouncePushDir.multiplyScalar(BOUNCE_RADIUS - minDist));
-                        child.position.copy(correctedWorldVortex).applyMatrix4(d.group.matrixWorldInverse);
+                        child.position.copy(correctedWorldVortex).applyMatrix4(groupInvWorld);
                     }
                 }
 
