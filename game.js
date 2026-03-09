@@ -12,6 +12,7 @@
     var CLUSTER_RADIUS = 0.5;
     var AVOID_NEAR = 0.2;
     var AVOID_FAR = 0.55;
+    var BOUNCE_RADIUS = 0.58;
 
     function smoothstep(t) {
         t = t < 0 ? 0 : t > 1 ? 1 : t;
@@ -120,6 +121,8 @@
         var raycaster = new THREE.Raycaster();
         var mouse = new THREE.Vector2();
         var worldPosVortex = new THREE.Vector3();
+        var correctedWorldVortex = new THREE.Vector3();
+        var bouncePushDir = new THREE.Vector3();
 
         function setBlock(bx, by, bz, blockType) {
             var key = blockKey(bx, by, bz);
@@ -416,6 +419,28 @@
                             baseLocal.y + orbitY,
                             baseLocal.z + orbitZ
                         );
+                    }
+                }
+
+                var nearestBlock, b, blockMesh, minDist, dist;
+                for (c = 0; c < d.group.children.length; c++) {
+                    child = d.group.children[c];
+                    child.getWorldPosition(worldPosVortex);
+                    minDist = Infinity;
+                    nearestBlock = null;
+                    for (b = 0; b < blockMeshes.length; b++) {
+                        blockMesh = blockMeshes[b];
+                        if (blockMesh.userData.blockType !== BLOCK.KEY_ORE_P5 && blockMesh.userData.blockType !== BLOCK.KEY_ORE_P13) continue;
+                        dist = worldPosVortex.distanceTo(blockMesh.position);
+                        if (dist < minDist) {
+                            minDist = dist;
+                            nearestBlock = blockMesh;
+                        }
+                    }
+                    if (nearestBlock && minDist < BOUNCE_RADIUS) {
+                        bouncePushDir.copy(worldPosVortex).sub(nearestBlock.position).normalize();
+                        correctedWorldVortex.copy(worldPosVortex).add(bouncePushDir.multiplyScalar(BOUNCE_RADIUS - minDist));
+                        child.position.copy(correctedWorldVortex).applyMatrix4(d.group.matrixWorldInverse);
                     }
                 }
 
