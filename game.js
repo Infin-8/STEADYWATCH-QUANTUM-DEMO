@@ -9,6 +9,13 @@
     var BLOCK_SIZE = 1;
     var TOTAL_P5 = 144;
     var TOTAL_P13 = 336;
+    var CLUSTER_RADIUS = 0.5;
+
+    function project4Dto3D(a, b, c, d, radius) {
+        var w = d;
+        var scale = radius / (1 + Math.abs(w) * 0.1);
+        return { x: a * scale, y: b * scale, z: c * scale };
+    }
 
     function getKeyColor(keyIndex, total) {
         if (typeof THREE === 'undefined') return null;
@@ -125,21 +132,29 @@
         function spawnKeyDrop(wx, wy, wz, prime, keyIndex) {
             var total = prime === 5 ? TOTAL_P5 : TOTAL_P13;
             var col = getKeyColor(keyIndex, total);
-            var geom = new THREE.SphereGeometry(0.25, 16, 16);
+            var quats = window.HurwitzKeys.unzipSeed(prime);
+            var group = new THREE.Group();
+            group.position.set(wx, wy, wz);
+            var sharedGeom = new THREE.SphereGeometry(0.06, 8, 8);
             var mat = new THREE.MeshPhongMaterial({
                 color: col,
                 emissive: col,
                 emissiveIntensity: 0.4,
                 shininess: 100
             });
-            var mesh = new THREE.Mesh(geom, mat);
-            mesh.position.set(wx, wy, wz);
-            mesh.userData.prime = prime;
-            mesh.userData.keyIndex = keyIndex;
-            mesh.userData.basePosition = new THREE.Vector3(wx, wy, wz);
-            scene.add(mesh);
+            var i, q, pos;
+            for (i = 0; i < quats.length; i++) {
+                q = quats[i];
+                pos = project4Dto3D(q.a, q.b, q.c, q.d, CLUSTER_RADIUS);
+                var mesh = new THREE.Mesh(sharedGeom, mat);
+                mesh.position.set(pos.x, pos.y, pos.z);
+                mesh.userData.keyDropIndex = keyDrops.length;
+                group.add(mesh);
+            }
+            scene.add(group);
             keyDrops.push({
-                mesh: mesh,
+                group: group,
+                material: mat,
                 prime: prime,
                 keyIndex: keyIndex,
                 total: total,
@@ -147,19 +162,30 @@
             });
         }
 
-        // --- Hover effects and tooltips for key drop orbs (like 144-satellites) ---
-        var hoveredOrbMesh = null;
+        // --- Hover effects and tooltips for key drop clusters (like 144-satellites) ---
+        var hoveredKeyDrop = null;
         var HOVER_SHININESS = 200;
         var HOVER_SPECULAR = 0xaaccff;
         var DEFAULT_SHININESS = 100;
         var DEFAULT_SPECULAR = 0x111111;
 
-        function resetOrbHoverEffect(mesh) {
-            if (!mesh || !mesh.material) return;
-            mesh.material.emissiveIntensity = 0.4;
-            mesh.material.shininess = DEFAULT_SHININESS;
-            if (mesh.material.specular) mesh.material.specular.setHex(DEFAULT_SPECULAR);
-            mesh.scale.set(1, 1, 1);
+        function resetClusterHoverEffect(drop) {
+            if (!drop) return;
+            drop.group.scale.set(1, 1, 1);
+            if (drop.material) {
+                drop.material.emissiveIntensity = 0.4;
+                drop.material.shininess = DEFAULT_SHININESS;
+                if (drop.material.specular) drop.material.specular.setHex(DEFAULT_SPECULAR);
+            }
+        }
+
+        function getOrbMeshesForRaycast() {
+            var list = [];
+            for (var i = 0; i < keyDrops.length; i++) {
+                var children = keyDrops[i].group.children;
+                for (var c = 0; c < children.length; c++) list.push(children[c]);
+            }
+            return list;
         }
 
         var tooltip = document.createElement('div');
@@ -172,34 +198,36 @@
             mouse.x = ((event.clientX - rect.left) / rect.width) * 2 - 1;
             mouse.y = -((event.clientY - rect.top) / rect.height) * 2 + 1;
             raycaster.setFromCamera(mouse, camera);
-            var orbMeshes = keyDrops.map(function (d) { return d.mesh; });
+            var orbMeshes = getOrbMeshesForRaycast();
             var hits = raycaster.intersectObjects(orbMeshes, false);
             if (hits.length > 0) {
                 var intersected = hits[0].object;
-                if (hoveredOrbMesh !== intersected) {
-                    if (hoveredOrbMesh) resetOrbHoverEffect(hoveredOrbMesh);
-                    hoveredOrbMesh = intersected;
-                    intersected.material.emissiveIntensity = 1.0;
-                    intersected.material.shininess = HOVER_SHININESS;
-                    if (intersected.material.specular) intersected.material.specular.setHex(HOVER_SPECULAR);
-                    intersected.scale.set(1.5, 1.5, 1.5);
-                    var drop = keyDrops.filter(function (d) { return d.mesh === intersected; })[0];
+                var dropIndex = intersected.userData.keyDropIndex;
+                var drop = dropIndex !== undefined && keyDrops[dropIndex] ? keyDrops[dropIndex] : null;
+                if (drop && hoveredKeyDrop !== drop) {
+                    if (hoveredKeyDrop) resetClusterHoverEffect(hoveredKeyDrop);
+                    hoveredKeyDrop = drop;
+                    drop.material.emissiveIntensity = 1.0;
+                    drop.material.shininess = HOVER_SHININESS;
+                    if (drop.material.specular) drop.material.specular.setHex(HOVER_SPECULAR);
+                    drop.group.scale.set(1.5, 1.5, 1.5);
                     var q = window.HurwitzKeys && drop ? window.HurwitzKeys.getKey(drop.prime, drop.keyIndex) : null;
                     var qStr = q ? '(' + q.a + ',' + q.b + ',' + q.c + ',' + q.d + ')' : '—';
-                    tooltip.innerHTML = '<strong>Key #' + (drop ? drop.keyIndex : '') + '</strong> (p=' + (drop ? drop.prime : '') + ')<br>Quaternion: ' + qStr + '<br>Position: (' + intersected.position.x.toFixed(2) + ', ' + intersected.position.y.toFixed(2) + ', ' + intersected.position.z.toFixed(2) + ')';
+                    var bp = drop.basePosition;
+                    tooltip.innerHTML = '<strong>Key #' + (drop ? drop.keyIndex : '') + '</strong> (p=' + (drop ? drop.prime : '') + ')<br>Quaternion: ' + qStr + '<br>Position: (' + bp.x.toFixed(2) + ', ' + bp.y.toFixed(2) + ', ' + bp.z.toFixed(2) + ')';
                     tooltip.style.display = 'block';
                     var cr = container.getBoundingClientRect();
                     tooltip.style.left = (event.clientX - cr.left + 10) + 'px';
                     tooltip.style.top = (event.clientY - cr.top - 10) + 'px';
-                } else {
+                } else if (drop) {
                     var cr = container.getBoundingClientRect();
                     tooltip.style.left = (event.clientX - cr.left + 10) + 'px';
                     tooltip.style.top = (event.clientY - cr.top - 10) + 'px';
                 }
             } else {
-                if (hoveredOrbMesh) {
-                    resetOrbHoverEffect(hoveredOrbMesh);
-                    hoveredOrbMesh = null;
+                if (hoveredKeyDrop) {
+                    resetClusterHoverEffect(hoveredKeyDrop);
+                    hoveredKeyDrop = null;
                 }
                 tooltip.style.display = 'none';
             }
@@ -329,18 +357,18 @@
                 rotationAngle = time + phase;
                 style = styling.calculateUnifiedStyle(d.keyIndex, time, rotationAngle, basePos);
                 wobble = style.noiseFactor * 0.08;
-                d.mesh.position.x = basePos.x + Math.sin(time * 0.7 + idx) * wobble;
-                d.mesh.position.y = basePos.y + Math.cos(time * 1.1 + idx * 0.5) * wobble;
-                d.mesh.position.z = basePos.z + Math.sin(time * 0.6 + idx * 0.3) * wobble;
-                if (hoveredOrbMesh !== d.mesh) {
+                d.group.position.x = basePos.x + Math.sin(time * 0.7 + idx) * wobble;
+                d.group.position.y = basePos.y + Math.cos(time * 1.1 + idx * 0.5) * wobble;
+                d.group.position.z = basePos.z + Math.sin(time * 0.6 + idx * 0.3) * wobble;
+                if (hoveredKeyDrop !== d) {
                     hue = (d.keyIndex / d.total);
                     sat = 0.7 * (0.8 + style.glowIntensity * 0.4);
                     light = 0.6 * (0.9 + style.lightingFactor * 0.2);
-                    d.mesh.material.color.setHSL(hue, sat, light);
-                    d.mesh.material.emissive.setHSL(hue, 0.7, style.glowIntensity * 2);
-                    d.mesh.material.emissiveIntensity = 0.3 + style.glowIntensity * 0.5;
+                    d.material.color.setHSL(hue, sat, light);
+                    d.material.emissive.setHSL(hue, 0.7, style.glowIntensity * 2);
+                    d.material.emissiveIntensity = 0.3 + style.glowIntensity * 0.5;
                     scale = 0.95 + style.noiseFactor * 0.1;
-                    d.mesh.scale.set(scale, scale, scale);
+                    d.group.scale.set(scale, scale, scale);
                 }
             }
 
