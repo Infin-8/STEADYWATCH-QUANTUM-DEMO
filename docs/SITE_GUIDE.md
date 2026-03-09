@@ -15,7 +15,7 @@ This guide describes every page on the demo site, how to run it locally, and the
 | **13 => 336** | [layers-336.html](../layers-336.html) | Layers-336 visualization (Hurwitz 336 keys). |
 | **Echo** | [echo-visual.html](../echo-visual.html) | Echo Resonance visualization. |
 | **Consulting** | [consulting-services.html](../consulting-services.html) | Consulting services. |
-| **THE VAULT™** | [game.html](../game.html) | 81-block Keyz board; optional Vault API panel to request key release per slot. See [THE_VAULT.md](THE_VAULT.md). |
+| **THE VAULT™** | [game.html](../game.html) | 81-block Keyz board; optional Vault API panel to request key release per slot. See [THE_VAULT.md](../vault-api/THE_VAULT.md). |
 | **Contact** | [contact.html](../contact.html) | Contact. |
 
 ---
@@ -61,10 +61,10 @@ STEADYWATCH-QUANTUM-DEMO/
 ├── vault-api/              # THE VAULT backend
 │   ├── server.js
 │   ├── package.json
-│   └── README.md
+│   ├── README.md
+│   └── THE_VAULT.md
 ├── docs/
 │   ├── README.md           # This documentation index
-│   ├── THE_VAULT.md
 │   ├── SITE_GUIDE.md       # This file
 │   ├── KEYZ_GAME_81_BLOCKS.md
 │   ├── VAULT_OPS.md

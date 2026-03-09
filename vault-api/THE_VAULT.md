@@ -15,9 +15,9 @@ THE VAULT™ is the quantum-backed vault product layer built on STEADYWATCH Hybr
 
 ## Architecture
 
-- **Backend (vault-api):** Express server with 81-slot in-memory key store, `POST /api/vault/store` (store encrypted payload), `POST /api/vault/request` (request key release for a slot), `GET /api/vault/slots`, `GET /api/vault/audit`. API key via `X-Vault-Api-Key` (or body). See [vault-api/README.md](../vault-api/README.md).
+- **Backend (vault-api):** Express server with 81-slot in-memory key store, `POST /api/vault/store` (store encrypted payload), `POST /api/vault/request` (request key release for a slot), `GET /api/vault/slots`, `GET /api/vault/audit`. API key via `X-Vault-Api-Key` (or body). See [README.md](README.md).
 - **Front end (game.html + game.js):** 81-block Keyz board unchanged; optional “Vault API” panel (base URL, API key, checkbox). When Vault mode is on and user clicks a key ore block, the game calls `POST /api/vault/request` with the slot index and displays “Key released” or an error.
-- **Future:** SHQKD/Echo key injection, persistent key store, HSM, M-of-N or time-lock policy, and compliance (see [VAULT_OPS.md](VAULT_OPS.md)).
+- **Future:** SHQKD/Echo key injection, persistent key store, HSM, M-of-N or time-lock policy, and compliance (see [VAULT_OPS.md](../docs/VAULT_OPS.md)).
 
 ---
 
@@ -51,4 +51,4 @@ THE VAULT™ is the quantum-backed vault product layer built on STEADYWATCH Hybr
   `GET /api/vault/audit?limit=100`  
   Requires auth. Returns recent store/request entries.
 
-Full details: [vault-api/README.md](../vault-api/README.md). Operations and compliance: [VAULT_OPS.md](VAULT_OPS.md).
+Full details: [README.md](README.md). Operations and compliance: [VAULT_OPS.md](../docs/VAULT_OPS.md).

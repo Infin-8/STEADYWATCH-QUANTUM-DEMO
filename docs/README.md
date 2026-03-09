@@ -16,7 +16,7 @@ The demo showcases **STEADYWATCH Hybrid Quantum Key Distribution (SHQKD)** and r
 
 | Document | Description |
 |----------|-------------|
-| [THE VAULT™ — Product & architecture](THE_VAULT.md) | What THE VAULT is, architecture, UI flow, API usage, and links to API and ops. |
+| [THE VAULT™ — Product & architecture](../vault-api/THE_VAULT.md) | What THE VAULT is, architecture, UI flow, API usage, and links to API and ops. |
 | [vault-api/README.md](../vault-api/README.md) | Run the vault API, endpoints, auth, key material (demo vs production). |
 | [VAULT_OPS.md](VAULT_OPS.md) | Key custody, rotation, backup/recovery, regulatory compliance, production checklist. |
 
