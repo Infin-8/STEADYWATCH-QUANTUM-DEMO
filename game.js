@@ -323,14 +323,20 @@
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json', 'X-Vault-Api-Key': apiKey },
                         body: JSON.stringify({ slotIndex: slotIndex })
-                    }).then(function (res) { return res.json().then(function (data) { return { ok: res.ok, data: data }; }); })
+                    }).then(function (res) {
+                        return res.text().then(function (text) {
+                            var data;
+                            try { data = text ? JSON.parse(text) : {}; } catch (e) { data = { message: 'Invalid response (status ' + res.status + ')' }; }
+                            return { ok: res.ok, data: data };
+                        });
+                    })
                       .then(function (result) {
-                          if (result.ok && result.data.keyReleased) {
+                          if (result.ok && result.data && result.data.keyReleased) {
                               if (vaultStatus) vaultStatus.textContent = 'Key released slot ' + slotIndex;
                               if (labelEl) labelEl.textContent = 'Vault: Key released for slot ' + slotIndex + '. ' + (result.data.hasPayload ? 'Payload present.' : '');
                           } else {
                               if (vaultStatus) vaultStatus.textContent = 'Request denied';
-                              if (labelEl) labelEl.textContent = 'Vault: ' + (result.data.message || result.data.error || 'Request denied');
+                              if (labelEl) labelEl.textContent = 'Vault: ' + ((result.data && (result.data.message || result.data.error)) || 'Request denied');
                           }
                       })
                       .catch(function (err) {
@@ -526,7 +532,22 @@
                 fetch(base + '/api/vault/configs/default', {
                     method: 'GET',
                     headers: { 'X-Vault-Api-Key': apiKey }
-                }).then(function (res) { return res.json().then(function (data) { return { ok: res.ok, data: data }; }); })
+                }).then(function (res) {
+                    return res.text().then(function (text) {
+                        var ok = res.ok;
+                        var data;
+                        try {
+                            data = text ? JSON.parse(text) : {};
+                        } catch (e) {
+                            if (res.status === 404) {
+                                data = { message: 'Config API not available (404). Set Vault API base to your API URL (e.g. http://localhost:5003 when running locally).' };
+                            } else {
+                                data = { message: 'Invalid response from server (status ' + res.status + ').' };
+                            }
+                        }
+                        return { ok: ok && data && data.id, data: data, status: res.status };
+                    });
+                })
                     .then(function (result) {
                         if (result.ok && result.data.id) {
                             currentVaultConfig = result.data;
@@ -542,7 +563,7 @@
                             if (vaultConfigMoat) vaultConfigMoat.textContent = moatLabel || '—';
                             if (vaultConfigStatus) vaultConfigStatus.textContent = 'Loaded';
                         } else {
-                            if (vaultConfigStatus) vaultConfigStatus.textContent = result.data.message || result.data.error || 'Failed';
+                            if (vaultConfigStatus) vaultConfigStatus.textContent = (result.data && (result.data.message || result.data.error)) || 'Failed';
                         }
                     })
                     .catch(function (err) {
