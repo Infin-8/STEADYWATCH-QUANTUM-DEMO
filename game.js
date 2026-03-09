@@ -163,6 +163,12 @@
 
         buildWorld();
 
+        function worldToSlotIndex(bx, bz) {
+            var row = 4 - bz;
+            var col = bx + 4;
+            return row * 9 + col;
+        }
+
         function onPointerClick(event) {
             var rect = renderer.domElement.getBoundingClientRect();
             mouse.x = ((event.clientX - rect.left) / rect.width) * 2 - 1;
@@ -185,6 +191,36 @@
             var wz = bz * BLOCK_SIZE;
             spawnKeyDrop(wx, wy, wz, prime, keyIndex);
             updateKeyLabel(null);
+
+            var vaultMode = document.getElementById('vault-mode');
+            var vaultBase = document.getElementById('vault-base-url');
+            var vaultKey = document.getElementById('vault-api-key');
+            var vaultStatus = document.getElementById('vault-status');
+            if (vaultMode && vaultMode.checked && vaultBase && vaultKey) {
+                var base = (vaultBase.value || '').replace(/\/$/, '');
+                var apiKey = vaultKey.value;
+                if (base && apiKey) {
+                    var slotIndex = worldToSlotIndex(bx, bz);
+                    fetch(base + '/api/vault/request', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json', 'X-Vault-Api-Key': apiKey },
+                        body: JSON.stringify({ slotIndex: slotIndex })
+                    }).then(function (res) { return res.json().then(function (data) { return { ok: res.ok, data: data }; }); })
+                      .then(function (result) {
+                          if (result.ok && result.data.keyReleased) {
+                              if (vaultStatus) vaultStatus.textContent = 'Key released slot ' + slotIndex;
+                              if (labelEl) labelEl.textContent = 'Vault: Key released for slot ' + slotIndex + '. ' + (result.data.hasPayload ? 'Payload present.' : '');
+                          } else {
+                              if (vaultStatus) vaultStatus.textContent = 'Request denied';
+                              if (labelEl) labelEl.textContent = 'Vault: ' + (result.data.message || result.data.error || 'Request denied');
+                          }
+                      })
+                      .catch(function (err) {
+                          if (vaultStatus) vaultStatus.textContent = 'Request failed';
+                          if (labelEl) labelEl.textContent = 'Vault: ' + (err.message || 'Request failed');
+                      });
+                }
+            }
         }
 
         renderer.domElement.addEventListener('click', onPointerClick);

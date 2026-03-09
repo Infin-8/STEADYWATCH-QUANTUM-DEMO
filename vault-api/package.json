@@ -1,0 +1,17 @@
+{
+  "name": "the-vault-api",
+  "version": "0.1.0",
+  "description": "THE VAULT™ API: 81-slot key store, store/request subject to policy and auth.",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node server.js"
+  },
+  "engines": {
+    "node": ">=14"
+  },
+  "dependencies": {
+    "express": "^4.18.2",
+    "cors": "^2.8.5"
+  }
+}
