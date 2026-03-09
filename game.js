@@ -422,6 +422,7 @@
                     }
                 }
 
+                // BOUNCE PASS — push particles off ore so they don't pass through
                 var nearestBlock, b, blockMesh, minDist, dist;
                 for (c = 0; c < d.group.children.length; c++) {
                     child = d.group.children[c];
