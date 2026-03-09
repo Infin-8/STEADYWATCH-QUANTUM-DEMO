@@ -147,7 +147,64 @@
             });
         }
 
-        function buildWorld() {
+        // --- Hover effects and tooltips for key drop orbs (like 144-satellites) ---
+        var hoveredOrbMesh = null;
+        var HOVER_SHININESS = 200;
+        var HOVER_SPECULAR = 0xaaccff;
+        var DEFAULT_SHININESS = 100;
+        var DEFAULT_SPECULAR = 0x111111;
+
+        function resetOrbHoverEffect(mesh) {
+            if (!mesh || !mesh.material) return;
+            mesh.material.emissiveIntensity = 0.4;
+            mesh.material.shininess = DEFAULT_SHININESS;
+            if (mesh.material.specular) mesh.material.specular.setHex(DEFAULT_SPECULAR);
+            mesh.scale.set(1, 1, 1);
+        }
+
+        var tooltip = document.createElement('div');
+        tooltip.setAttribute('id', 'vault-orb-tooltip');
+        tooltip.style.cssText = 'position:absolute;left:0;top:0;background:rgba(102,126,234,0.95);color:white;padding:10px 15px;border-radius:8px;pointer-events:none;z-index:10;font-size:14px;box-shadow:0 4px 12px rgba(0,0,0,0.3);display:none;max-width:280px;';
+        container.appendChild(tooltip);
+
+        function onMouseMove(event) {
+            var rect = renderer.domElement.getBoundingClientRect();
+            mouse.x = ((event.clientX - rect.left) / rect.width) * 2 - 1;
+            mouse.y = -((event.clientY - rect.top) / rect.height) * 2 + 1;
+            raycaster.setFromCamera(mouse, camera);
+            var orbMeshes = keyDrops.map(function (d) { return d.mesh; });
+            var hits = raycaster.intersectObjects(orbMeshes, false);
+            if (hits.length > 0) {
+                var intersected = hits[0].object;
+                if (hoveredOrbMesh !== intersected) {
+                    if (hoveredOrbMesh) resetOrbHoverEffect(hoveredOrbMesh);
+                    hoveredOrbMesh = intersected;
+                    intersected.material.emissiveIntensity = 1.0;
+                    intersected.material.shininess = HOVER_SHININESS;
+                    if (intersected.material.specular) intersected.material.specular.setHex(HOVER_SPECULAR);
+                    intersected.scale.set(1.5, 1.5, 1.5);
+                    var drop = keyDrops.filter(function (d) { return d.mesh === intersected; })[0];
+                    var q = window.HurwitzKeys && drop ? window.HurwitzKeys.getKey(drop.prime, drop.keyIndex) : null;
+                    var qStr = q ? '(' + q.a + ',' + q.b + ',' + q.c + ',' + q.d + ')' : '—';
+                    tooltip.innerHTML = '<strong>Key #' + (drop ? drop.keyIndex : '') + '</strong> (p=' + (drop ? drop.prime : '') + ')<br>Quaternion: ' + qStr + '<br>Position: (' + intersected.position.x.toFixed(2) + ', ' + intersected.position.y.toFixed(2) + ', ' + intersected.position.z.toFixed(2) + ')';
+                    tooltip.style.display = 'block';
+                    var cr = container.getBoundingClientRect();
+                    tooltip.style.left = (event.clientX - cr.left + 10) + 'px';
+                    tooltip.style.top = (event.clientY - cr.top - 10) + 'px';
+                } else {
+                    var cr = container.getBoundingClientRect();
+                    tooltip.style.left = (event.clientX - cr.left + 10) + 'px';
+                    tooltip.style.top = (event.clientY - cr.top - 10) + 'px';
+                }
+            } else {
+                if (hoveredOrbMesh) {
+                    resetOrbHoverEffect(hoveredOrbMesh);
+                    hoveredOrbMesh = null;
+                }
+                tooltip.style.display = 'none';
+            }
+        }
+        renderer.domElement.addEventListener('mousemove', onMouseMove);
             var i, j;
             for (i = -4; i <= 4; i++) {
                 for (j = -4; j <= 4; j++) {
@@ -273,14 +330,16 @@
                 d.mesh.position.x = basePos.x + Math.sin(time * 0.7 + idx) * wobble;
                 d.mesh.position.y = basePos.y + Math.cos(time * 1.1 + idx * 0.5) * wobble;
                 d.mesh.position.z = basePos.z + Math.sin(time * 0.6 + idx * 0.3) * wobble;
-                hue = (d.keyIndex / d.total);
-                sat = 0.7 * (0.8 + style.glowIntensity * 0.4);
-                light = 0.6 * (0.9 + style.lightingFactor * 0.2);
-                d.mesh.material.color.setHSL(hue, sat, light);
-                d.mesh.material.emissive.setHSL(hue, 0.7, style.glowIntensity * 2);
-                d.mesh.material.emissiveIntensity = 0.3 + style.glowIntensity * 0.5;
-                scale = 0.95 + style.noiseFactor * 0.1;
-                d.mesh.scale.set(scale, scale, scale);
+                if (hoveredOrbMesh !== d.mesh) {
+                    hue = (d.keyIndex / d.total);
+                    sat = 0.7 * (0.8 + style.glowIntensity * 0.4);
+                    light = 0.6 * (0.9 + style.lightingFactor * 0.2);
+                    d.mesh.material.color.setHSL(hue, sat, light);
+                    d.mesh.material.emissive.setHSL(hue, 0.7, style.glowIntensity * 2);
+                    d.mesh.material.emissiveIntensity = 0.3 + style.glowIntensity * 0.5;
+                    scale = 0.95 + style.noiseFactor * 0.1;
+                    d.mesh.scale.set(scale, scale, scale);
+                }
             }
 
             controls.update();
