@@ -149,6 +149,8 @@
                 var mesh = new THREE.Mesh(sharedGeom, mat);
                 mesh.position.set(pos.x, pos.y, pos.z);
                 mesh.userData.keyDropIndex = keyDrops.length;
+                mesh.userData.baseLocalPosition = new THREE.Vector3(pos.x, pos.y, pos.z);
+                mesh.userData.satelliteIndex = i;
                 group.add(mesh);
             }
             scene.add(group);
@@ -360,8 +362,32 @@
                 d.group.position.x = basePos.x + Math.sin(time * 0.7 + idx) * wobble;
                 d.group.position.y = basePos.y + Math.cos(time * 1.1 + idx * 0.5) * wobble;
                 d.group.position.z = basePos.z + Math.sin(time * 0.6 + idx * 0.3) * wobble;
+                var orbitRadius = 0.12;
+                var c, child, baseLocal, satIdx, orbitSpeed, orbitX, orbitY, orbitZ;
+                for (c = 0; c < d.group.children.length; c++) {
+                    child = d.group.children[c];
+                    baseLocal = child.userData.baseLocalPosition;
+                    if (!baseLocal) continue;
+                    satIdx = child.userData.satelliteIndex;
+                    phase = (satIdx / d.total) * Math.PI * 2;
+                    rotationAngle = time + phase;
+                    style = styling.calculateUnifiedStyle(satIdx, time, rotationAngle, basePos);
+                    orbitSpeed = 0.5 * (style.teslaMultiplier || 1);
+                    orbitX = Math.cos(time * orbitSpeed + (style.teslaPhase || 0)) * orbitRadius * style.noiseFactor;
+                    orbitY = Math.sin(time * orbitSpeed * 1.3 + (style.teslaPhase || 0)) * orbitRadius * style.noiseFactor;
+                    orbitZ = Math.cos(time * orbitSpeed * 0.7 + (style.teslaPhase || 0)) * orbitRadius * style.noiseFactor;
+                    child.position.set(
+                        baseLocal.x + orbitX,
+                        baseLocal.y + orbitY,
+                        baseLocal.z + orbitZ
+                    );
+                }
                 if (hoveredKeyDrop !== d) {
-                    hue = (d.keyIndex / d.total);
+                    phase = (d.keyIndex / d.total) * Math.PI * 2;
+                    rotationAngle = time + phase;
+                    style = styling.calculateUnifiedStyle(d.keyIndex, time, rotationAngle, basePos);
+                    hue = (time * 0.1 + d.keyIndex * 0.1) % 1;
+                    hue = hue < 0 ? hue + 1 : hue;
                     sat = 0.7 * (0.8 + style.glowIntensity * 0.4);
                     light = 0.6 * (0.9 + style.lightingFactor * 0.2);
                     d.material.color.setHSL(hue, sat, light);
