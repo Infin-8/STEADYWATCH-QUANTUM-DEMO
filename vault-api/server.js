@@ -27,6 +27,22 @@ for (let i = 0; i < SLOTS; i++) {
 
 const auditLog = [];
 
+// Configs: custom key configurations (moat, symbol, tier). In-memory; keyed by id.
+const SIGNATURE_CONFIG = {
+  id: 'signature',
+  name: 'Key-at-zero, 144 Hurwitz moat, unlocked key moat',
+  tier: 'signature',
+  crownSlotIndex: 0,
+  moatLayers: [
+    { kind: 'hurwitz', points: 144, role: 'guard' },
+    { kind: 'unlocked_key_moat', role: 'orbital' }
+  ],
+  slotRoles: { '0': 'crown' },
+  meta: { createdAt: new Date().toISOString(), updatedAt: new Date().toISOString() }
+};
+const configsStore = new Map();
+configsStore.set('signature', JSON.parse(JSON.stringify(SIGNATURE_CONFIG)));
+
 function authMiddleware(req, res, next) {
   const apiKey = req.headers['x-vault-api-key'] || req.body?.apiKey || req.query?.apiKey;
   if (!apiKey || apiKey !== DEFAULT_API_KEY) {
@@ -79,6 +95,69 @@ app.post('/api/vault/request', authMiddleware, (req, res) => {
 app.get('/api/vault/audit', authMiddleware, (req, res) => {
   const limit = Math.min(parseInt(req.query.limit, 10) || 100, 500);
   res.json({ audit: auditLog.slice(-limit) });
+});
+
+// --- Configs API (custom key configurations → tiered packages) ---
+app.get('/api/vault/configs', authMiddleware, (req, res) => {
+  const list = Array.from(configsStore.values()).map(c => ({
+    id: c.id,
+    name: c.name,
+    tier: c.tier,
+    crownSlotIndex: c.crownSlotIndex
+  }));
+  res.json({ configs: list });
+});
+
+app.get('/api/vault/configs/default', authMiddleware, (req, res) => {
+  const c = configsStore.get('signature');
+  if (!c) return res.status(404).json({ error: 'Not found', message: 'Default config not found' });
+  res.json(c);
+});
+
+app.get('/api/vault/configs/:id', authMiddleware, (req, res) => {
+  const c = configsStore.get(req.params.id);
+  if (!c) return res.status(404).json({ error: 'Not found', message: 'Config not found' });
+  res.json(c);
+});
+
+app.post('/api/vault/configs', authMiddleware, (req, res) => {
+  const body = req.body || {};
+  const id = (body.id || 'config-' + Date.now()).toString().replace(/\s+/g, '-').toLowerCase();
+  if (configsStore.has(id)) return res.status(409).json({ error: 'Conflict', message: 'Config id already exists' });
+  const now = new Date().toISOString();
+  const config = {
+    id,
+    name: body.name || 'Unnamed config',
+    tier: body.tier || 'custom',
+    crownSlotIndex: typeof body.crownSlotIndex === 'number' ? body.crownSlotIndex : 0,
+    moatLayers: Array.isArray(body.moatLayers) ? body.moatLayers : [],
+    slotRoles: typeof body.slotRoles === 'object' && body.slotRoles !== null ? body.slotRoles : {},
+    meta: { createdAt: now, updatedAt: now }
+  };
+  configsStore.set(id, config);
+  res.status(201).json(config);
+});
+
+app.patch('/api/vault/configs/:id', authMiddleware, (req, res) => {
+  const c = configsStore.get(req.params.id);
+  if (!c) return res.status(404).json({ error: 'Not found', message: 'Config not found' });
+  if (req.params.id === 'signature') return res.status(403).json({ error: 'Forbidden', message: 'Cannot modify default config' });
+  const body = req.body || {};
+  if (body.name !== undefined) c.name = body.name;
+  if (body.tier !== undefined) c.tier = body.tier;
+  if (typeof body.crownSlotIndex === 'number') c.crownSlotIndex = body.crownSlotIndex;
+  if (Array.isArray(body.moatLayers)) c.moatLayers = body.moatLayers;
+  if (typeof body.slotRoles === 'object' && body.slotRoles !== null) c.slotRoles = body.slotRoles;
+  c.meta = c.meta || {};
+  c.meta.updatedAt = new Date().toISOString();
+  res.json(c);
+});
+
+app.delete('/api/vault/configs/:id', authMiddleware, (req, res) => {
+  if (req.params.id === 'signature') return res.status(403).json({ error: 'Forbidden', message: 'Cannot delete default config' });
+  if (!configsStore.has(req.params.id)) return res.status(404).json({ error: 'Not found', message: 'Config not found' });
+  configsStore.delete(req.params.id);
+  res.status(204).send();
 });
 
 const port = process.env.PORT || 5003;

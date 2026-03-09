@@ -52,3 +52,17 @@ THE VAULT™ is the quantum-backed vault product layer built on STEADYWATCH Hybr
   Requires auth. Returns recent store/request entries.
 
 Full details: [README.md](README.md). Operations and compliance: [VAULT_OPS.md](../docs/VAULT_OPS.md).
+
+---
+
+## Product idea: Custom key configurations → tiered packages
+
+**Concept:** Users utilize the 3D vault interface not only to view and request keys, but to *design* custom key configurations—e.g. which slots form the “moat,” which are symbol blocks, layout and grouping—and save those as named configurations. Those configurations can be offered as **tiered packages** (e.g. Standard / Moat / Symbol / Enterprise custom layout), turning THE VAULT UI into a configurator and differentiator for pricing tiers.
+
+- **Moat:** Configuration where only certain perimeter or guard slots are active; inner slots reserved or gated.
+- **Symbol:** Configuration where specific slots map to symbols or roles (e.g. by customer, by asset type).
+- **Custom layouts:** Enterprise or power users design and save a full 81-slot layout (which slots exist, how they’re labeled/grouped in the 3D view), then that layout becomes their “package” for key storage and release.
+
+**Implications:** Vault API could support multiple “configs” or “templates” per API key (or per tenant); the 3D game would need a “design mode” or configurator flow to create and name configurations, then attach them to a tier or product SKU. Backend: store config metadata (slot roles, labels, moat/symbol rules) and optionally restrict store/request by config.
+
+**Preferred config (signature tier):** Key at slot index **0**, **144 Hurwitz moat**, then **unlocked key moat**. See [VAULT_CONFIGS_API_SKETCH.md](VAULT_CONFIGS_API_SKETCH.md) for API sketch and one-pager.

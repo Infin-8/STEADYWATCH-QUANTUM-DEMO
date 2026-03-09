@@ -25,6 +25,12 @@ npm start
 | `POST` | `/api/vault/store`  | Key | Store encrypted payload in a slot |
 | `POST` | `/api/vault/request` | Key | Request key release; returns `keyMaterial`, `hasPayload` |
 | `GET`  | `/api/vault/audit?limit=100` | Key | Recent audit log |
+| `GET`  | `/api/vault/configs` | Key | List configs |
+| `GET`  | `/api/vault/configs/default` | Key | Default config (signature tier) |
+| `GET`  | `/api/vault/configs/:id` | Key | Get config by id |
+| `POST` | `/api/vault/configs` | Key | Create config |
+| `PATCH`| `/api/vault/configs/:id` | Key | Update config |
+| `DELETE`| `/api/vault/configs/:id` | Key | Delete config (not default) |
 
 **Store/Request body:** `slotIndex` (0..80); store also accepts `encryptedPayload`.  
 **Header:** `X-Vault-Api-Key`

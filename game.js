@@ -499,6 +499,51 @@
 
         animate();
 
+        // Load default config (viz controls panel)
+        var vaultConfigBase = document.getElementById('vault-config-base');
+        var vaultConfigKey = document.getElementById('vault-config-key');
+        var loadDefaultConfigBtn = document.getElementById('load-default-config');
+        var vaultConfigStatus = document.getElementById('vault-config-status');
+        var vaultConfigName = document.getElementById('vault-config-name');
+        var vaultConfigTier = document.getElementById('vault-config-tier');
+        var vaultConfigCrown = document.getElementById('vault-config-crown');
+        var vaultConfigMoat = document.getElementById('vault-config-moat');
+        var currentVaultConfig = null;
+
+        if (loadDefaultConfigBtn) {
+            loadDefaultConfigBtn.addEventListener('click', function () {
+                var base = (vaultConfigBase && vaultConfigBase.value ? vaultConfigBase.value : '').trim().replace(/\/$/, '');
+                if (!base) base = 'http://localhost:5003';
+                var apiKey = (vaultConfigKey && vaultConfigKey.value) ? vaultConfigKey.value : 'vault-demo-key-change-in-production';
+                if (vaultConfigStatus) vaultConfigStatus.textContent = 'Loading…';
+                fetch(base + '/api/vault/configs/default', {
+                    method: 'GET',
+                    headers: { 'X-Vault-Api-Key': apiKey }
+                }).then(function (res) { return res.json().then(function (data) { return { ok: res.ok, data: data }; }); })
+                    .then(function (result) {
+                        if (result.ok && result.data.id) {
+                            currentVaultConfig = result.data;
+                            if (vaultConfigName) vaultConfigName.textContent = result.data.name || result.data.id;
+                            if (vaultConfigTier) vaultConfigTier.textContent = result.data.tier || '—';
+                            if (vaultConfigCrown) vaultConfigCrown.textContent = String(result.data.crownSlotIndex ?? '—');
+                            var moatLabel = '';
+                            if (result.data.moatLayers && result.data.moatLayers.length) {
+                                moatLabel = result.data.moatLayers.map(function (m) {
+                                    return m.kind + (m.points ? '(' + m.points + ')' : '');
+                                }).join(', ');
+                            }
+                            if (vaultConfigMoat) vaultConfigMoat.textContent = moatLabel || '—';
+                            if (vaultConfigStatus) vaultConfigStatus.textContent = 'Loaded';
+                        } else {
+                            if (vaultConfigStatus) vaultConfigStatus.textContent = result.data.message || result.data.error || 'Failed';
+                        }
+                    })
+                    .catch(function (err) {
+                        if (vaultConfigStatus) vaultConfigStatus.textContent = 'Error: ' + (err.message || 'Request failed');
+                    });
+            });
+        }
+
         window.addEventListener('resize', function () {
             var w = container.clientWidth;
             var h = container.clientHeight || 600;
