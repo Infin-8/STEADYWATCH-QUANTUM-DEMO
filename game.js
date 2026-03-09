@@ -147,7 +147,7 @@
                 q = quats[i];
                 pos = project4Dto3D(q.a, q.b, q.c, q.d, CLUSTER_RADIUS);
                 var mesh = new THREE.Mesh(sharedGeom, mat);
-                mesh.position.set(pos.x, pos.y, pos.z);
+                mesh.position.set(0, 0, 0);
                 mesh.userData.keyDropIndex = keyDrops.length;
                 mesh.userData.baseLocalPosition = new THREE.Vector3(pos.x, pos.y, pos.z);
                 mesh.userData.satelliteIndex = i;
@@ -160,7 +160,9 @@
                 prime: prime,
                 keyIndex: keyIndex,
                 total: total,
-                basePosition: new THREE.Vector3(wx, wy, wz)
+                basePosition: new THREE.Vector3(wx, wy, wz),
+                expansionProgress: 0,
+                expansionSpeed: 0.03
             });
         }
 
@@ -362,26 +364,43 @@
                 d.group.position.x = basePos.x + Math.sin(time * 0.7 + idx) * wobble;
                 d.group.position.y = basePos.y + Math.cos(time * 1.1 + idx * 0.5) * wobble;
                 d.group.position.z = basePos.z + Math.sin(time * 0.6 + idx * 0.3) * wobble;
-                var orbitRadius = 0.12;
-                var c, child, baseLocal, satIdx, orbitSpeed, orbitX, orbitY, orbitZ;
-                for (c = 0; c < d.group.children.length; c++) {
-                    child = d.group.children[c];
-                    baseLocal = child.userData.baseLocalPosition;
-                    if (!baseLocal) continue;
-                    satIdx = child.userData.satelliteIndex;
-                    phase = (satIdx / d.total) * Math.PI * 2;
-                    rotationAngle = time + phase;
-                    style = styling.calculateUnifiedStyle(satIdx, time, rotationAngle, basePos);
-                    orbitSpeed = 0.5 * (style.teslaMultiplier || 1);
-                    orbitX = Math.cos(time * orbitSpeed + (style.teslaPhase || 0)) * orbitRadius * style.noiseFactor;
-                    orbitY = Math.sin(time * orbitSpeed * 1.3 + (style.teslaPhase || 0)) * orbitRadius * style.noiseFactor;
-                    orbitZ = Math.cos(time * orbitSpeed * 0.7 + (style.teslaPhase || 0)) * orbitRadius * style.noiseFactor;
-                    child.position.set(
-                        baseLocal.x + orbitX,
-                        baseLocal.y + orbitY,
-                        baseLocal.z + orbitZ
-                    );
+
+                if (d.expansionProgress < 1) {
+                    d.expansionProgress = Math.min(1, d.expansionProgress + (d.expansionSpeed || 0.03));
+                    var eased = 1 - Math.pow(1 - d.expansionProgress, 2);
+                    var c, child, baseLocal, lerpedX, lerpedY, lerpedZ;
+                    for (c = 0; c < d.group.children.length; c++) {
+                        child = d.group.children[c];
+                        baseLocal = child.userData.baseLocalPosition;
+                        if (!baseLocal) continue;
+                        lerpedX = baseLocal.x * eased;
+                        lerpedY = baseLocal.y * eased;
+                        lerpedZ = baseLocal.z * eased;
+                        child.position.set(lerpedX, lerpedY, lerpedZ);
+                    }
+                } else {
+                    var orbitRadius = 0.12;
+                    var c, child, baseLocal, satIdx, orbitSpeed, orbitX, orbitY, orbitZ;
+                    for (c = 0; c < d.group.children.length; c++) {
+                        child = d.group.children[c];
+                        baseLocal = child.userData.baseLocalPosition;
+                        if (!baseLocal) continue;
+                        satIdx = child.userData.satelliteIndex;
+                        phase = (satIdx / d.total) * Math.PI * 2;
+                        rotationAngle = time + phase;
+                        style = styling.calculateUnifiedStyle(satIdx, time, rotationAngle, basePos);
+                        orbitSpeed = 0.5 * (style.teslaMultiplier || 1);
+                        orbitX = Math.cos(time * orbitSpeed + (style.teslaPhase || 0)) * orbitRadius * style.noiseFactor;
+                        orbitY = Math.sin(time * orbitSpeed * 1.3 + (style.teslaPhase || 0)) * orbitRadius * style.noiseFactor;
+                        orbitZ = Math.cos(time * orbitSpeed * 0.7 + (style.teslaPhase || 0)) * orbitRadius * style.noiseFactor;
+                        child.position.set(
+                            baseLocal.x + orbitX,
+                            baseLocal.y + orbitY,
+                            baseLocal.z + orbitZ
+                        );
+                    }
                 }
+
                 if (hoveredKeyDrop !== d) {
                     phase = (d.keyIndex / d.total) * Math.PI * 2;
                     rotationAngle = time + phase;
