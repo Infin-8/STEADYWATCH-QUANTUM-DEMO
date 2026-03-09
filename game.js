@@ -10,6 +10,13 @@
     var TOTAL_P5 = 144;
     var TOTAL_P13 = 336;
     var CLUSTER_RADIUS = 0.5;
+    var AVOID_NEAR = 0.2;
+    var AVOID_FAR = 0.55;
+
+    function smoothstep(t) {
+        t = t < 0 ? 0 : t > 1 ? 1 : t;
+        return t * t * (3 - 2 * t);
+    }
 
     function project4Dto3D(a, b, c, d, radius) {
         var w = d;
@@ -112,6 +119,7 @@
         var time = 0;
         var raycaster = new THREE.Raycaster();
         var mouse = new THREE.Vector2();
+        var worldPosVortex = new THREE.Vector3();
 
         function setBlock(bx, by, bz, blockType) {
             var key = blockKey(bx, by, bz);
@@ -146,7 +154,7 @@
             for (i = 0; i < quats.length; i++) {
                 q = quats[i];
                 pos = project4Dto3D(q.a, q.b, q.c, q.d, CLUSTER_RADIUS);
-                var mesh = new THREE.Mesh(sharedGeom, mat);
+                var mesh = new THREE.Mesh(sharedGeom, mat.clone());
                 mesh.position.set(0, 0, 0);
                 mesh.userData.keyDropIndex = keyDrops.length;
                 mesh.userData.baseLocalPosition = new THREE.Vector3(pos.x, pos.y, pos.z);
@@ -176,10 +184,14 @@
         function resetClusterHoverEffect(drop) {
             if (!drop) return;
             drop.group.scale.set(1, 1, 1);
-            if (drop.material) {
-                drop.material.emissiveIntensity = 0.4;
-                drop.material.shininess = DEFAULT_SHININESS;
-                if (drop.material.specular) drop.material.specular.setHex(DEFAULT_SPECULAR);
+            var c, child;
+            for (c = 0; c < drop.group.children.length; c++) {
+                child = drop.group.children[c];
+                if (child.material) {
+                    child.material.emissiveIntensity = 0.4;
+                    child.material.shininess = DEFAULT_SHININESS;
+                    if (child.material.specular) child.material.specular.setHex(DEFAULT_SPECULAR);
+                }
             }
         }
 
@@ -211,9 +223,15 @@
                 if (drop && hoveredKeyDrop !== drop) {
                     if (hoveredKeyDrop) resetClusterHoverEffect(hoveredKeyDrop);
                     hoveredKeyDrop = drop;
-                    drop.material.emissiveIntensity = 1.0;
-                    drop.material.shininess = HOVER_SHININESS;
-                    if (drop.material.specular) drop.material.specular.setHex(HOVER_SPECULAR);
+                    var c, child;
+                    for (c = 0; c < drop.group.children.length; c++) {
+                        child = drop.group.children[c];
+                        if (child.material) {
+                            child.material.emissiveIntensity = 1.0;
+                            child.material.shininess = HOVER_SHININESS;
+                            if (child.material.specular) child.material.specular.setHex(HOVER_SPECULAR);
+                        }
+                    }
                     drop.group.scale.set(1.5, 1.5, 1.5);
                     var q = window.HurwitzKeys && drop ? window.HurwitzKeys.getKey(drop.prime, drop.keyIndex) : null;
                     var qStr = q ? '(' + q.a + ',' + q.b + ',' + q.c + ',' + q.d + ')' : '—';
@@ -409,9 +427,25 @@
                     hue = hue < 0 ? hue + 1 : hue;
                     sat = 0.7 * (0.8 + style.glowIntensity * 0.4);
                     light = 0.6 * (0.9 + style.lightingFactor * 0.2);
-                    d.material.color.setHSL(hue, sat, light);
-                    d.material.emissive.setHSL(hue, 0.7, style.glowIntensity * 2);
-                    d.material.emissiveIntensity = 0.3 + style.glowIntensity * 0.5;
+                    var baseIntensity = 0.3 + style.glowIntensity * 0.5;
+                    var b, blockMesh, minDist, dist, t, factor;
+                    for (c = 0; c < d.group.children.length; c++) {
+                        child = d.group.children[c];
+                        child.material.color.setHSL(hue, sat, light);
+                        child.material.emissive.setHSL(hue, 0.7, style.glowIntensity * 2);
+                        child.getWorldPosition(worldPosVortex);
+                        minDist = Infinity;
+                        for (b = 0; b < blockMeshes.length; b++) {
+                            blockMesh = blockMeshes[b];
+                            if (blockMesh.userData.blockType !== BLOCK.KEY_ORE_P5 && blockMesh.userData.blockType !== BLOCK.KEY_ORE_P13) continue;
+                            dist = worldPosVortex.distanceTo(blockMesh.position);
+                            if (dist < minDist) minDist = dist;
+                        }
+                        t = (minDist - AVOID_NEAR) / (AVOID_FAR - AVOID_NEAR);
+                        t = t < 0 ? 0 : t > 1 ? 1 : t;
+                        factor = smoothstep(t);
+                        child.material.emissiveIntensity = baseIntensity * (0.35 + 0.65 * factor);
+                    }
                     scale = 0.95 + style.noiseFactor * 0.1;
                     d.group.scale.set(scale, scale, scale);
                 }
