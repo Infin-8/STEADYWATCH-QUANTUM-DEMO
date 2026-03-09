@@ -1,15 +1,62 @@
 /**
- * Keyz Game — Minimal shell: Three.js scene + one key-colored orb driven by UnifiedQubitStyling.
- * Uses HurwitzKeys (js/hurwitz-keys.js) and UnifiedQubitStyling (js/unified-qubit-styling.js).
- * Three.js r128 + OrbitControls.
+ * Keyz Game — Minimal voxel: key ore blocks (p=5, p=13), break → key drop orbs.
+ * Uses HurwitzKeys, UnifiedQubitStyling. Three.js r128 + OrbitControls.
  */
 (function () {
     'use strict';
+
+    var BLOCK = { AIR: 0, GROUND: 1, KEY_ORE_P5: 2, KEY_ORE_P13: 3 };
+    var BLOCK_SIZE = 1;
+    var TOTAL_P5 = 144;
+    var TOTAL_P13 = 336;
 
     function getKeyColor(keyIndex, total) {
         if (typeof THREE === 'undefined') return null;
         var hue = (keyIndex / (total || 144)) * 360;
         return new THREE.Color().setHSL(hue / 360, 0.8, 0.6);
+    }
+
+    function blockKey(x, y, z) { return x + ',' + y + ',' + z; }
+
+    function hashKeyIndex(x, z, prime) {
+        var n = (x * 31 + z * 17) | 0;
+        n = n < 0 ? -n : n;
+        return prime === 5 ? n % TOTAL_P5 : n % TOTAL_P13;
+    }
+
+    function createBlockMesh(blockType, bx, by, bz) {
+        var geometry = new THREE.BoxGeometry(BLOCK_SIZE * 0.98, BLOCK_SIZE * 0.98, BLOCK_SIZE * 0.98);
+        var material;
+        var prime = blockType === BLOCK.KEY_ORE_P5 ? 5 : blockType === BLOCK.KEY_ORE_P13 ? 13 : 0;
+        var keyIndex = (blockType === BLOCK.KEY_ORE_P5 || blockType === BLOCK.KEY_ORE_P13)
+            ? hashKeyIndex(bx, bz, prime) : 0;
+
+        if (blockType === BLOCK.GROUND) {
+            material = new THREE.MeshPhongMaterial({
+                color: 0x4a3728,
+                shininess: 20,
+                flatShading: true
+            });
+        } else {
+            var col = getKeyColor(keyIndex, prime === 5 ? TOTAL_P5 : TOTAL_P13);
+            material = new THREE.MeshPhongMaterial({
+                color: col,
+                emissive: col,
+                emissiveIntensity: 0.2,
+                shininess: 80,
+                flatShading: true
+            });
+        }
+
+        var mesh = new THREE.Mesh(geometry, material);
+        mesh.position.set(bx * BLOCK_SIZE, by * BLOCK_SIZE, bz * BLOCK_SIZE);
+        mesh.userData.blockType = blockType;
+        mesh.userData.bx = bx;
+        mesh.userData.by = by;
+        mesh.userData.bz = bz;
+        mesh.userData.prime = prime;
+        mesh.userData.keyIndex = keyIndex;
+        return mesh;
     }
 
     function initGame() {
@@ -19,23 +66,15 @@
             return;
         }
 
-        var prime = 5;
-        var keyIndex = 0;
-        var totalKeys = 144;
-        var keyData = window.HurwitzKeys.getKey(prime, keyIndex);
-        if (!keyData) {
-            keyData = { index: 0, a: 2, b: 1, c: 0, d: 0 };
-        }
-
         var scene = new THREE.Scene();
         scene.background = new THREE.Color(0x0a0a1a);
-        scene.fog = new THREE.Fog(0x0a0a1a, 30, 120);
+        scene.fog = new THREE.Fog(0x0a0a1a, 40, 100);
 
         var width = container.clientWidth;
         var height = container.clientHeight || 600;
 
         var camera = new THREE.PerspectiveCamera(60, width / height, 0.1, 1000);
-        camera.position.set(0, 4, 12);
+        camera.position.set(6, 6, 6);
         camera.lookAt(0, 0, 0);
 
         var renderer = new THREE.WebGLRenderer({ antialias: true });
@@ -47,8 +86,8 @@
         var controls = new THREE.OrbitControls(camera, renderer.domElement);
         controls.enableDamping = true;
         controls.dampingFactor = 0.05;
-        controls.minDistance = 5;
-        controls.maxDistance = 40;
+        controls.minDistance = 4;
+        controls.maxDistance = 50;
 
         var ambientLight = new THREE.AmbientLight(0x667eea, 0.4);
         scene.add(ambientLight);
@@ -59,54 +98,152 @@
         pointLight2.position.set(-12, 12, -12);
         scene.add(pointLight2);
 
-        var baseColor = getKeyColor(keyIndex, totalKeys);
-        var orbGeometry = new THREE.SphereGeometry(0.8, 32, 32);
-        var orbMaterial = new THREE.MeshPhongMaterial({
-            color: baseColor,
-            emissive: baseColor,
-            emissiveIntensity: 0.3,
-            shininess: 100,
-            transparent: true,
-            opacity: 0.95
-        });
-        var orb = new THREE.Mesh(orbGeometry, orbMaterial);
-        orb.position.set(0, 0, 0);
-        orb.userData.keyIndex = keyIndex;
-        orb.userData.prime = prime;
-        orb.userData.basePosition = new THREE.Vector3(0, 0, 0);
-        scene.add(orb);
-
+        var blocks = {};
+        var blockMeshes = [];
+        var keyDrops = [];
         var styling = new window.UnifiedQubitStyling();
         var time = 0;
+        var raycaster = new THREE.Raycaster();
+        var mouse = new THREE.Vector2();
+
+        function setBlock(bx, by, bz, blockType) {
+            var key = blockKey(bx, by, bz);
+            if (blocks[key]) {
+                scene.remove(blocks[key]);
+                blockMeshes.splice(blockMeshes.indexOf(blocks[key]), 1);
+            }
+            if (blockType === BLOCK.AIR) {
+                delete blocks[key];
+                return;
+            }
+            var mesh = createBlockMesh(blockType, bx, by, bz);
+            blocks[key] = mesh;
+            blockMeshes.push(mesh);
+            scene.add(mesh);
+        }
+
+        function spawnKeyDrop(wx, wy, wz, prime, keyIndex) {
+            var total = prime === 5 ? TOTAL_P5 : TOTAL_P13;
+            var col = getKeyColor(keyIndex, total);
+            var geom = new THREE.SphereGeometry(0.25, 16, 16);
+            var mat = new THREE.MeshPhongMaterial({
+                color: col,
+                emissive: col,
+                emissiveIntensity: 0.4,
+                shininess: 100
+            });
+            var mesh = new THREE.Mesh(geom, mat);
+            mesh.position.set(wx, wy, wz);
+            mesh.userData.prime = prime;
+            mesh.userData.keyIndex = keyIndex;
+            mesh.userData.basePosition = new THREE.Vector3(wx, wy, wz);
+            scene.add(mesh);
+            keyDrops.push({
+                mesh: mesh,
+                prime: prime,
+                keyIndex: keyIndex,
+                total: total,
+                basePosition: new THREE.Vector3(wx, wy, wz)
+            });
+        }
+
+        function buildWorld() {
+            var i, j;
+            for (i = -4; i <= 4; i++) {
+                for (j = -4; j <= 4; j++) {
+                    setBlock(i, 0, j, BLOCK.GROUND);
+                }
+            }
+            setBlock(0, 1, 0, BLOCK.KEY_ORE_P5);
+            setBlock(2, 1, 1, BLOCK.KEY_ORE_P5);
+            setBlock(-1, 1, 2, BLOCK.KEY_ORE_P13);
+            setBlock(1, 1, -2, BLOCK.KEY_ORE_P13);
+            setBlock(-2, 1, -1, BLOCK.KEY_ORE_P5);
+        }
+
+        buildWorld();
+
+        function onPointerClick(event) {
+            var rect = renderer.domElement.getBoundingClientRect();
+            mouse.x = ((event.clientX - rect.left) / rect.width) * 2 - 1;
+            mouse.y = -((event.clientY - rect.top) / rect.height) * 2 + 1;
+            raycaster.setFromCamera(mouse, camera);
+            var hits = raycaster.intersectObjects(blockMeshes, true);
+            if (hits.length === 0) return;
+            var hit = hits[0];
+            var obj = hit.object;
+            var bt = obj.userData.blockType;
+            if (bt !== BLOCK.KEY_ORE_P5 && bt !== BLOCK.KEY_ORE_P13) return;
+            var bx = obj.userData.bx;
+            var by = obj.userData.by;
+            var bz = obj.userData.bz;
+            var prime = obj.userData.prime;
+            var keyIndex = obj.userData.keyIndex;
+            setBlock(bx, by, bz, BLOCK.AIR);
+            var wx = bx * BLOCK_SIZE;
+            var wy = by * BLOCK_SIZE + BLOCK_SIZE * 0.5;
+            var wz = bz * BLOCK_SIZE;
+            spawnKeyDrop(wx, wy, wz, prime, keyIndex);
+            updateKeyLabel(null);
+        }
+
+        renderer.domElement.addEventListener('click', onPointerClick);
 
         var labelEl = document.getElementById('game-key-label');
-        if (labelEl) {
-            labelEl.textContent = 'Key #' + keyIndex + ' (p=' + prime + ') — (' + keyData.a + ',' + keyData.b + ',' + keyData.c + ',' + keyData.d + ')';
+        function updateKeyLabel(drop) {
+            if (!labelEl) return;
+            if (drop) {
+                var k = window.HurwitzKeys.getKey(drop.prime, drop.keyIndex);
+                var q = k ? '(' + k.a + ',' + k.b + ',' + k.c + ',' + k.d + ')' : '';
+                labelEl.textContent = 'Key #' + drop.keyIndex + ' (p=' + drop.prime + ') ' + q + ' — click key ore to mine';
+            } else {
+                var n = keyDrops.length;
+                labelEl.textContent = n + ' key drop(s). Click key ore (glowing blocks) to mine.';
+            }
         }
+
+        updateKeyLabel(null);
 
         function animate() {
             requestAnimationFrame(animate);
             time += 0.02;
 
-            var basePos = orb.userData.basePosition;
-            var phase = (orb.userData.keyIndex / totalKeys) * Math.PI * 2;
-            var rotationAngle = time + phase;
-            var style = styling.calculateUnifiedStyle(orb.userData.keyIndex, time, rotationAngle, basePos);
+            var idx, phase, rotationAngle, style, hue, sat, light, wobble, scale;
 
-            var wobble = style.noiseFactor * 0.15;
-            orb.position.x = basePos.x + Math.sin(time * 0.8) * wobble;
-            orb.position.y = basePos.y + Math.cos(time * 1.2) * wobble;
-            orb.position.z = basePos.z + Math.sin(time * 0.5) * wobble;
+            for (idx = 0; idx < blockMeshes.length; idx++) {
+                var m = blockMeshes[idx];
+                if (m.userData.blockType !== BLOCK.KEY_ORE_P5 && m.userData.blockType !== BLOCK.KEY_ORE_P13) continue;
+                var bp = m.position;
+                phase = (m.userData.keyIndex / (m.userData.prime === 5 ? TOTAL_P5 : TOTAL_P13)) * Math.PI * 2;
+                rotationAngle = time + phase;
+                style = styling.calculateUnifiedStyle(m.userData.keyIndex, time, rotationAngle, bp);
+                hue = (m.userData.keyIndex / (m.userData.prime === 5 ? TOTAL_P5 : TOTAL_P13));
+                sat = 0.7 * (0.8 + style.glowIntensity * 0.4);
+                light = 0.55 * (0.9 + style.lightingFactor * 0.2);
+                m.material.color.setHSL(hue, sat, light);
+                m.material.emissive.setHSL(hue, 0.7, style.glowIntensity * 2);
+                m.material.emissiveIntensity = 0.15 + style.glowIntensity * 0.4;
+            }
 
-            var hue = (orb.userData.keyIndex / totalKeys);
-            var sat = 0.7 * (0.8 + style.glowIntensity * 0.4);
-            var light = 0.6 * (0.9 + style.lightingFactor * 0.2);
-            orb.material.color.setHSL(hue, sat, light);
-            orb.material.emissive.setHSL(hue, 0.7, style.glowIntensity * 2);
-            orb.material.emissiveIntensity = 0.3 + style.glowIntensity * 0.5;
-
-            var scale = 0.95 + style.noiseFactor * 0.1;
-            orb.scale.set(scale, scale, scale);
+            for (idx = 0; idx < keyDrops.length; idx++) {
+                var d = keyDrops[idx];
+                var basePos = d.basePosition;
+                phase = (d.keyIndex / d.total) * Math.PI * 2;
+                rotationAngle = time + phase;
+                style = styling.calculateUnifiedStyle(d.keyIndex, time, rotationAngle, basePos);
+                wobble = style.noiseFactor * 0.08;
+                d.mesh.position.x = basePos.x + Math.sin(time * 0.7 + idx) * wobble;
+                d.mesh.position.y = basePos.y + Math.cos(time * 1.1 + idx * 0.5) * wobble;
+                d.mesh.position.z = basePos.z + Math.sin(time * 0.6 + idx * 0.3) * wobble;
+                hue = (d.keyIndex / d.total);
+                sat = 0.7 * (0.8 + style.glowIntensity * 0.4);
+                light = 0.6 * (0.9 + style.lightingFactor * 0.2);
+                d.mesh.material.color.setHSL(hue, sat, light);
+                d.mesh.material.emissive.setHSL(hue, 0.7, style.glowIntensity * 2);
+                d.mesh.material.emissiveIntensity = 0.3 + style.glowIntensity * 0.5;
+                scale = 0.95 + style.noiseFactor * 0.1;
+                d.mesh.scale.set(scale, scale, scale);
+            }
 
             controls.update();
             renderer.render(scene, camera);
