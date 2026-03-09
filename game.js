@@ -13,6 +13,7 @@
     var AVOID_NEAR = 0.2;
     var AVOID_FAR = 0.55;
     var BOUNCE_RADIUS = 0.58;
+    var BOUNCE_BACK_FACTOR = 0.4;
 
     function smoothstep(t) {
         t = t < 0 ? 0 : t > 1 ? 1 : t;
@@ -123,6 +124,8 @@
         var worldPosVortex = new THREE.Vector3();
         var correctedWorldVortex = new THREE.Vector3();
         var bouncePushDir = new THREE.Vector3();
+        var velocityVortex = new THREE.Vector3();
+        var surfacePointVortex = new THREE.Vector3();
         var groupInvWorld = new THREE.Matrix4();
 
         function setBlock(bx, by, bz, blockType) {
@@ -423,13 +426,18 @@
                     }
                 }
 
-                // BOUNCE PASS — push particles off ore so they don't pass through
+                // BOUNCE PASS — reflect motion off ore (basketball dribble: ball comes right back)
                 d.group.updateMatrixWorld(true);
                 groupInvWorld.getInverse(d.group.matrixWorld);
-                var nearestBlock, b, blockMesh, minDist, dist;
+                var nearestBlock, b, blockMesh, minDist, dist, prevWorld;
                 for (c = 0; c < d.group.children.length; c++) {
                     child = d.group.children[c];
                     child.getWorldPosition(worldPosVortex);
+                    prevWorld = child.userData.previousWorldPosition;
+                    if (!prevWorld) {
+                        child.userData.previousWorldPosition = worldPosVortex.clone();
+                        prevWorld = child.userData.previousWorldPosition;
+                    }
                     minDist = Infinity;
                     nearestBlock = null;
                     for (b = 0; b < blockMeshes.length; b++) {
@@ -443,8 +451,13 @@
                     }
                     if (nearestBlock && minDist < BOUNCE_RADIUS) {
                         bouncePushDir.copy(worldPosVortex).sub(nearestBlock.position).normalize();
-                        correctedWorldVortex.copy(worldPosVortex).add(bouncePushDir.multiplyScalar(BOUNCE_RADIUS - minDist));
+                        surfacePointVortex.copy(nearestBlock.position).add(bouncePushDir.clone().multiplyScalar(BOUNCE_RADIUS));
+                        velocityVortex.copy(worldPosVortex).sub(prevWorld).reflect(bouncePushDir);
+                        correctedWorldVortex.copy(surfacePointVortex).add(velocityVortex.multiplyScalar(BOUNCE_BACK_FACTOR));
                         child.position.copy(correctedWorldVortex).applyMatrix4(groupInvWorld);
+                        prevWorld.copy(correctedWorldVortex);
+                    } else {
+                        prevWorld.copy(worldPosVortex);
                     }
                 }
 
