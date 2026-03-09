@@ -73,13 +73,24 @@ Use `keyMaterial` to decrypt a payload you stored in that slot (or for your own 
 
 The API stores your ciphertext as-is; it does not encrypt. You should encrypt your secret with the slot key (from a previous **Request** or from your own derivation) before sending.
 
-**Example (curl):**
+**Full example (run in order; API at `http://localhost:5003`, demo key):**
 
 ```bash
+# Store something in slot 0 (e.g. base64 "test")
 curl -X POST http://localhost:5003/api/vault/store \
   -H "Content-Type: application/json" \
   -H "X-Vault-Api-Key: vault-demo-key-change-in-production" \
   -d '{"slotIndex": 0, "encryptedPayload": "dGVzdA=="}'
+
+# Which slots have payloads?
+curl -s http://localhost:5003/api/vault/slots
+# → {"slots":81,"filled":[0]}
+
+# Get key for slot 0 (hasPayload will be true)
+curl -X POST http://localhost:5003/api/vault/request \
+  -H "Content-Type: application/json" \
+  -H "X-Vault-Api-Key: vault-demo-key-change-in-production" \
+  -d '{"slotIndex": 0}'
 ```
 
 ### Configs (auth required)
