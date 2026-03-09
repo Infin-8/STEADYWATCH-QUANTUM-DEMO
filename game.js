@@ -205,6 +205,8 @@
             }
         }
         renderer.domElement.addEventListener('mousemove', onMouseMove);
+
+        function buildWorld() {
             var i, j;
             for (i = -4; i <= 4; i++) {
                 for (j = -4; j <= 4; j++) {
