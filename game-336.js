@@ -16,9 +16,7 @@
     var BOUNCE_RADIUS = 0.58;
     var BOUNCE_RADIUS_336 = 0.72;
     var BOUNCE_BACK_FACTOR = 0.4;
-    const INTER_SEED_BOUNCE_RADIUS     = 1.2;   // tune: 0.8 to 1.6
-    const INTER_SEED_BOUNCE_RADIUS_432 = 1.5;   // assuming 432 has longer arms; adjust
-    const INTER_BOUNCE_BACK_FACTOR     = 0.4;
+
 
     function smoothstep(t) {
         t = t < 0 ? 0 : t > 1 ? 1 : t;
@@ -132,47 +130,6 @@
         var velocityVortex = new THREE.Vector3();
         var surfacePointVortex = new THREE.Vector3();
         var groupInvWorld = new THREE.Matrix4();
-
-        // collison seed function
-    function applyInterDropRepulsion() {
-    var dropA, dropB, posA, posB, dx, dy, dz, distSq, dist, r, overlap, nx, ny, nz, push;
-    for (let i = 0; i < keyDrops.length; i++) {
-        dropA = keyDrops[i];
-        posA = dropA.group.position;  // or dropA.basePosition if that's the vec3
-
-        for (let j = i + 1; j < keyDrops.length; j++) {
-            dropB = keyDrops[j];
-            posB = dropB.group.position;  // same for B
-
-            dx = posB.x - posA.x;
-            dy = posB.y - posA.y;
-            dz = posB.z - posA.z;
-            distSq = dx*dx + dy*dy + dz*dz;
-
-            // Use 432 radius if applicable; here assuming all are similar, but customize
-            r = INTER_SEED_BOUNCE_RADIUS * 2;  // sum of two radii; make per-type if needed
-
-            if (distSq >= r * r) continue;
-
-            dist = Math.sqrt(distSq) || 0.001;
-            overlap = r - dist;
-
-            nx = dx / dist;
-            ny = dy / dist;
-            nz = dz / dist;
-
-            push = overlap * INTER_BOUNCE_BACK_FACTOR;
-
-            posA.x -= nx * push;
-            posA.y -= ny * push;
-            posA.z -= nz * push;
-
-            posB.x += nx * push;
-            posB.y += ny * push;
-            posB.z += nz * push;
-        }
-    }
-}
 
         function setBlock(bx, by, bz, blockType) {
             var key = blockKey(bx, by, bz);
@@ -451,7 +408,7 @@
                     }
                 }
 
-                applyInterDropRepulsion();
+                
                 // BOUNCE PASS — reflect motion off ore (basketball dribble: ball comes right back)
                 d.group.updateMatrixWorld(true);
                 groupInvWorld.getInverse(d.group.matrixWorld);
