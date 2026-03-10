@@ -10,7 +10,7 @@
     var BLOCK_SIZE = 1;
     var TOTAL_P5 = 144 * 2.2;
     var TOTAL_P13 = 336 * 1.6;
-    var CLUSTER_RADIUS = 0.2;
+    var CLUSTER_RADIUS = 0.55;
     var AVOID_NEAR = 0.2;
     var AVOID_FAR = 0.55;
     var BOUNCE_RADIUS = 0.58;
