@@ -11,9 +11,14 @@
     var TOTAL_P5 = 144;
     var TOTAL_P13 = 336;
     var CLUSTER_RADIUS = 0.5;
+    var CLUSTER_RADIUS_432 = 0.65;
+    var HUE_SHIFT_432 = 0.08;
+    var EMISSIVE_INTENSITY_432 = 0.55;
+    var EMISSIVE_BOOST_432 = 1.35;
     var AVOID_NEAR = 0.2;
     var AVOID_FAR = 0.55;
     var BOUNCE_RADIUS = 0.58;
+    var BOUNCE_RADIUS_432 = 0.72;
     var BOUNCE_BACK_FACTOR = 0.4;
 
     function smoothstep(t) {
@@ -148,8 +153,10 @@
         function spawnKeyDrop(wx, wy, wz, prime, keyIndex) {
             var drop = window.FourWayVertex.createFourWayVertexGroup(wx, wy, wz, keyIndex, {
                 prime: 17,
-                radius: CLUSTER_RADIUS,
-                keyDropIndex: keyDrops.length
+                radius: CLUSTER_RADIUS_432,
+                keyDropIndex: keyDrops.length,
+                hueShift: HUE_SHIFT_432,
+                emissiveIntensity: EMISSIVE_INTENSITY_432
             });
             scene.add(drop.group);
             keyDrops.push(drop);
@@ -166,10 +173,11 @@
             if (!drop) return;
             drop.group.scale.set(1, 1, 1);
             var c, child;
+            var defaultEmissive = EMISSIVE_INTENSITY_432;
             for (c = 0; c < drop.group.children.length; c++) {
                 child = drop.group.children[c];
                 if (child.material) {
-                    child.material.emissiveIntensity = 0.4;
+                    child.material.emissiveIntensity = defaultEmissive;
                     child.material.shininess = DEFAULT_SHININESS;
                     if (child.material.specular) child.material.specular.setHex(DEFAULT_SPECULAR);
                 }
@@ -430,9 +438,9 @@
                             nearestBlock = blockMesh;
                         }
                     }
-                    if (nearestBlock && minDist < BOUNCE_RADIUS) {
+                    if (nearestBlock && minDist < BOUNCE_RADIUS_432) {
                         bouncePushDir.copy(worldPosVortex).sub(nearestBlock.position).normalize();
-                        surfacePointVortex.copy(nearestBlock.position).add(bouncePushDir.clone().multiplyScalar(BOUNCE_RADIUS));
+                        surfacePointVortex.copy(nearestBlock.position).add(bouncePushDir.clone().multiplyScalar(BOUNCE_RADIUS_432));
                         velocityVortex.copy(worldPosVortex).sub(prevWorld).reflect(bouncePushDir);
                         correctedWorldVortex.copy(surfacePointVortex).add(velocityVortex.multiplyScalar(BOUNCE_BACK_FACTOR));
                         child.position.copy(correctedWorldVortex).applyMatrix4(groupInvWorld);
@@ -448,9 +456,11 @@
                     style = styling.calculateUnifiedStyle(d.keyIndex, time, rotationAngle, basePos);
                     hue = (time * 0.1 + d.keyIndex * 0.1) % 1;
                     hue = hue < 0 ? hue + 1 : hue;
+                    hue = (hue + HUE_SHIFT_432) % 1;
+                    if (hue < 0) hue += 1;
                     sat = 0.7 * (0.8 + style.glowIntensity * 0.4);
                     light = 0.6 * (0.9 + style.lightingFactor * 0.2);
-                    var baseIntensity = 0.3 + style.glowIntensity * 0.5;
+                    var baseIntensity = (0.3 + style.glowIntensity * 0.5) * EMISSIVE_BOOST_432;
                     var b, blockMesh, minDist, dist, t, factor;
                     for (c = 0; c < d.group.children.length; c++) {
                         child = d.group.children[c];

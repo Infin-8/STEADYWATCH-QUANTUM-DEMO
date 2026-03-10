@@ -49,12 +49,14 @@
      * @param {number} wy world y
      * @param {number} wz world z
      * @param {number} keyIndex from mined block (for hue/label)
-     * @param {{ radius?: number, keyDropIndex?: number, prime?: number, totalKeys?: number }} options
+     * @param {{ radius?: number, keyDropIndex?: number, prime?: number, totalKeys?: number, hueShift?: number, emissiveIntensity?: number }} options
      */
     function createFourWayVertexGroup(wx, wy, wz, keyIndex, options) {
         options = options || {};
         var radius = typeof options.radius === 'number' ? options.radius : 0.5;
         var keyDropIndex = typeof options.keyDropIndex === 'number' ? options.keyDropIndex : 0;
+        var hueShift = typeof options.hueShift === 'number' ? options.hueShift : 0;
+        var emissiveIntensity = typeof options.emissiveIntensity === 'number' ? options.emissiveIntensity : 0.4;
 
         var totalKeys = TOTAL_KEYS_336;
         var prime = 13;
@@ -68,11 +70,13 @@
 
         var hue = (keyIndex / totalKeys) % 1;
         if (hue < 0) hue += 1;
+        hue = (hue + hueShift) % 1;
+        if (hue < 0) hue += 1;
         var col = typeof THREE !== 'undefined' ? new THREE.Color().setHSL(hue, 0.8, 0.6) : null;
         var mat = typeof THREE !== 'undefined' ? new THREE.MeshPhongMaterial({
             color: col,
             emissive: col,
-            emissiveIntensity: 0.4,
+            emissiveIntensity: emissiveIntensity,
             shininess: 100
         }) : null;
 
