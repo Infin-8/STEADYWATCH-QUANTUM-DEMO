@@ -219,7 +219,7 @@
 
         var tooltip = document.createElement('div');
         tooltip.setAttribute('id', 'vault-orb-tooltip');
-        tooltip.style.cssText = 'position:absolute;left:0;top:0;background:rgba(102,126,234,0.95);color:white;padding:10px 15px;border-radius:8px;pointer-events:none;z-index:10;font-size:14px;box-shadow:0 4px 12px rgba(0,0,0,0.3);display:none;max-width:280px;';
+        tooltip.style.cssText = 'position:absolute;left:627px;top:370px;background:rgba(102,126,234,0.95);color:white;padding:10px 15px;border-radius:8px;pointer-events:none;z-index:10;font-size:14px;box-shadow:0 4px 12px rgba(0,0,0,0.3);display:none;max-width:280px;';
         container.appendChild(tooltip);
 
         function onMouseMove(event) {
