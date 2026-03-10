@@ -58,11 +58,11 @@
         roughness: 0.0,                         // super smooth/polished surface
         metalness: 0.0,                         // non-metallic (pure dielectric like crystal/glass)
 
-        transmission: 0.95,                     // main translucency (0 = opaque, 1 = fully transmissive)
+        transmission: 0.90,                     // main translucency (0 = opaque, 1 = fully transmissive)
         opacity: 1.0,                           // keep 1.0 when using transmission (Three.js rule)
         transparent: true,                      // required for transmission to work properly
 
-        ior: 1.55,                              // index of refraction — glass ~1.5, crystal/quartz ~1.54–1.6
+        ior: 1.7,                              // index of refraction — glass ~1.5, crystal/quartz ~1.54–1.6
                                                 // higher = more bending/refraction (try 1.45–1.7)
 
         thickness: 0.5,                         // simulates material depth (affects refraction strength)
@@ -77,7 +77,7 @@
 
         // Optional extras for more "crystal magic"
          specularIntensity: 1.0,              // if you want stronger highlights (Phong-like)
-         clearcoatMap: someNormalTexture,     // if you add subtle faceting normals later
+        // clearcoatMap: someNormalTexture,     // if you add subtle faceting normals later
     });
         } else {
             var col = getKeyColor(keyIndex, prime === 5 ? TOTAL_P5 : TOTAL_P13);
