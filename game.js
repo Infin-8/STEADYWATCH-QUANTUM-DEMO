@@ -76,7 +76,7 @@
         side: THREE.DoubleSide,                 // optional: render both sides if geometry has holes/thin parts
 
         // Optional extras for more "crystal magic"
-        // specularIntensity: 1.0,              // if you want stronger highlights (Phong-like)
+         specularIntensity: 1.0,              // if you want stronger highlights (Phong-like)
         // clearcoatMap: someNormalTexture,     // if you add subtle faceting normals later
     });
         } else {
