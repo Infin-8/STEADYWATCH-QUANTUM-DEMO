@@ -14,6 +14,7 @@
     var AVOID_NEAR = 0.2;
     var AVOID_FAR = 0.55;
     var BOUNCE_RADIUS = 0.58;
+    var BOUNCE_RADIUS_336 = 0.72;
     var BOUNCE_BACK_FACTOR = 0.4;
 
     function smoothstep(t) {
@@ -405,7 +406,6 @@
                         );
                     }
                 }
-
                 // BOUNCE PASS — reflect motion off ore (basketball dribble: ball comes right back)
                 d.group.updateMatrixWorld(true);
                 groupInvWorld.getInverse(d.group.matrixWorld);
@@ -429,9 +429,9 @@
                             nearestBlock = blockMesh;
                         }
                     }
-                    if (nearestBlock && minDist < BOUNCE_RADIUS) {
+                    if (nearestBlock && minDist < BOUNCE_RADIUS_336) {
                         bouncePushDir.copy(worldPosVortex).sub(nearestBlock.position).normalize();
-                        surfacePointVortex.copy(nearestBlock.position).add(bouncePushDir.clone().multiplyScalar(BOUNCE_RADIUS));
+                        surfacePointVortex.copy(nearestBlock.position).add(bouncePushDir.clone().multiplyScalar(BOUNCE_RADIUS_336));
                         velocityVortex.copy(worldPosVortex).sub(prevWorld).reflect(bouncePushDir);
                         correctedWorldVortex.copy(surfacePointVortex).add(velocityVortex.multiplyScalar(BOUNCE_BACK_FACTOR));
                         child.position.copy(correctedWorldVortex).applyMatrix4(groupInvWorld);
