@@ -13,7 +13,10 @@
     var AVOID_NEAR = 0.2;
     var AVOID_FAR = 0.55;
     var BOUNCE_RADIUS = 0.58;
+    var BOUNCE_RADIUS_BASE_EXPANDED = 0.72;
     var BOUNCE_BACK_FACTOR = 0.4;
+    var SPHERE_COLLISION_RADIUS = 0.08;
+    var SPHERE_COLLISION_DAMPING = 0.6;
 
     function smoothstep(t) {
         t = t < 0 ? 0 : t > 1 ? 1 : t;
@@ -127,6 +130,9 @@
         var velocityVortex = new THREE.Vector3();
         var surfacePointVortex = new THREE.Vector3();
         var groupInvWorld = new THREE.Matrix4();
+        var collisionNormal = new THREE.Vector3();
+        var tempVec1 = new THREE.Vector3();
+        var tempVec2 = new THREE.Vector3();
 
         function setBlock(bx, by, bz, blockType) {
             var key = blockKey(bx, by, bz);
@@ -432,16 +438,62 @@
                     }
                 }
 
-                // BOUNCE PASS — reflect motion off ore (basketball dribble: ball comes right back)
+                // Compute world positions and ensure previousWorldPosition is initialized
                 d.group.updateMatrixWorld(true);
                 groupInvWorld.getInverse(d.group.matrixWorld);
+                var children = d.group.children;
                 var nearestBlock, b, blockMesh, minDist, dist, prevWorld;
-                for (c = 0; c < d.group.children.length; c++) {
-                    child = d.group.children[c];
+                for (c = 0; c < children.length; c++) {
+                    child = children[c];
                     child.getWorldPosition(worldPosVortex);
+                    if (!child.userData.worldPos) {
+                        child.userData.worldPos = worldPosVortex.clone();
+                    } else {
+                        child.userData.worldPos.copy(worldPosVortex);
+                    }
                     prevWorld = child.userData.previousWorldPosition;
                     if (!prevWorld) {
                         child.userData.previousWorldPosition = worldPosVortex.clone();
+                    }
+                }
+
+                // Intra-cluster sphere-sphere collisions (soft, damped)
+                var i, j, childA, childB, posA, posB, prevA, prevB, minDistCenters, distSq, distCenters, penetration;
+                var radiusBase = SPHERE_COLLISION_RADIUS;
+                for (i = 0; i < children.length; i++) {
+                    childA = children[i];
+                    posA = childA.userData.worldPos;
+                    prevA = childA.userData.previousWorldPosition;
+                    if (!posA || !prevA) continue;
+                    for (j = i + 1; j < children.length; j++) {
+                        childB = children[j];
+                        posB = childB.userData.worldPos;
+                        prevB = childB.userData.previousWorldPosition;
+                        if (!posB || !prevB) continue;
+                        minDistCenters = radiusBase * 2;
+                        collisionNormal.copy(posB).sub(posA);
+                        distSq = collisionNormal.lengthSq();
+                        if (distSq === 0 || distSq > minDistCenters * minDistCenters) continue;
+                        distCenters = Math.sqrt(distSq);
+                        collisionNormal.divideScalar(distCenters);
+                        penetration = minDistCenters - distCenters;
+                        if (penetration <= 0) continue;
+                        // Soft separation along the collision normal, slightly damped
+                        var correction = (penetration * 0.5) * SPHERE_COLLISION_DAMPING;
+                        posA.addScaledVector(collisionNormal, -correction);
+                        posB.addScaledVector(collisionNormal, correction);
+                    }
+                }
+
+                // BOUNCE PASS — reflect motion off ore (basketball dribble: ball comes right back)
+                var worldPos;
+                for (c = 0; c < children.length; c++) {
+                    child = children[c];
+                    worldPos = child.userData.worldPos;
+                    if (!worldPos) continue;
+                    prevWorld = child.userData.previousWorldPosition;
+                    if (!prevWorld) {
+                        child.userData.previousWorldPosition = worldPos.clone();
                         prevWorld = child.userData.previousWorldPosition;
                     }
                     minDist = Infinity;
@@ -449,22 +501,30 @@
                     for (b = 0; b < blockMeshes.length; b++) {
                         blockMesh = blockMeshes[b];
                         if (blockMesh.userData.blockType !== BLOCK.KEY_ORE_P5 && blockMesh.userData.blockType !== BLOCK.KEY_ORE_P13) continue;
-                        dist = worldPosVortex.distanceTo(blockMesh.position);
+                        dist = worldPos.distanceTo(blockMesh.position);
                         if (dist < minDist) {
                             minDist = dist;
                             nearestBlock = blockMesh;
                         }
                     }
-                    if (nearestBlock && minDist < BOUNCE_RADIUS) {
-                        bouncePushDir.copy(worldPosVortex).sub(nearestBlock.position).normalize();
-                        surfacePointVortex.copy(nearestBlock.position).add(bouncePushDir.clone().multiplyScalar(BOUNCE_RADIUS));
-                        velocityVortex.copy(worldPosVortex).sub(prevWorld).reflect(bouncePushDir);
+                    if (nearestBlock && minDist < BOUNCE_RADIUS_BASE_EXPANDED) {
+                        bouncePushDir.copy(worldPos).sub(nearestBlock.position).normalize();
+                        surfacePointVortex.copy(nearestBlock.position).add(bouncePushDir.clone().multiplyScalar(BOUNCE_RADIUS_BASE_EXPANDED));
+                        velocityVortex.copy(worldPos).sub(prevWorld).reflect(bouncePushDir);
                         correctedWorldVortex.copy(surfacePointVortex).add(velocityVortex.multiplyScalar(BOUNCE_BACK_FACTOR));
-                        child.position.copy(correctedWorldVortex).applyMatrix4(groupInvWorld);
+                        worldPos.copy(correctedWorldVortex);
                         prevWorld.copy(correctedWorldVortex);
                     } else {
-                        prevWorld.copy(worldPosVortex);
+                        prevWorld.copy(worldPos);
                     }
+                }
+
+                // Apply final world positions back to local space
+                for (c = 0; c < children.length; c++) {
+                    child = children[c];
+                    worldPos = child.userData.worldPos;
+                    if (!worldPos) continue;
+                    child.position.copy(worldPos).applyMatrix4(groupInvWorld);
                 }
 
                 if (hoveredKeyDrop !== d) {
