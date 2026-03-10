@@ -416,7 +416,7 @@
                         child.position.set(lerpedX, lerpedY, lerpedZ);
                     }
                 } else {
-                    var orbitRadius = 0.12;
+                    var orbitRadius = 0.08;
                     var c, child, baseLocal, satIdx, orbitSpeed, orbitX, orbitY, orbitZ;
                     for (c = 0; c < d.group.children.length; c++) {
                         child = d.group.children[c];
