@@ -77,7 +77,7 @@
 
         // Optional extras for more "crystal magic"
          specularIntensity: 1.0,              // if you want stronger highlights (Phong-like)
-        // clearcoatMap: someNormalTexture,     // if you add subtle faceting normals later
+         clearcoatMap: someNormalTexture,     // if you add subtle faceting normals later
     });
         } else {
             var col = getKeyColor(keyIndex, prime === 5 ? TOTAL_P5 : TOTAL_P13);
