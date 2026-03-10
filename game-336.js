@@ -8,9 +8,9 @@
 
     var BLOCK = { AIR: 0, GROUND: 1, KEY_ORE_P5: 2, KEY_ORE_P13: 3 };
     var BLOCK_SIZE = 1;
-    var TOTAL_P5 = 144;
-    var TOTAL_P13 = 336;
-    var CLUSTER_RADIUS = 0.5;
+    var TOTAL_P5 = 144 * 2.2;
+    var TOTAL_P13 = 336 * 1.6;
+    var CLUSTER_RADIUS = 0.2;
     var AVOID_NEAR = 0.2;
     var AVOID_FAR = 0.55;
     var BOUNCE_RADIUS = 0.58;
