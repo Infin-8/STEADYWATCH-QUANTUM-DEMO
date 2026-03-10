@@ -52,7 +52,7 @@
 
         if (blockType === BLOCK.GROUND) {
  material = new THREE.MeshPhysicalMaterial({
-        color: new THREE.Color(0xe0f7fa),       // very pale cyan/ice-blue tint (adjust for warmer/cooler crystal)
+        color: new THREE.Color(0xe0f2f1),       // very pale cyan/ice-blue tint (adjust for warmer/cooler crystal)
         // or try subtle purple: 0xf3e5f5, quartz-like: 0xfafafa (near-white), or emerald: 0xe0f2f1
 
         roughness: 0.0,                         // super smooth/polished surface
