@@ -56,11 +56,34 @@
             ? hashKeyIndex(bx, bz, prime) : 0;
 
         if (blockType === BLOCK.GROUND) {
-            material = new THREE.MeshPhongMaterial({
-                color: 0x4a3728,
-                shininess: 20,
-                flatShading: true
-            });
+            material = new THREE.MeshPhysicalMaterial({
+            color: new THREE.Color(0xf3e5f5),   // very pale cyan/ice-blue tint (adjust for warmer/cooler crystal)
+                                                // or subtle purple: 0xf3e5f5, quartz-like: 0xfafafa (near-white), or emerald: 0xe0f2f1
+
+            roughness: 0.0,                         // super smooth/polished surface
+            metalness: 0.0,                         // non-metallic (pure dielectric like crystal/glass)
+
+            transmission: 0.90,                     // main translucency (0 = opaque, 1 = fully transmissive)
+            opacity: 1.0,                           // keep 1.0 when using transmission (Three.js rule)
+            transparent: true,                      // required for transmission to work properly
+
+            ior: 1.7,                               // index of refraction — glass ~1.5, crystal/quartz ~1.54–1.6
+                                                    // higher = more bending/refraction (try 1.45–1.7)
+
+            thickness: 0.5,                         // simulates material depth (affects refraction strength)
+                                                    // smaller = thinner crystal feel; larger = chunkier
+
+            clearcoat: 0.8,                         // adds a glossy top layer (like polished crystal facets)
+            clearcoatRoughness: 0.05,               // very low for extra shine
+
+            envMapIntensity: 1.2,                   // boost reflections from scene environment (HDR if you have one)
+
+            side: THREE.DoubleSide,                 // optional: render both sides if geometry has holes/thin parts
+
+            // Optional extras for more "crystal magic"
+             specularIntensity: 1.0,                // if you want stronger highlights (Phong-like)
+            // clearcoatMap: someNormalTexture,     // if you add subtle faceting normals later
+    });
         } else {
             var col = getKeyColor(keyIndex, prime === 5 ? TOTAL_P5 : TOTAL_P13);
             material = new THREE.MeshPhongMaterial({
