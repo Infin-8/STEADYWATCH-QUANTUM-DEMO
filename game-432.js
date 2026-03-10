@@ -20,7 +20,7 @@
     var BOUNCE_RADIUS = 0.58;
     var BOUNCE_RADIUS_432 = 0.72;
     var BOUNCE_BACK_FACTOR = 0.4;
-    var SPHERE_COLLISION_RADIUS = 0.08;
+    var SPHERE_COLLISION_RADIUS = 0.8;
     var SPHERE_COLLISION_DAMPING = 0.6;
 
     function smoothstep(t) {
