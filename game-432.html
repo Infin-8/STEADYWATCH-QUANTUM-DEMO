@@ -3,8 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SKYNET™ | STEADYWATCH™</title>
-    <meta name="description" content="81-board vault with 336 keyz per drop as four-way qubit vertex. Hurwitz p=13, UnifiedQubitStyling. Three.js.">
+    <title>THE VAULT (432 keyz) | STEADYWATCH™</title>
+    <meta name="description" content="81-board vault with 432 keyz per drop as four-way qubit vertex. Hurwitz p=17, 108 per arm. UnifiedQubitStyling. Three.js.">
     <link rel="icon" href="images/logo.png" type="image/png">
     <link rel="stylesheet" href="styles.css">
     <script src="header-hurwitz-bg.js" defer></script>
@@ -14,7 +14,7 @@
     <script src="js/hurwitz-keys.js" defer></script>
     <script src="js/unified-qubit-styling.js" defer></script>
     <script src="js/four-way-vertex.js" defer></script>
-    <script src="game-336.js" defer></script>
+    <script src="game-432.js" defer></script>
 </head>
 <body>
     <nav style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;">
@@ -30,7 +30,7 @@
                 <li style="font-size: x-small; !important"><a href="144-satellites.html" class="quickShadow">(P == |&gt;)</a></li>
                 <li><a href="layers-336.html" class="quickShadow">13 =&gt; 336</a></li>
                 <li><a href="game.html" class="quickShadow">VAULT™</a></li>
-                <li><a href="game-432.html" class="quickShadow">432 keyz</a></li>
+                <li><a href="game-336.html" class="quickShadow">336 keyz</a></li>
                 <li><a href="consulting-services.html" class="quickShadow">Consulting</a></li>
                 <li><a href="contact.html" class="viz-button" style="background: linear-gradient(140deg, #fdfdfd 0%, #6e85eb 100%); padding: 10px; border-radius: 25px; text-shadow: 2px 1px 1px black; border: none !important;">⭐︎ Contact</a></li>
             </ul>
@@ -41,11 +41,11 @@
         <div class="header-hurwitz-dots" id="header-hurwitz-dots" aria-hidden="true"></div>
         <div class="header-content">
             <div class="container">
-                <h1 style="text-shadow: 3px 2px 2px black; font-size: 2em;"><u>SKYNET™</u></h1>
-                <p>81 keyz. Each mined block drops 336 keyz as a four-way qubit vertex (84 per arm)</p>
+                <h1 style="text-shadow: 3px 2px 2px black; font-size: 2em;"><u>THE VAULT™</u> (432 keyz)</h1>
+                <p>81 keyz. Each mined block drops 432 keyz as a four-way qubit vertex (108 per arm).</p>
                 <div style="margin-top: 20px;">
-                    <span style="text-shadow: 1px 1px 1px black; background: linear-gradient(135deg, #fdfdfd 0%, #6e85eb 100%); color: white !important" class="badge">⭐︎ 336 Four-Way</span>
-                    <span style="text-shadow: 1px 1px 1px black; background: linear-gradient(135deg, #fdfdfd 0%, #6e85eb 100%); color: white !important" class="badge">⭐︎ p=13</span>
+                    <span style="text-shadow: 1px 1px 1px black; background: linear-gradient(135deg, #fdfdfd 0%, #6e85eb 100%); color: white !important" class="badge">⭐︎ 432 Four-Way</span>
+                    <span style="text-shadow: 1px 1px 1px black; background: linear-gradient(135deg, #fdfdfd 0%, #6e85eb 100%); color: white !important" class="badge">⭐︎ p=17</span>
                     <span style="text-shadow: 1px 1px 1px black; background: linear-gradient(135deg, #fdfdfd 0%, #6e85eb 100%); color: white !important" class="badge">⭐︎ Quantum Secure</span>
                 </div>
             </div>
@@ -55,13 +55,13 @@
     <div class="section white">
         <div class="container">
             <p class="section-subtitle" style="text-align: center; font-size: small; text-shadow: 1px 2px 7px black; font-weight: 100;">
-                (Click to Mine) => <strong>Desktop Only</strong> — Key drops = 336 four-way vertex
+                (Click to Mine) => <strong>Desktop Only</strong> — Key drops = 432 four-way vertex
             </p>
-            <div id="game-container" class="visualization-container" style="height: 600px;" aria-label="Keyz game 3D view (336 four-way)"></div>
-            <p id="game-key-label" class="section-subtitle" style="text-align: center; margin-top: 10px; font-size: small;">Click key ore to mine. Each drop shows 336 keyz in four arms (84 per arm).</p>
+            <div id="game-container" class="visualization-container" style="height: 600px;" aria-label="Keyz game 3D view (432 four-way)"></div>
+            <p id="game-key-label" class="section-subtitle" style="text-align: center; margin-top: 10px; font-size: small;">Click key ore to mine. Each drop shows 432 keyz in four arms (108 per arm).</p>
 
             <!-- Viz controls -->
-            <!-- <div class="visualization-controls">
+            <div class="visualization-controls">
                 <div id="panel-controls">
                     <input type="text" id="vault-config-base" placeholder="Optional: API base URL for live config" style="min-width: 220px; padding: 6px 10px; border-radius: 6px; border: 1px solid rgba(102,126,234,0.5);" />
                     <input type="password" id="vault-config-key" placeholder="API key (optional for demo)" style="min-width: 140px; padding: 6px 10px; border-radius: 6px; border: 1px solid rgba(102,126,234,0.5);" />
@@ -88,22 +88,21 @@
                 </div>
             </div>
         </div>
-    </div> -->
+    </div>
 
     <div class="section" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; text-align: center;">
         <div class="container">
             <h2 class="section-title" style="color: white; text-shadow: 2px 2px 4px rgba(0,0,0,0.3);">
-                How to use <u>SKYNET™</u>
+                How to use <u>THE VAULT™</u>
             </h2>
             <div class="container">
                 <div class="code-block" style="padding-left: 10px">
                     <ol>
                         <li>
-                            <p>coming soon....</p>
-                            <!-- <p># Run vault API</p>
+                            <p># Run vault API</p>
                             <p>cd vault-api</p>
                             <p>npm install</p>
-                            <p>npm start</p> -->
+                            <p>npm start</p>
                         </li>
                     </ol>
                 </div>
@@ -111,8 +110,9 @@
                     <strong>API Endpoint:</strong> <code style="padding: 5px 10px; border-radius: 3px;">http://localhost:5003/</code>
                 </p>
             </div>
-            <!-- <a class="cta-button" style="background: white; color: #667eea; text-decoration: none; padding: 15px 40px; border-radius: 30px; font-weight: 600; display: inline-block; margin-top: 20px;" href="game.html" style="margin-right: 10px;">VAULT (144/336 cluster)</a> -->
-            <!-- <a class="cta-button" style="background: white; color: #667eea; text-decoration: none; padding: 15px 40px; border-radius: 30px; font-weight: 600; display: inline-block; margin-top: 20px;" href="https://github.com/Infin-8/STEADYWATCH-QUANTUM-DEMO/blob/main/vault-api/THE_VAULT.md" target="_blank">Read Walkthrough →</a> -->
+            <a class="cta-button" style="background: white; color: #667eea; text-decoration: none; padding: 15px 40px; border-radius: 30px; font-weight: 600; display: inline-block; margin-top: 20px; margin-right: 10px;" href="game.html">VAULT (144/336 cluster)</a>
+            <a class="cta-button" style="background: white; color: #667eea; text-decoration: none; padding: 15px 40px; border-radius: 30px; font-weight: 600; display: inline-block; margin-top: 20px; margin-right: 10px;" href="game-336.html">VAULT 336</a>
+            <a class="cta-button" style="background: white; color: #667eea; text-decoration: none; padding: 15px 40px; border-radius: 30px; font-weight: 600; display: inline-block; margin-top: 20px;" href="https://github.com/Infin-8/STEADYWATCH-QUANTUM-DEMO/blob/main/vault-api/THE_VAULT.md" target="_blank">Read Walkthrough →</a>
         </div>
     </div>
 
@@ -123,6 +123,7 @@
             <p style="margin-top: 10px; opacity: 0.8;">
                 <a href="index.html" style="color: white; text-decoration: none;">| Home</a> |
                 <a href="game.html" style="color: white; text-decoration: none;">VAULT™</a> |
+                <a href="game-336.html" style="color: white; text-decoration: none;">336 keyz</a> |
                 <a href="144-satellites.html" style="color: white; text-decoration: none;">(P == |&gt;)</a> |
                 <a href="layers-336.html" style="color: white; text-decoration: none;">13 =&gt; 336</a> |
                 <a href="echo-visual.html" style="color: white; text-decoration: none;">Echo</a> |
