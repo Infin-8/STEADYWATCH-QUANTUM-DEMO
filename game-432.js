@@ -228,11 +228,11 @@
                     tooltip.innerHTML = '<strong>Key #' + (drop ? drop.keyIndex : '') + '</strong> (p=' + (drop ? drop.prime : '') + ') 432 four-way<br>Quaternion: ' + qStr + '<br>Position: (' + bp.x.toFixed(2) + ', ' + bp.y.toFixed(2) + ', ' + bp.z.toFixed(2) + ')';
                     tooltip.style.display = 'block';
                     var cr = container.getBoundingClientRect();
-                    tooltip.style.left = (event.clientX - cr.left + 10) + 'px';
+                    tooltip.style.left = (event.clientX - cr.left + 50) + 'px';
                     tooltip.style.top = (event.clientY - cr.top - 10) + 'px';
                 } else if (drop) {
                     var cr = container.getBoundingClientRect();
-                    tooltip.style.left = (event.clientX - cr.left + 10) + 'px';
+                    tooltip.style.left = (event.clientX - cr.left + 50) + 'px';
                     tooltip.style.top = (event.clientY - cr.top - 10) + 'px';
                 }
             } else {
