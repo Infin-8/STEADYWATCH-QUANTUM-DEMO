@@ -20,6 +20,8 @@
     var BOUNCE_RADIUS = 0.58;
     var BOUNCE_RADIUS_432 = 0.72;
     var BOUNCE_BACK_FACTOR = 0.4;
+    var BOUNCE_DAMPING_432 = 0.88;
+    var MIN_BOUNCE_INTERVAL = 0.06; // in \"time\" units (see animate)
 
     function smoothstep(t) {
         t = t < 0 ? 0 : t > 1 ? 1 : t;
@@ -133,6 +135,7 @@
         var velocityVortex = new THREE.Vector3();
         var surfacePointVortex = new THREE.Vector3();
         var groupInvWorld = new THREE.Matrix4();
+        var tmpVelocity = new THREE.Vector3();
 
         function setBlock(bx, by, bz, blockType) {
             var key = blockKey(bx, by, bz);
@@ -158,6 +161,28 @@
                 hueShift: HUE_SHIFT_432,
                 emissiveIntensity: EMISSIVE_INTENSITY_432
             });
+
+            // Initialize per-key physics state so each sphere can collide/bounce individually.
+            if (drop && drop.group && drop.group.children) {
+                var i, child, baseLocal, outwardDir, speed;
+                for (i = 0; i < drop.group.children.length; i++) {
+                    child = drop.group.children[i];
+                    baseLocal = child.userData.baseLocalPosition;
+                    // Outward direction from center as initial direction; fallback to small random vector.
+                    if (baseLocal && (baseLocal.x !== 0 || baseLocal.y !== 0 || baseLocal.z !== 0)) {
+                        outwardDir = new THREE.Vector3(baseLocal.x, baseLocal.y, baseLocal.z).normalize();
+                    } else {
+                        outwardDir = new THREE.Vector3(Math.random() - 0.5, Math.random() - 0.5, Math.random() - 0.5).normalize();
+                    }
+                    // Small base speed so motion is subtle; scaled for 432.
+                    speed = 0.03 + Math.random() * 0.015;
+                    child.userData.velocity = outwardDir.multiplyScalar(speed);
+                    child.userData.lastBounceTime = -Infinity;
+                    // Approximate collision radius in world units (matches visual sphere size reasonably).
+                    child.userData.collisionRadius = 0.09;
+                }
+            }
+
             scene.add(drop.group);
             keyDrops.push(drop);
         }
@@ -407,6 +432,7 @@
                         orbitX = Math.cos(time * orbitSpeed + (style.teslaPhase || 0)) * orbitRadius * style.noiseFactor;
                         orbitY = Math.sin(time * orbitSpeed * 1.3 + (style.teslaPhase || 0)) * orbitRadius * style.noiseFactor;
                         orbitZ = Math.cos(time * orbitSpeed * 0.7 + (style.teslaPhase || 0)) * orbitRadius * style.noiseFactor;
+                        // Base orbital position around which per-key physics will operate.
                         child.position.set(
                             baseLocal.x + orbitX,
                             baseLocal.y + orbitY,
@@ -415,7 +441,7 @@
                     }
                 }
 
-                // BOUNCE PASS — reflect motion off ore (basketball dribble: ball comes right back)
+                // BOUNCE / PHYSICS PASS — per-key velocity + block collisions.
                 d.group.updateMatrixWorld(true);
                 groupInvWorld.getInverse(d.group.matrixWorld);
                 var nearestBlock, b, blockMesh, minDist, dist, prevWorld;
@@ -427,6 +453,12 @@
                         child.userData.previousWorldPosition = worldPosVortex.clone();
                         prevWorld = child.userData.previousWorldPosition;
                     }
+
+                    // Integrate per-key velocity in world space (simple Euler step).
+                    if (child.userData.velocity) {
+                        worldPosVortex.add(tmpVelocity.copy(child.userData.velocity));
+                    }
+
                     minDist = Infinity;
                     nearestBlock = null;
                     for (b = 0; b < blockMeshes.length; b++) {
@@ -438,14 +470,37 @@
                             nearestBlock = blockMesh;
                         }
                     }
-                    if (nearestBlock && minDist < BOUNCE_RADIUS_432) {
+
+                    var collisionRadius = child.userData.collisionRadius || BOUNCE_RADIUS_432;
+                    var lastBounce = typeof child.userData.lastBounceTime === 'number' ? child.userData.lastBounceTime : -Infinity;
+
+                    if (nearestBlock && minDist < collisionRadius && (time - lastBounce) > MIN_BOUNCE_INTERVAL) {
+                        // Compute collision normal and surface point on block.
                         bouncePushDir.copy(worldPosVortex).sub(nearestBlock.position).normalize();
-                        surfacePointVortex.copy(nearestBlock.position).add(bouncePushDir.clone().multiplyScalar(BOUNCE_RADIUS_432));
-                        velocityVortex.copy(worldPosVortex).sub(prevWorld).reflect(bouncePushDir);
-                        correctedWorldVortex.copy(surfacePointVortex).add(velocityVortex.multiplyScalar(BOUNCE_BACK_FACTOR));
+                        surfacePointVortex.copy(nearestBlock.position).add(bouncePushDir.clone().multiplyScalar(collisionRadius));
+
+                        // Reflect velocity around the normal; fall back to directional impulse if velocity is tiny.
+                        if (!child.userData.velocity) {
+                            child.userData.velocity = bouncePushDir.clone().multiplyScalar(0.02);
+                        }
+                        velocityVortex.copy(child.userData.velocity);
+                        var dot = velocityVortex.dot(bouncePushDir);
+                        if (Math.abs(dot) < 1e-4) {
+                            // Nudge velocity outward if nearly perpendicular to avoid sticking.
+                            velocityVortex.add(bouncePushDir.clone().multiplyScalar(0.02));
+                        } else {
+                            velocityVortex.sub(bouncePushDir.clone().multiplyScalar(2 * dot));
+                        }
+                        velocityVortex.multiplyScalar(BOUNCE_DAMPING_432);
+                        child.userData.velocity.copy(velocityVortex);
+
+                        correctedWorldVortex.copy(surfacePointVortex);
                         child.position.copy(correctedWorldVortex).applyMatrix4(groupInvWorld);
                         prevWorld.copy(correctedWorldVortex);
+                        child.userData.lastBounceTime = time;
                     } else {
+                        // No collision: just carry integrated position forward.
+                        child.position.copy(worldPosVortex).applyMatrix4(groupInvWorld);
                         prevWorld.copy(worldPosVortex);
                     }
                 }
