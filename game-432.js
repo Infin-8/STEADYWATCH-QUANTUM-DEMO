@@ -13,8 +13,8 @@
     var CLUSTER_RADIUS = 0.5 * 0.8;
     var CLUSTER_RADIUS_432 = 0.65;
     var HUE_SHIFT_432 = 0.08;
-    var EMISSIVE_INTENSITY_432 = 0.55;
-    var EMISSIVE_BOOST_432 = 0.35;
+    var EMISSIVE_INTENSITY_432 = 0.55 * 1.6;
+    var EMISSIVE_BOOST_432 = 1.35 * 1.45;
     var AVOID_NEAR = 0.4;
     var AVOID_FAR = 0.55;
     var BOUNCE_RADIUS = 0.58;
