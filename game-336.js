@@ -193,8 +193,8 @@
 
     // seed collison function
     function applyInterChildRepulsion() {
-    const REPULSION_RADIUS = 0.25;          // small — tune 0.18 to 0.35; covers satellite orbit + buffer
-    const REPULSION_FACTOR = 0.25;          // gentle push; lower than bounce to avoid jitter
+    const REPULSION_RADIUS = 0.45;          // small — tune 0.18 to 0.35; covers satellite orbit + buffer
+    const REPULSION_FACTOR = 0.35;          // gentle push; lower than bounce to avoid jitter
     const DAMPING = 0.85;                   // optional soften per-frame moves
 
     let childA, childB, posA, posB, dx, dy, dz, distSq, dist, overlap, nx, ny, nz, push;
