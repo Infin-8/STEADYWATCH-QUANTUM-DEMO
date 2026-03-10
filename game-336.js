@@ -450,7 +450,12 @@
                         lerpedY = baseLocal.y * eased;
                         lerpedZ = baseLocal.z * eased;
                         child.position.set(lerpedX, lerpedY, lerpedZ);
-                        applyInterChildRepulsion();   // or throttled version
+                       let repulsionFrame = 0;
+                    // in animate():
+                    repulsionFrame++;
+                    if (repulsionFrame % 4 === 0) {
+                    applyInterChildRepulsion();
+                }
                         
                     }
                 } else {
