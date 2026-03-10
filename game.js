@@ -10,7 +10,7 @@
     var TOTAL_P5 = 144;
     var TOTAL_P13 = 336;
     var CLUSTER_RADIUS = 0.5;
-    var AVOID_NEAR = 0.4;
+    var AVOID_NEAR = 0.55;
     var AVOID_FAR = 0.55;
     var BOUNCE_RADIUS = 0.58;
     var BOUNCE_RADIUS_BASE_EXPANDED = 0.72;
