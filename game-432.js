@@ -8,10 +8,10 @@
 
     var BLOCK = { AIR: 0, GROUND: 1, KEY_ORE_P5: 2, KEY_ORE_P13: 3 };
     var BLOCK_SIZE = 1;
-    var TOTAL_P5 = 144;
-    var TOTAL_P13 = 336;
+    var TOTAL_P5 = 144 * 2.2;
+    var TOTAL_P13 = 336 * 1.6;
     var CLUSTER_RADIUS = 0.5 * 0.8;
-    var CLUSTER_RADIUS_432 = 0.65;
+    var CLUSTER_RADIUS_432 = 0.65 * 0.85;
     var HUE_SHIFT_432 = 0.08;
     var EMISSIVE_INTENSITY_432 = 0.55 * 1.6;
     var EMISSIVE_BOOST_432 = 1.35 * 1.45;
