@@ -504,8 +504,9 @@
                         lerpedY = baseLocal.y * eased;
                         lerpedZ = baseLocal.z * eased;
                         child.position.set(lerpedX, lerpedY, lerpedZ);
-                    }
                 } else {
+                    let repulsionFrame = 0;
+                    repulsionFrame++;
                     var orbitRadius = 0.08;
                     var c, child, baseLocal, satIdx, orbitSpeed, orbitX, orbitY, orbitZ;
                     for (c = 0; c < d.group.children.length; c++) {
@@ -525,13 +526,11 @@
                             baseLocal.y + orbitY,
                             baseLocal.z + orbitZ
                         );
-                    }
-
-                    let repulsionFrame = 0;
                     // in animate():
-                    repulsionFrame++;
                     if (repulsionFrame % 4 === 0) {
                     applyInterChildRepulsion();
+                    }
+                    }
                 }
 
                 // Compute world positions and ensure previousWorldPosition is initialized
