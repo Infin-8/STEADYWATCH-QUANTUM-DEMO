@@ -217,6 +217,73 @@
         var DEFAULT_SHININESS = 100;
         var DEFAULT_SPECULAR = 0x111111;
 
+    // seed collison function
+    function applyInterChildRepulsion() {
+    const REPULSION_RADIUS = 0.45;          // small — tune 0.18 to 0.35; covers satellite orbit + buffer
+    const REPULSION_FACTOR = 0.35;          // gentle push; lower than bounce to avoid jitter
+    const DAMPING = 0.85;                   // optional soften per-frame moves
+
+    let childA, childB, posA, posB, dx, dy, dz, distSq, dist, overlap, nx, ny, nz, push;
+    let dropA, dropB;
+
+    // Only run if enough drops to matter
+    if (keyDrops.length < 2) return;
+
+    for (let i = 0; i < keyDrops.length; i++) {
+        dropA = keyDrops[i];
+        if (dropA.expansionProgress < 1) continue; // skip expanding ones to reduce noise
+
+        for (let j = i + 1; j < keyDrops.length; j++) {
+            dropB = keyDrops[j];
+            if (dropB.expansionProgress < 1) continue;
+
+            // Now check children between these two drops
+            for (let ca = 0; ca < dropA.group.children.length; ca++) {
+                childA = dropA.group.children[ca];
+                childA.getWorldPosition(worldPosVortex); // reuse your vortex vec or create temp
+                posA = worldPosVortex;
+
+                for (let cb = 0; cb < dropB.group.children.length; cb++) {
+                    childB = dropB.group.children[cb];
+                    childB.getWorldPosition(tempVec); // need a second temp vec3
+                    posB = tempVec;
+
+                    dx = posB.x - posA.x;
+                    dy = posB.y - posA.y;
+                    dz = posB.z - posA.z;
+                    distSq = dx*dx + dy*dy + dz*dz;
+
+                    if (distSq >= REPULSION_RADIUS * REPULSION_RADIUS * 4) continue; // early out
+
+                    dist = Math.sqrt(distSq) || 0.001;
+                    overlap = (REPULSION_RADIUS * 2) - dist;
+                    if (overlap <= 0) continue;
+
+                    nx = dx / dist;
+                    ny = dy / dist;
+                    nz = dz / dist;
+
+                    push = overlap * REPULSION_FACTOR;
+
+                    // Push A child away
+                    childA.position.x -= nx * push;
+                    childA.position.y -= ny * push;
+                    childA.position.z -= nz * push;
+
+                    // Push B child away
+                    childB.position.x += nx * push;
+                    childB.position.y += ny * push;
+                    childB.position.z += nz * push;
+
+                    // Optional: damp the move a bit to prevent oscillation
+                    childA.position.multiplyScalar(DAMPING);
+                    childB.position.multiplyScalar(DAMPING);
+                }
+            }
+        }
+    }
+}
+
         function resetClusterHoverEffect(drop) {
             if (!drop) return;
             drop.group.scale.set(1, 1, 1);
@@ -459,6 +526,12 @@
                             baseLocal.z + orbitZ
                         );
                     }
+
+                    let repulsionFrame = 0;
+                    // in animate():
+                    repulsionFrame++;
+                    if (repulsionFrame % 4 === 0) {
+                    applyInterChildRepulsion();
                 }
 
                 // Compute world positions and ensure previousWorldPosition is initialized
