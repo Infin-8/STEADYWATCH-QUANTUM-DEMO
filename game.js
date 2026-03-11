@@ -101,7 +101,7 @@
         return mesh;
     }
 
-    function initGame() {
+        function initGame() {
         var container = document.getElementById('game-container');
         if (!container || typeof THREE === 'undefined' || !window.HurwitzKeys || !window.UnifiedQubitStyling) {
             if (container) container.innerHTML = '<p style="padding:20px;">Load error: Three.js, HurwitzKeys, or UnifiedQubitStyling missing.</p>';
@@ -216,7 +216,6 @@
         var HOVER_SPECULAR = 0xaaccff;
         var DEFAULT_SHININESS = 100;
         var DEFAULT_SPECULAR = 0x111111;
-
 
         function resetClusterHoverEffect(drop) {
             if (!drop) return;
@@ -440,7 +439,6 @@
                         child.position.set(lerpedX, lerpedY, lerpedZ);
                     }
                 } else {
-      
                     var orbitRadius = 0.08;
                     var c, child, baseLocal, satIdx, orbitSpeed, orbitX, orbitY, orbitZ;
                     for (c = 0; c < d.group.children.length; c++) {
@@ -460,9 +458,8 @@
                             baseLocal.y + orbitY,
                             baseLocal.z + orbitZ
                         );
-   
                     }
-                
+                }
 
                 // Compute world positions and ensure previousWorldPosition is initialized
                 d.group.updateMatrixWorld(true);
@@ -510,7 +507,6 @@
                         posB.addScaledVector(collisionNormal, correction);
                     }
                 }
-            }
 
                 // BOUNCE PASS — reflect motion off ore (basketball dribble: ball comes right back)
                 var worldPos;
