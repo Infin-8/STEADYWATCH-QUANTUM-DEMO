@@ -462,7 +462,7 @@
                         );
    
                     }
-                }
+                
 
                 // Compute world positions and ensure previousWorldPosition is initialized
                 d.group.updateMatrixWorld(true);
