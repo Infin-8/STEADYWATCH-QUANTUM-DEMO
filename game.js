@@ -438,6 +438,7 @@
                         lerpedY = baseLocal.y * eased;
                         lerpedZ = baseLocal.z * eased;
                         child.position.set(lerpedX, lerpedY, lerpedZ);
+                    }
                 } else {
       
                     var orbitRadius = 0.08;
