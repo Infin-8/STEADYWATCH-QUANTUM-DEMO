@@ -509,6 +509,7 @@
                         posB.addScaledVector(collisionNormal, correction);
                     }
                 }
+            }
 
                 // BOUNCE PASS — reflect motion off ore (basketball dribble: ball comes right back)
                 var worldPos;
