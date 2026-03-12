@@ -512,7 +512,7 @@
                                 vel.z *= VEL_DAMPING;
                             }
                         } else {
-                            // Velocity settled — lerp toward orbit target so repulsion corrections persist
+                            // Velocity settled — hand off to orbit
                             if (vel) { vel.x = 0; vel.y = 0; vel.z = 0; }
                             satIdx = child.userData.satelliteIndex;
                             phase = (satIdx / d.total) * Math.PI * 2;
@@ -522,12 +522,11 @@
                             orbitX = Math.cos(time * orbitSpeed + (style.teslaPhase || 0)) * orbitRadius * style.noiseFactor;
                             orbitY = Math.sin(time * orbitSpeed * 1.3 + (style.teslaPhase || 0)) * orbitRadius * style.noiseFactor;
                             orbitZ = Math.cos(time * orbitSpeed * 0.7 + (style.teslaPhase || 0)) * orbitRadius * style.noiseFactor;
-                            var targetX = baseLocal.x + orbitX;
-                            var targetY = baseLocal.y + orbitY;
-                            var targetZ = baseLocal.z + orbitZ;
-                            child.position.x += (targetX - child.position.x) * 0.3;
-                            child.position.y += (targetY - child.position.y) * 0.3;
-                            child.position.z += (targetZ - child.position.z) * 0.3;
+                            child.position.set(
+                                baseLocal.x + orbitX,
+                                baseLocal.y + orbitY,
+                                baseLocal.z + orbitZ
+                            );
                         }
                     }
                 }
@@ -607,8 +606,6 @@
                 }
             }
 
-            // Run inter-drop repulsion every frame so corrections aren't stale
-            applyInterChildRepulsion();
 
             controls.update();
             renderer.render(scene, camera);
