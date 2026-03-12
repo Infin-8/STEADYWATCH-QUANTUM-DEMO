@@ -84,7 +84,7 @@
         if (!group || !mat) return { group: group, material: mat, prime: prime, keyIndex: keyIndex, total: totalKeys, basePosition: { x: wx, y: wy, z: wz }, expansionProgress: 0, expansionSpeed: 0.03 };
 
         group.position.set(wx, wy, wz);
-        var sharedGeom = new THREE.SphereGeometry(0.06, 8, 8);
+        var sharedGeom = new THREE.SphereGeometry(0.018, 8, 8);
         var i, pos, mesh;
         for (i = 0; i < totalKeys; i++) {
             pos = getFourWayVertexPosition(i, totalKeys, radius);
