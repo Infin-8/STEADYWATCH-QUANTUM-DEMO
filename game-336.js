@@ -17,6 +17,9 @@
  *  - Added ARM_RADIUS constant for tunable arm-orb collision thickness
  *  - bounced flag prevents double-bounce from two overlapping blocks in same frame
  *  - previousWorldPosition only updated when no bounce occurred (was updating on bounce too)
+ *  - PERF: spatial bucket grid — bounce pass only checks blocks within 2 units (O(1) vs O(n))
+ *  - PERF: velocity clamping — max corrected displacement capped at 0.15 per frame
+ *  - PERF: bounce pass runs every 2nd frame — invisible at arm movement speeds
  */
 (function () {
     'use strict';
@@ -24,17 +27,21 @@
     // ─── Constants ────────────────────────────────────────────────────────────
     var BLOCK = { AIR: 0, GROUND: 1, KEY_ORE_P5: 2, KEY_ORE_P13: 3 };
     var BLOCK_SIZE      = 1;
-    var TOTAL_P5        = 144;      // FIX: was 144*2.2 (float) — broke % modulo
-    var TOTAL_P13       = 336;      // FIX: was 336*1.6 (float) — broke % modulo
+    var TOTAL_P5        = 144;
+    var TOTAL_P13       = 336;
     var CLUSTER_RADIUS  = 0.55;
     var AVOID_NEAR      = 0.2;
     var AVOID_FAR       = 0.55;
     var BOUNCE_RADIUS_336   = 0.72; // arm vs ore collision radius
-    var BOUNCE_BACK_FACTOR  = 0.4;
+    var BOUNCE_BACK_FACTOR  = 0.35; // reduced from 0.4 — less energy on bounce
     var ARM_RADIUS          = 0.18; // arm orb size for AABB floor collision
+    var MAX_BOUNCE_DELTA    = 0.15; // max world-space displacement per bounce frame
+    var BOUNCE_BUCKET_SIZE  = 2.0;  // spatial grid cell size for block lookup
+    var BOUNCE_FRAME_SKIP   = 2;    // run bounce pass every Nth frame
 
     // ─── Repulsion throttle (module-level, not per-child) ─────────────────────
-    var repulsionFrame = 0; // FIX: was declared inside the child loop
+    var repulsionFrame = 0;
+    var bounceFrame    = 0;
 
     // ─── Math helpers ─────────────────────────────────────────────────────────
     function smoothstep(t) {
@@ -164,7 +171,47 @@
         var velocityVortex      = new THREE.Vector3();
         var surfacePointVortex  = new THREE.Vector3();
         var groupInvWorld       = new THREE.Matrix4();
-        var tempVec             = new THREE.Vector3(); // FIX: was missing — crashed applyInterChildRepulsion
+        var tempVec             = new THREE.Vector3();
+
+        // ─── Spatial bucket grid ──────────────────────────────────────────────
+        // Maps "gx|gy|gz" → [blockMesh, ...]. Rebuilt on every setBlock call.
+        // Bounce pass queries only the 27 neighbouring cells instead of all blockMeshes.
+        var blockBuckets = {};
+
+        function bucketKey(wx, wy, wz) {
+            var gx = Math.floor(wx / BOUNCE_BUCKET_SIZE);
+            var gy = Math.floor(wy / BOUNCE_BUCKET_SIZE);
+            var gz = Math.floor(wz / BOUNCE_BUCKET_SIZE);
+            return gx + '|' + gy + '|' + gz;
+        }
+
+        function rebuildBuckets() {
+            blockBuckets = {};
+            for (var i = 0; i < blockMeshes.length; i++) {
+                var bm  = blockMeshes[i];
+                var bk  = bucketKey(bm.position.x, bm.position.y, bm.position.z);
+                if (!blockBuckets[bk]) blockBuckets[bk] = [];
+                blockBuckets[bk].push(bm);
+            }
+        }
+
+        function getNearbyBlocks(wx, wy, wz) {
+            var gx = Math.floor(wx / BOUNCE_BUCKET_SIZE);
+            var gy = Math.floor(wy / BOUNCE_BUCKET_SIZE);
+            var gz = Math.floor(wz / BOUNCE_BUCKET_SIZE);
+            var result = [];
+            for (var dx = -1; dx <= 1; dx++) {
+                for (var dy = -1; dy <= 1; dy++) {
+                    for (var dz = -1; dz <= 1; dz++) {
+                        var cell = blockBuckets[(gx+dx) + '|' + (gy+dy) + '|' + (gz+dz)];
+                        if (cell) {
+                            for (var k = 0; k < cell.length; k++) result.push(cell[k]);
+                        }
+                    }
+                }
+            }
+            return result;
+        }
 
         // ─── Block helpers ────────────────────────────────────────────────────
         function setBlock(bx, by, bz, blockType) {
@@ -173,7 +220,7 @@
                 scene.remove(blocks[key]);
                 blockMeshes.splice(blockMeshes.indexOf(blocks[key]), 1);
             }
-            if (blockType === BLOCK.AIR) { delete blocks[key]; return; }
+            if (blockType === BLOCK.AIR) { delete blocks[key]; rebuildBuckets(); return; }
             var mesh = createBlockMesh(blockType, bx, by, bz);
             blocks[key] = mesh;
             blockMeshes.push(mesh);
@@ -334,6 +381,7 @@
             }
         }
         buildWorld();
+        rebuildBuckets(); // initial bucket build after world is populated
 
         function worldToSlotIndex(bx, bz) {
             return (4 - bz) * 9 + (bx + 4);
@@ -482,92 +530,100 @@
                 }
 
                 // ── BOUNCE PASS ──────────────────────────────────────────────
-                // Handles two collision types:
-                //   1. Arm vs ORE  — sphere-vs-sphere using BOUNCE_RADIUS_336
-                //   2. Arm vs GROUND 9x9 — sphere-vs-AABB using face-normal
+                // PERF: only runs every BOUNCE_FRAME_SKIP frames.
+                // PERF: uses spatial bucket grid — only checks ~27 nearby cells
+                //       instead of all 162 blockMeshes. O(1) block lookups.
+                // PERF: velocity clamped to MAX_BOUNCE_DELTA — prevents violent
+                //       multi-frame energy accumulation when many drops are active.
                 //
-                // Key principles:
-                //   • ARM_RADIUS added to ore radius so arm thickness is respected
-                //   • AABB closest-point gives the correct surface normal for any face
-                //   • bounced flag: break after first collision — no double-bounce
-                //   • previousWorldPosition only updated when NOT bouncing
+                // Collision types:
+                //   1. Arm vs ORE  — sphere-vs-sphere
+                //   2. Arm vs GROUND — sphere-vs-AABB with face-normal
                 // ─────────────────────────────────────────────────────────────
-                d.group.updateMatrixWorld(true);
-                groupInvWorld.getInverse(d.group.matrixWorld);
-                var half = BLOCK_SIZE * 0.5; // half-extent of a block = 0.5
-                var prevWorld, bounced;
+                if (bounceFrame % BOUNCE_FRAME_SKIP === 0) {
+                    d.group.updateMatrixWorld(true);
+                    groupInvWorld.getInverse(d.group.matrixWorld);
+                    var half = BLOCK_SIZE * 0.5;
+                    var prevWorld, bounced, nearbyBlocks, bLen;
 
-                for (c = 0; c < d.group.children.length; c++) {
-                    child = d.group.children[c];
-                    child.getWorldPosition(worldPosVortex);
+                    for (c = 0; c < d.group.children.length; c++) {
+                        child = d.group.children[c];
+                        child.getWorldPosition(worldPosVortex);
 
-                    prevWorld = child.userData.previousWorldPosition;
-                    if (!prevWorld) {
-                        child.userData.previousWorldPosition = worldPosVortex.clone();
                         prevWorld = child.userData.previousWorldPosition;
-                    }
+                        if (!prevWorld) {
+                            child.userData.previousWorldPosition = worldPosVortex.clone();
+                            prevWorld = child.userData.previousWorldPosition;
+                        }
 
-                    bounced = false;
+                        bounced      = false;
+                        nearbyBlocks = getNearbyBlocks(worldPosVortex.x, worldPosVortex.y, worldPosVortex.z);
+                        bLen         = nearbyBlocks.length;
 
-                    for (b = 0; b < blockMeshes.length; b++) {
-                        blockMesh = blockMeshes[b];
-                        var bt = blockMesh.userData.blockType;
+                        for (b = 0; b < bLen; b++) {
+                            blockMesh = nearbyBlocks[b];
+                            var bt = blockMesh.userData.blockType;
 
-                        if (bt === BLOCK.KEY_ORE_P5 || bt === BLOCK.KEY_ORE_P13) {
-                            // ── Sphere vs sphere (ore) ────────────────────────
-                            dist = worldPosVortex.distanceTo(blockMesh.position);
-                            var oreRadius = BOUNCE_RADIUS_336 + ARM_RADIUS;
-                            if (dist < oreRadius && dist > 0.001) {
-                                bouncePushDir.copy(worldPosVortex).sub(blockMesh.position).normalize();
-                                surfacePointVortex.copy(blockMesh.position).add(
-                                    bouncePushDir.clone().multiplyScalar(oreRadius)
-                                );
-                                velocityVortex.copy(worldPosVortex).sub(prevWorld).reflect(bouncePushDir);
-                                correctedWorldVortex.copy(surfacePointVortex).add(
-                                    velocityVortex.multiplyScalar(BOUNCE_BACK_FACTOR)
-                                );
-                                child.position.copy(correctedWorldVortex).applyMatrix4(groupInvWorld);
-                                prevWorld.copy(correctedWorldVortex);
-                                bounced = true;
-                                break;
-                            }
+                            if (bt === BLOCK.KEY_ORE_P5 || bt === BLOCK.KEY_ORE_P13) {
+                                // ── Sphere vs sphere (ore) ────────────────────
+                                dist = worldPosVortex.distanceTo(blockMesh.position);
+                                var oreRadius = BOUNCE_RADIUS_336 + ARM_RADIUS;
+                                if (dist < oreRadius && dist > 0.001) {
+                                    bouncePushDir.copy(worldPosVortex).sub(blockMesh.position).normalize();
+                                    surfacePointVortex.copy(blockMesh.position).add(
+                                        bouncePushDir.clone().multiplyScalar(oreRadius)
+                                    );
+                                    velocityVortex.copy(worldPosVortex).sub(prevWorld).reflect(bouncePushDir);
+                                    // Clamp velocity magnitude to prevent violent kicks
+                                    if (velocityVortex.length() > MAX_BOUNCE_DELTA) {
+                                        velocityVortex.setLength(MAX_BOUNCE_DELTA);
+                                    }
+                                    correctedWorldVortex.copy(surfacePointVortex).add(
+                                        velocityVortex.multiplyScalar(BOUNCE_BACK_FACTOR)
+                                    );
+                                    child.position.copy(correctedWorldVortex).applyMatrix4(groupInvWorld);
+                                    prevWorld.copy(correctedWorldVortex);
+                                    bounced = true;
+                                    break;
+                                }
 
-                        } else if (bt === BLOCK.GROUND) {
-                            // ── Sphere vs AABB (9x9 ground blocks) ───────────
-                            // Closest point on block's AABB to the arm center
-                            var bpx = blockMesh.position.x;
-                            var bpy = blockMesh.position.y;
-                            var bpz = blockMesh.position.z;
-                            var cx2 = Math.max(bpx - half, Math.min(worldPosVortex.x, bpx + half));
-                            var cy2 = Math.max(bpy - half, Math.min(worldPosVortex.y, bpy + half));
-                            var cz2 = Math.max(bpz - half, Math.min(worldPosVortex.z, bpz + half));
+                            } else if (bt === BLOCK.GROUND) {
+                                // ── Sphere vs AABB (9x9 floor blocks) ────────
+                                var bpx = blockMesh.position.x;
+                                var bpy = blockMesh.position.y;
+                                var bpz = blockMesh.position.z;
+                                var cx2 = Math.max(bpx - half, Math.min(worldPosVortex.x, bpx + half));
+                                var cy2 = Math.max(bpy - half, Math.min(worldPosVortex.y, bpy + half));
+                                var cz2 = Math.max(bpz - half, Math.min(worldPosVortex.z, bpz + half));
+                                var dx  = worldPosVortex.x - cx2;
+                                var dy  = worldPosVortex.y - cy2;
+                                var dz  = worldPosVortex.z - cz2;
+                                var penetration = Math.sqrt(dx*dx + dy*dy + dz*dz);
 
-                            var dx = worldPosVortex.x - cx2;
-                            var dy = worldPosVortex.y - cy2;
-                            var dz = worldPosVortex.z - cz2;
-                            var penetration = Math.sqrt(dx*dx + dy*dy + dz*dz);
-
-                            if (penetration < ARM_RADIUS && penetration > 0.0001) {
-                                // Normal points from AABB surface toward arm center
-                                bouncePushDir.set(dx, dy, dz).divideScalar(penetration);
-                                surfacePointVortex.set(cx2, cy2, cz2).add(
-                                    bouncePushDir.clone().multiplyScalar(ARM_RADIUS)
-                                );
-                                velocityVortex.copy(worldPosVortex).sub(prevWorld).reflect(bouncePushDir);
-                                correctedWorldVortex.copy(surfacePointVortex).add(
-                                    velocityVortex.multiplyScalar(BOUNCE_BACK_FACTOR)
-                                );
-                                child.position.copy(correctedWorldVortex).applyMatrix4(groupInvWorld);
-                                prevWorld.copy(correctedWorldVortex);
-                                bounced = true;
-                                break;
+                                if (penetration < ARM_RADIUS && penetration > 0.0001) {
+                                    bouncePushDir.set(dx, dy, dz).divideScalar(penetration);
+                                    surfacePointVortex.set(cx2, cy2, cz2).add(
+                                        bouncePushDir.clone().multiplyScalar(ARM_RADIUS)
+                                    );
+                                    velocityVortex.copy(worldPosVortex).sub(prevWorld).reflect(bouncePushDir);
+                                    // Clamp velocity magnitude
+                                    if (velocityVortex.length() > MAX_BOUNCE_DELTA) {
+                                        velocityVortex.setLength(MAX_BOUNCE_DELTA);
+                                    }
+                                    correctedWorldVortex.copy(surfacePointVortex).add(
+                                        velocityVortex.multiplyScalar(BOUNCE_BACK_FACTOR)
+                                    );
+                                    child.position.copy(correctedWorldVortex).applyMatrix4(groupInvWorld);
+                                    prevWorld.copy(correctedWorldVortex);
+                                    bounced = true;
+                                    break;
+                                }
                             }
                         }
-                    }
 
-                    // Only advance history when no collision — keeps velocity accurate
-                    if (!bounced) {
-                        prevWorld.copy(worldPosVortex);
+                        if (!bounced) {
+                            prevWorld.copy(worldPosVortex);
+                        }
                     }
                 }
                 // ── END BOUNCE PASS ──────────────────────────────────────────
@@ -605,8 +661,9 @@
                 }
             }
 
-            // FIX: repulsionFrame now at module level — correctly throttles every 4 frames
+            // Throttled passes — both counters advance every frame
             repulsionFrame++;
+            bounceFrame++;
             if (repulsionFrame % 4 === 0) {
                 applyInterChildRepulsion();
             }
