@@ -369,9 +369,16 @@
                     setBlock(i, 0, j, BLOCK.GROUND);
                 }
             }
+            // Layer 1 (y=1): p=5 key ore (144 satellites)
             for (i = -4; i <= 4; i++) {
                 for (j = -4; j <= 4; j++) {
                     setBlock(i, 1, j, BLOCK.KEY_ORE_P5);
+                }
+            }
+            // Layer 2 (y=2): p=13 key ore (336 satellites)
+            for (i = -4; i <= 4; i++) {
+                for (j = -4; j <= 4; j++) {
+                    setBlock(i, 2, j, BLOCK.KEY_ORE_P13);
                 }
             }
         }
