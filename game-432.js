@@ -22,8 +22,6 @@
     var BOUNCE_BACK_FACTOR = 0.4;
     var SPHERE_COLLISION_RADIUS = 0.08;
     var SPHERE_COLLISION_DAMPING = 0.6;
-    var VEL_DAMPING = 0.80;
-    var SETTLE_SQ = 1e-6;
 
     function smoothstep(t) {
         t = t < 0 ? 0 : t > 1 ? 1 : t;
@@ -478,7 +476,6 @@
                 d.group.position.z = basePos.z + Math.sin(time * 0.6 + idx * 0.3) * wobble;
 
                 if (d.expansionProgress < 1) {
-                    var prevProgress = d.expansionProgress;
                     d.expansionProgress = Math.min(1, d.expansionProgress + (d.expansionSpeed || 0.03));
                     var eased = 1 - Math.pow(1 - d.expansionProgress, 2);
                     var baseLocal, lerpedX, lerpedY, lerpedZ;
@@ -490,23 +487,16 @@
                         lerpedY = baseLocal.y * eased;
                         lerpedZ = baseLocal.z * eased;
                         child.position.set(lerpedX, lerpedY, lerpedZ);
-                    }
-                    if (d.expansionProgress >= 1 && prevProgress < 1) {
-                        for (c = 0; c < d.group.children.length; c++) {
-                            child = d.group.children[c];
-                            baseLocal = child.userData.baseLocalPosition;
-                            if (!baseLocal) continue;
-                            var outLen = Math.sqrt(baseLocal.x*baseLocal.x + baseLocal.y*baseLocal.y + baseLocal.z*baseLocal.z) || 1;
-                            child.userData.vel = {
-                                x: (baseLocal.x / outLen) * 0.045,
-                                y: (baseLocal.y / outLen) * 0.045,
-                                z: (baseLocal.z / outLen) * 0.045
-                            };
+                    let repulsionFrame = 0;
+                    // in animate():
+                    repulsionFrame++;
+                    if (repulsionFrame % 4 === 0) {
+                    applyInterChildRepulsion();  
                         }
                     }
                 } else {
                     var orbitRadius = 0.12;
-                    var baseLocal, satIdx, orbitSpeed, orbitX, orbitY, orbitZ, vel, velSq;
+                    var baseLocal, satIdx, orbitSpeed, orbitX, orbitY, orbitZ;
                     for (c = 0; c < d.group.children.length; c++) {
                         child = d.group.children[c];
                         baseLocal = child.userData.baseLocalPosition;
@@ -519,27 +509,16 @@
                         orbitX = Math.cos(time * orbitSpeed + (style.teslaPhase || 0)) * orbitRadius * style.noiseFactor;
                         orbitY = Math.sin(time * orbitSpeed * 1.3 + (style.teslaPhase || 0)) * orbitRadius * style.noiseFactor;
                         orbitZ = Math.cos(time * orbitSpeed * 0.7 + (style.teslaPhase || 0)) * orbitRadius * style.noiseFactor;
-                        vel = child.userData.vel;
-                        velSq = vel ? vel.x*vel.x + vel.y*vel.y + vel.z*vel.z : 0;
-                        if (vel && velSq > SETTLE_SQ) {
-                            child.position.x += vel.x;
-                            child.position.y += vel.y;
-                            child.position.z += vel.z;
-                            vel.x *= VEL_DAMPING;
-                            vel.y *= VEL_DAMPING;
-                            vel.z *= VEL_DAMPING;
-                        } else {
-                            child.position.set(
-                                baseLocal.x + orbitX,
-                                baseLocal.y + orbitY,
-                                baseLocal.z + orbitZ
-                            );
-                        }
+                        child.position.set(
+                            baseLocal.x + orbitX,
+                            baseLocal.y + orbitY,
+                            baseLocal.z + orbitZ
+                        );
                     }
                 }
                 // Compute world positions and ensure previousWorldPosition is initialized
                 d.group.updateMatrixWorld(true);
-                groupInvWorld.copy(d.group.matrixWorld).invert();
+                groupInvWorld.getInverse(d.group.matrixWorld);
                 var children = d.group.children;
                 var b, blockMesh, minDist, dist, prevWorld;
                 for (c = 0; c < children.length; c++) {
@@ -594,16 +573,6 @@
                 var nearestBlock, worldPos;
                 for (c = 0; c < children.length; c++) {
                     child = children[c];
-                    var cv = child.userData.vel;
-                    if (cv && (cv.x * cv.x + cv.y * cv.y + cv.z * cv.z) > 1e-8) {
-                        worldPos = child.userData.worldPos;
-                        prevWorld = child.userData.previousWorldPosition;
-                        if (worldPos) {
-                            if (prevWorld) prevWorld.copy(worldPos);
-                            else child.userData.previousWorldPosition = worldPos.clone();
-                        }
-                        continue;
-                    }
                     worldPos = child.userData.worldPos;
                     if (!worldPos) continue;
                     prevWorld = child.userData.previousWorldPosition;
@@ -637,8 +606,6 @@
                 // Apply final world positions back to local space
                 for (c = 0; c < children.length; c++) {
                     child = children[c];
-                    var applyVel = child.userData.vel;
-                    if (applyVel && (applyVel.x * applyVel.x + applyVel.y * applyVel.y + applyVel.z * applyVel.z) > 1e-8) continue;
                     worldPos = child.userData.worldPos;
                     if (!worldPos) continue;
                     child.position.copy(worldPos).applyMatrix4(groupInvWorld);
