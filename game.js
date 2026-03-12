@@ -136,10 +136,10 @@
         var ambientLight = new THREE.AmbientLight(0x667eea, 0.4);
         scene.add(ambientLight);
         var pointLight1 = new THREE.PointLight(0x667eea, 1, 80);
-        pointLight1.position.set(12, 12, 12);
+        pointLight1.position.set(17, 10, 17);
         scene.add(pointLight1);
         var pointLight2 = new THREE.PointLight(0x764ba2, 0.8, 80);
-        pointLight2.position.set(-12, 12, -12);
+        pointLight2.position.set(-17, 10, -17);
         scene.add(pointLight2);
 
         var blocks = {};
