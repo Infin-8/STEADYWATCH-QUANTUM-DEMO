@@ -496,7 +496,6 @@
                 d.group.position.z = basePos.z + Math.sin(time * 0.6 + idx * 0.3) * wobble;
 
                 if (d.expansionProgress < 1) {
-                    var prevProgress = d.expansionProgress;
                     d.expansionProgress = Math.min(1, d.expansionProgress + (d.expansionSpeed || 0.03));
                     var eased = 1 - Math.pow(1 - d.expansionProgress, 2);
                     var c, child, baseLocal, lerpedX, lerpedY, lerpedZ;
@@ -509,22 +508,9 @@
                         lerpedZ = baseLocal.z * eased;
                         child.position.set(lerpedX, lerpedY, lerpedZ);
                     }
-                    if (d.expansionProgress >= 1 && prevProgress < 1) {
-                        for (c = 0; c < d.group.children.length; c++) {
-                            child = d.group.children[c];
-                            baseLocal = child.userData.baseLocalPosition;
-                            if (!baseLocal) continue;
-                            var outLen = Math.sqrt(baseLocal.x*baseLocal.x + baseLocal.y*baseLocal.y + baseLocal.z*baseLocal.z) || 1;
-                            child.userData.vel = {
-                                x: (baseLocal.x / outLen) * 0.045,
-                                y: (baseLocal.y / outLen) * 0.045,
-                                z: (baseLocal.z / outLen) * 0.045
-                            };
-                        }
-                    }
                 } else {
                     var orbitRadius = 0.08;
-                    var c, child, baseLocal, satIdx, orbitSpeed, orbitX, orbitY, orbitZ, vel, velSq;
+                    var c, child, baseLocal, satIdx, orbitSpeed, orbitX, orbitY, orbitZ;
                     for (c = 0; c < d.group.children.length; c++) {
                         child = d.group.children[c];
                         baseLocal = child.userData.baseLocalPosition;
@@ -537,22 +523,11 @@
                         orbitX = Math.cos(time * orbitSpeed + (style.teslaPhase || 0)) * orbitRadius * style.noiseFactor;
                         orbitY = Math.sin(time * orbitSpeed * 1.3 + (style.teslaPhase || 0)) * orbitRadius * style.noiseFactor;
                         orbitZ = Math.cos(time * orbitSpeed * 0.7 + (style.teslaPhase || 0)) * orbitRadius * style.noiseFactor;
-                        vel = child.userData.vel;
-                        velSq = vel ? vel.x*vel.x + vel.y*vel.y + vel.z*vel.z : 0;
-                        if (vel && velSq > SETTLE_SQ) {
-                            child.position.x += vel.x;
-                            child.position.y += vel.y;
-                            child.position.z += vel.z;
-                            vel.x *= VEL_DAMPING;
-                            vel.y *= VEL_DAMPING;
-                            vel.z *= VEL_DAMPING;
-                        } else {
-                            child.position.set(
-                                baseLocal.x + orbitX,
-                                baseLocal.y + orbitY,
-                                baseLocal.z + orbitZ
-                            );
-                        }
+                        child.position.set(
+                            baseLocal.x + orbitX,
+                            baseLocal.y + orbitY,
+                            baseLocal.z + orbitZ
+                        );
                     }
                 }
 
