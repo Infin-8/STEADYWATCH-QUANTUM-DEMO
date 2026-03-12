@@ -505,12 +505,6 @@
                         lerpedY = baseLocal.y * eased;
                         lerpedZ = baseLocal.z * eased;
                         child.position.set(lerpedX, lerpedY, lerpedZ);
-                     let repulsionFrame = 0;
-                    // in animate():
-                    repulsionFrame++;
-                    if (repulsionFrame % 4 === 0) {
-                    applyInterChildRepulsion();  
-                        }
                     }
                 } else {
                     var orbitRadius = 0.08;
@@ -537,7 +531,7 @@
 
                 // Compute world positions and ensure previousWorldPosition is initialized
                 d.group.updateMatrixWorld(true);
-                groupInvWorld.getInverse(d.group.matrixWorld);
+                groupInvWorld.copy(d.group.matrixWorld).invert();
                 var children = d.group.children;
                 var nearestBlock, b, blockMesh, minDist, dist, prevWorld;
                 for (c = 0; c < children.length; c++) {
@@ -586,6 +580,16 @@
                 var worldPos;
                 for (c = 0; c < children.length; c++) {
                     child = children[c];
+                    var cv = child.userData.vel;
+                    if (cv && (cv.x * cv.x + cv.y * cv.y + cv.z * cv.z) > 1e-8) {
+                        worldPos = child.userData.worldPos;
+                        prevWorld = child.userData.previousWorldPosition;
+                        if (worldPos) {
+                            if (prevWorld) prevWorld.copy(worldPos);
+                            else child.userData.previousWorldPosition = worldPos.clone();
+                        }
+                        continue;
+                    }
                     worldPos = child.userData.worldPos;
                     if (!worldPos) continue;
                     prevWorld = child.userData.previousWorldPosition;
@@ -619,6 +623,8 @@
                 // Apply final world positions back to local space
                 for (c = 0; c < children.length; c++) {
                     child = children[c];
+                    var applyVel = child.userData.vel;
+                    if (applyVel && (applyVel.x * applyVel.x + applyVel.y * applyVel.y + applyVel.z * applyVel.z) > 1e-8) continue;
                     worldPos = child.userData.worldPos;
                     if (!worldPos) continue;
                     child.position.copy(worldPos).applyMatrix4(groupInvWorld);
