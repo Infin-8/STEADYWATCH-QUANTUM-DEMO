@@ -85,9 +85,16 @@
 
         group.position.set(wx, wy, wz);
         var sharedGeom = new THREE.SphereGeometry(0.06, 8, 8);
-        var i, pos, mesh;
+        var i, pos, mesh, q, w, scale;
         for (i = 0; i < totalKeys; i++) {
-            pos = getFourWayVertexPosition(i, totalKeys, radius);
+            q = quats[i];
+            if (q) {
+                w = q.d;
+                scale = radius / (1 + Math.abs(w) * 0.1);
+                pos = { x: q.a * scale, y: q.b * scale, z: q.c * scale };
+            } else {
+                pos = { x: 0, y: 0, z: 0 };
+            }
             mesh = new THREE.Mesh(sharedGeom, mat.clone());
             mesh.position.set(0, 0, 0);
             mesh.userData.keyDropIndex = keyDropIndex;
