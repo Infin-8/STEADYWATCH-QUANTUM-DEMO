@@ -222,10 +222,14 @@
 
                     for (var ca = 0; ca < dropA.group.children.length; ca++) {
                         childA = dropA.group.children[ca];
+                        var vA = childA.userData.vel;
+                        if (vA && (vA.x * vA.x + vA.y * vA.y + vA.z * vA.z) > 1e-8) continue;
                         childA.getWorldPosition(worldPosVortex);
 
                         for (var cb = 0; cb < dropB.group.children.length; cb++) {
                             childB = dropB.group.children[cb];
+                            var vB = childB.userData.vel;
+                            if (vB && (vB.x * vB.x + vB.y * vB.y + vB.z * vB.z) > 1e-8) continue;
                             childB.getWorldPosition(tempVec);
 
                             dx = tempVec.x - worldPosVortex.x;
@@ -534,6 +538,14 @@
                 for (c = 0; c < d.group.children.length; c++) {
                     child = d.group.children[c];
                     child.getWorldPosition(worldPosVortex);
+                    // Skip bounce pass while vel reflection is active — both systems move positions
+                    // and they compound into unbounded displacement across multiple drops.
+                    var cv = child.userData.vel;
+                    if (cv && (cv.x * cv.x + cv.y * cv.y + cv.z * cv.z) > 1e-8) {
+                        if (child.userData.previousWorldPosition) child.userData.previousWorldPosition.copy(worldPosVortex);
+                        else child.userData.previousWorldPosition = worldPosVortex.clone();
+                        continue;
+                    }
                     prevWorld = child.userData.previousWorldPosition;
                     if (!prevWorld) {
                         child.userData.previousWorldPosition = worldPosVortex.clone();
