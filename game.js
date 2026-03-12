@@ -364,22 +364,16 @@
 
         function buildWorld() {
             var i, j;
-            // y=0: p=5 ore (144 satellites)
+            // y=0: p=5 ore (144 satellites) — hidden beneath crystal
             for (i = -4; i <= 4; i++) {
                 for (j = -4; j <= 4; j++) {
                     setBlock(i, 0, j, BLOCK.KEY_ORE_P5);
                 }
             }
-            // y=1: crystal
+            // y=1: crystal surface — user must rotate to mine beneath
             for (i = -4; i <= 4; i++) {
                 for (j = -4; j <= 4; j++) {
                     setBlock(i, 1, j, BLOCK.GROUND);
-                }
-            }
-            // y=2: p=13 ore (336 satellites)
-            for (i = -4; i <= 4; i++) {
-                for (j = -4; j <= 4; j++) {
-                    setBlock(i, 2, j, BLOCK.KEY_ORE_P13);
                 }
             }
         }
