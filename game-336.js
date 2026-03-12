@@ -472,7 +472,6 @@
                     }
                 } else {
                     var orbitRadius = 0.12;
-                    var REFLECT_RADIUS = 0.28;
                     var VEL_DAMPING = 0.80;
                     var SETTLE_SQ = 0.0001 * 0.0001;
                     var baseLocal, satIdx, orbitSpeed, orbitX, orbitY, orbitZ;
@@ -483,34 +482,13 @@
                         var vel = child.userData.vel;
                         var velSq = vel ? vel.x * vel.x + vel.y * vel.y + vel.z * vel.z : 0;
                         if (vel && velSq > SETTLE_SQ) {
-                            // Apply velocity
+                            // Outward burst — apply and decay, no reflection
                             child.position.x += vel.x;
                             child.position.y += vel.y;
                             child.position.z += vel.z;
-                            // Offset from base local position
-                            var ox = child.position.x - baseLocal.x;
-                            var oy = child.position.y - baseLocal.y;
-                            var oz = child.position.z - baseLocal.z;
-                            var oDist = Math.sqrt(ox * ox + oy * oy + oz * oz);
-                            // Reflect off boundary sphere around base position
-                            if (oDist > REFLECT_RADIUS) {
-                                var nx = ox / oDist;
-                                var ny = oy / oDist;
-                                var nz = oz / oDist;
-                                var dot = vel.x * nx + vel.y * ny + vel.z * nz;
-                                vel.x = (vel.x - 2 * dot * nx) * VEL_DAMPING;
-                                vel.y = (vel.y - 2 * dot * ny) * VEL_DAMPING;
-                                vel.z = (vel.z - 2 * dot * nz) * VEL_DAMPING;
-                                child.position.set(
-                                    baseLocal.x + nx * REFLECT_RADIUS,
-                                    baseLocal.y + ny * REFLECT_RADIUS,
-                                    baseLocal.z + nz * REFLECT_RADIUS
-                                );
-                            } else {
-                                vel.x *= VEL_DAMPING;
-                                vel.y *= VEL_DAMPING;
-                                vel.z *= VEL_DAMPING;
-                            }
+                            vel.x *= VEL_DAMPING;
+                            vel.y *= VEL_DAMPING;
+                            vel.z *= VEL_DAMPING;
                         } else {
                             // Velocity settled — hand off to orbit
                             if (vel) { vel.x = 0; vel.y = 0; vel.z = 0; }
