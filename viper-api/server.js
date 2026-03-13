@@ -227,10 +227,92 @@ app.get('/', (req, res) => {
     </div>
   </div>
 
+  <div class="section">
+    <div class="label">Lattice Fingerprint &nbsp;<span style="color:#2a4a6a;font-size:0.68rem;">p=13 · 336 F4 SITES · VIPER IDENTITY · 4 arms × 84 detection keys · brightness = arm activity</span></div>
+    <div style="display:flex;align-items:flex-start;gap:24px;">
+      <canvas id="fp-canvas" width="280" height="280" style="border:1px solid #1a3a2a;border-radius:4px;background:#060e0a;"></canvas>
+      <div style="font-size:0.72rem;color:#667eea;line-height:1.8;">
+        <div><span style="display:inline-block;width:10px;height:10px;border-radius:50%;background:#ff2d55;margin-right:6px;"></span>Arm 0 — Initial Access / Recon</div>
+        <div><span style="display:inline-block;width:10px;height:10px;border-radius:50%;background:#ff9500;margin-right:6px;"></span>Arm 1 — Lateral Movement</div>
+        <div><span style="display:inline-block;width:10px;height:10px;border-radius:50%;background:#667eea;margin-right:6px;"></span>Arm 2 — Exfiltration</div>
+        <div><span style="display:inline-block;width:10px;height:10px;border-radius:50%;background:#00e5ff;margin-right:6px;"></span>Arm 3 — Command &amp; Control</div>
+        <div style="margin-top:12px;color:#2a4a6a;font-size:0.68rem;">
+          VIPER's structural identity.<br>336 detection keys arranged<br>in the F4 lattice — the same<br>pattern as the 336-mode<br>Fingerprint View in the game.<br>Brightness shows which<br>threat vectors are active.
+        </div>
+        <div id="fp-hash" style="margin-top:12px;font-size:0.65rem;color:#1a3a2a;word-break:break-all;max-width:180px;"></div>
+      </div>
+    </div>
+  </div>
+
   <div class="footer">Auto-refreshes every 10s · Data persisted to viper-data.json · Port ${process.env.PORT || 5001}</div>
 
   <script>
     function id(x) { return document.getElementById(x); }
+
+    // --- Lattice Fingerprint Canvas ---
+    (function initFingerprintCanvas() {
+      const canvas = document.getElementById('fp-canvas');
+      if (!canvas) return;
+      const ctx = canvas.getContext('2d');
+      const W = canvas.width, H = canvas.height, CX = W / 2, CY = H / 2;
+      const ARM_COLORS = ['#ff2d55', '#ff9500', '#667eea', '#00e5ff'];
+      let sites = [], armActivity = [0, 0, 0, 0], maxActivity = 1, animFrame, t = 0;
+
+      function project(site) {
+        return { x: CX + site.x * 36, y: CY + site.y * 36 };
+      }
+
+      function draw() {
+        ctx.clearRect(0, 0, W, H);
+        ctx.strokeStyle = '#0a1f0d'; ctx.lineWidth = 0.5;
+        [40, 80, 120].forEach(r => {
+          ctx.beginPath(); ctx.arc(CX, CY, r, 0, Math.PI * 2); ctx.stroke();
+        });
+        const pulse = 0.5 + 0.5 * Math.sin(t * 0.04);
+        for (let i = 0; i < sites.length; i++) {
+          const s = sites[i];
+          const p = project(s);
+          const base = ARM_COLORS[s.arm] || '#667eea';
+          const activity = armActivity[s.arm] || 0;
+          const brightness = 0.18 + 0.82 * (activity / maxActivity) * (0.7 + pulse * 0.3);
+          ctx.globalAlpha = brightness;
+          if (brightness > 0.5) {
+            const g = ctx.createRadialGradient(p.x, p.y, 0, p.x, p.y, 6);
+            g.addColorStop(0, base + '44'); g.addColorStop(1, 'rgba(0,0,0,0)');
+            ctx.beginPath(); ctx.arc(p.x, p.y, 6, 0, Math.PI * 2);
+            ctx.fillStyle = g; ctx.fill();
+          }
+          ctx.beginPath(); ctx.arc(p.x, p.y, 2.2, 0, Math.PI * 2);
+          ctx.fillStyle = base; ctx.fill();
+        }
+        ctx.globalAlpha = 1;
+        t++;
+        animFrame = requestAnimationFrame(draw);
+      }
+
+      async function load() {
+        try {
+          const apiKey = id('apiKey') ? id('apiKey').value : '';
+          const [sitesRes, vectorsRes] = await Promise.all([
+            fetch('/auth/lattice-sites'),
+            fetch('/api/viper/vectors', { headers: { 'X-Viper-Api-Key': apiKey } })
+          ]);
+          const sitesData = await sitesRes.json();
+          sites = sitesData.sites || [];
+          if (vectorsRes.ok) {
+            const vData = await vectorsRes.json();
+            (vData.vectors || []).forEach(v => { armActivity[v.arm] = v.detections || 0; });
+            maxActivity = Math.max(...armActivity, 1);
+          }
+          const hashEl = document.getElementById('fp-hash');
+          if (hashEl && sitesData.hash) hashEl.textContent = 'ID: ' + sitesData.hash.slice(0, 24) + '…';
+          if (animFrame) cancelAnimationFrame(animFrame);
+          draw();
+        } catch (e) { console.warn('Fingerprint canvas load error:', e); }
+      }
+      load();
+    })();
+
     async function call(method, path, body, auth, outId) {
       const out = id(outId);
       out.textContent = '…';

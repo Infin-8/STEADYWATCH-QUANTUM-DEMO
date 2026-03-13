@@ -319,6 +319,29 @@ function mountLatticeAuth(app, options) {
       formula:    `24 × (${SERVER_PRIME} + 1) = ${24 * (SERVER_PRIME + 1)}`
     });
   });
+
+  // --------------------------------------------------------
+  // GET /auth/lattice-sites
+  // Returns the server's F4 sites projected to 2D for canvas rendering.
+  // Top-down view uses quaternion components (a, c) scaled by stereographic factor.
+  // Arm is the 2D quadrant: 0=Q1(+x+y), 1=Q2(-x+y), 2=Q3(-x-y), 3=Q4(+x-y)
+  // --------------------------------------------------------
+  const _sitesCache = {};
+  app.get('/auth/lattice-sites', (req, res) => {
+    if (_sitesCache[SERVER_PRIME]) return res.json(_sitesCache[SERVER_PRIME]);
+    const raw = generateF4Shell(SERVER_PRIME);
+    const sites = raw.map((q, i) => {
+      const [a, b, c, d] = q;
+      const scale = 1.0 / (1 + Math.abs(d) * 0.1);
+      const x = a * scale;
+      const y = c * scale;
+      const arm = (x >= 0 && y >= 0) ? 0 : (x < 0 && y >= 0) ? 1 : (x < 0 && y < 0) ? 2 : 3;
+      return { i, x, y, a, b, c, d, arm };
+    });
+    const result = { prime: SERVER_PRIME, hash: SERVER_HASH, site_count: raw.length, sites };
+    _sitesCache[SERVER_PRIME] = result;
+    return res.json(result);
+  });
 }
 
 // ---------------------------------------------------------------------------

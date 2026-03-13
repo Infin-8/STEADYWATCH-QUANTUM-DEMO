@@ -187,6 +187,27 @@ app.get('/', (req, res) => {
   </div>
 
   <div class="section">
+    <div class="label">Echo Phase &nbsp;<span style="color:#2a4a6a;font-size:0.68rem;">HARMONIC SYNC VIA UNSYNC · 4-satellite fusion · UTC clock · golden ratio offsets · φ = 1.618…</span></div>
+    <div style="display:flex;align-items:flex-start;gap:24px;flex-wrap:wrap;">
+      <canvas id="echo-canvas" width="200" height="200" style="border:1px solid #1a3a5a;border-radius:4px;background:#060e1a;flex-shrink:0;"></canvas>
+      <div style="flex:1;min-width:220px;">
+        <div id="echo-bars" style="font-size:0.72rem;font-family:monospace;line-height:2;"></div>
+        <div style="margin-top:10px;">
+          <div class="label" style="margin-bottom:4px;">Tesla 3 · 6 · 9</div>
+          <div id="tesla-bars" style="font-size:0.72rem;font-family:monospace;line-height:1.9;"></div>
+        </div>
+        <div style="margin-top:10px;color:#2a4a6a;font-size:0.68rem;line-height:1.8;">
+          L/R satellites orbit ±φ×0.1 from master.<br>
+          T/B satellites track master exactly (offset = 0).<br>
+          Fused signal = average of all 4 — the unsync IS the sync.<br>
+          When L wraps past 0, the fusion becomes non-trivial.<br>
+          <span style="color:#1a3a5a;margin-top:4px;display:block;">Seed: SHQKD-Echo-Resonance-81 → 81 slot keys</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="section">
     <div class="label">Recent activity</div>
     ${recent.length === 0
       ? '<div style="color:#2a4a6a;font-size:0.78rem;">No activity yet — mine a block in the 3D game to trigger a key release.</div>'
@@ -259,10 +280,227 @@ app.get('/', (req, res) => {
     </div>
   </div>
 
+  <div class="section">
+    <div class="label">Lattice Fingerprint &nbsp;<span style="color:#2a4a6a;font-size:0.68rem;">p=5 · 144 F4 SITES · VAULT IDENTITY · nodes 0–80 = vault slots · nodes 81–143 = moat</span></div>
+    <div style="display:flex;align-items:flex-start;gap:24px;">
+      <canvas id="fp-canvas" width="280" height="280" style="border:1px solid #1a3a5a;border-radius:4px;background:#060e1a;"></canvas>
+      <div style="font-size:0.72rem;color:#667eea;line-height:1.8;">
+        <div><span style="display:inline-block;width:10px;height:10px;border-radius:50%;background:#00e5ff;margin-right:6px;"></span>Crown — slot 0 (key zero)</div>
+        <div><span style="display:inline-block;width:10px;height:10px;border-radius:50%;background:#764ba2;margin-right:6px;"></span>Slot with payload stored</div>
+        <div><span style="display:inline-block;width:10px;height:10px;border-radius:50%;background:#1a2a3a;border:1px solid #2a4a6a;margin-right:6px;"></span>Empty vault slot (0–80)</div>
+        <div><span style="display:inline-block;width:10px;height:10px;border-radius:50%;background:#0d1f35;border:1px dashed #1a3a5a;margin-right:6px;"></span>Hurwitz moat (sites 81–143)</div>
+        <div style="margin-top:12px;color:#2a4a6a;font-size:0.68rem;">
+          This is your vault's structural<br>fingerprint — unique to p=5.<br>Same shape as Fingerprint View<br>in the 3D game, colored by<br>live slot occupancy.
+        </div>
+        <div id="fp-hash" style="margin-top:12px;font-size:0.65rem;color:#1a3a5a;word-break:break-all;max-width:180px;"></div>
+      </div>
+    </div>
+  </div>
+
   <div class="footer">Auto-refreshes every 10s · Data persisted to vault-data.json · Port ${process.env.PORT || 5003}</div>
 
   <script>
     function id(x) { return document.getElementById(x); }
+
+    // --- Lattice Fingerprint Canvas ---
+    (function initFingerprintCanvas() {
+      const canvas = document.getElementById('fp-canvas');
+      if (!canvas) return;
+      const ctx = canvas.getContext('2d');
+      const W = canvas.width, H = canvas.height, CX = W / 2, CY = H / 2;
+      let sites = [], filledSlots = new Set(), animFrame, t = 0;
+
+      function project(site) {
+        return { x: CX + site.x * 52, y: CY + site.y * 52 };
+      }
+
+      function hexAlpha(hex, a) {
+        const r = parseInt(hex.slice(1,3),16), g = parseInt(hex.slice(3,5),16), b = parseInt(hex.slice(5,7),16);
+        return 'rgba('+r+','+g+','+b+','+a+')';
+      }
+
+      function draw() {
+        ctx.clearRect(0, 0, W, H);
+        // Subtle grid rings for depth
+        ctx.strokeStyle = '#0d1f35'; ctx.lineWidth = 0.5;
+        [40, 80, 120].forEach(r => {
+          ctx.beginPath(); ctx.arc(CX, CY, r, 0, Math.PI * 2); ctx.stroke();
+        });
+        const pulse = 0.5 + 0.5 * Math.sin(t * 0.04);
+        for (let i = 0; i < sites.length; i++) {
+          const s = sites[i];
+          const p = project(s);
+          const isCrown = i === 0;
+          const isMoat = i >= 81;
+          const isFilled = filledSlots.has(i);
+          let color, r, glow = false;
+          if (isCrown) {
+            color = '#00e5ff'; r = 4.5; glow = true;
+          } else if (isMoat) {
+            color = '#0d2a3a'; r = 1.8;
+          } else if (isFilled) {
+            color = '#764ba2'; r = 3.5; glow = true;
+          } else {
+            color = '#1a2a3a'; r = 2.5;
+          }
+          if (glow) {
+            const gr = ctx.createRadialGradient(p.x, p.y, 0, p.x, p.y, r * 3);
+            gr.addColorStop(0, hexAlpha(color, 0.35));
+            gr.addColorStop(1, 'rgba(0,0,0,0)');
+            ctx.beginPath(); ctx.arc(p.x, p.y, r * 3, 0, Math.PI * 2);
+            ctx.fillStyle = gr; ctx.fill();
+          }
+          ctx.beginPath(); ctx.arc(p.x, p.y, r, 0, Math.PI * 2);
+          ctx.fillStyle = color; ctx.fill();
+          if (isMoat) {
+            ctx.strokeStyle = '#1a3a5a'; ctx.lineWidth = 0.4;
+            ctx.stroke();
+          }
+        }
+        t++;
+        animFrame = requestAnimationFrame(draw);
+      }
+
+      async function load() {
+        try {
+          const [sitesRes, slotsRes] = await Promise.all([
+            fetch('/auth/lattice-sites'),
+            fetch('/api/vault/slots')
+          ]);
+          const sitesData = await sitesRes.json();
+          const slotsData = await slotsRes.json();
+          sites = sitesData.sites || [];
+          (slotsData.filled || []).forEach(i => filledSlots.add(i));
+          const hashEl = document.getElementById('fp-hash');
+          if (hashEl && sitesData.hash) hashEl.textContent = 'ID: ' + sitesData.hash.slice(0, 24) + '…';
+          if (animFrame) cancelAnimationFrame(animFrame);
+          draw();
+        } catch (e) { console.warn('Fingerprint canvas load error:', e); }
+      }
+      load();
+    })();
+
+    // --- Live Echo Phase Display ---
+    (function initEchoPhase() {
+      var canvas = document.getElementById('echo-canvas');
+      if (!canvas) return;
+      var ctx = canvas.getContext('2d');
+      var CX = 100, CY = 100, RING = 74;
+      var PHI = 1.618033988749895, FACTOR = 0.1, DURATION = 10.0;
+
+      var SAT = [
+        { key: 'master',  label: 'M  Master',     color: '#c8d8e8', glowRgb: '200,216,232', r: 5 },
+        { key: 'left',    label: 'L  Left  −φ×f', color: '#ff6b6b', glowRgb: '255,107,107', r: 4 },
+        { key: 'right',   label: 'R  Right +φ×f', color: '#00e5ff', glowRgb: '0,229,255',   r: 4 },
+        { key: 'top',     label: 'T  Top   ±0',   color: '#ffcc00', glowRgb: '255,204,0',   r: 3.5 },
+        { key: 'fused',   label: '⊕  Fused',       color: '#764ba2', glowRgb: '118,75,162',  r: 5.5 }
+      ];
+
+      function calc() {
+        var utc = Date.now() / 1000;
+        var master = (utc / DURATION) % 1.0;
+        var left   = ((master - FACTOR * PHI) % 1.0 + 1.0) % 1.0;
+        var right  = (master + FACTOR * PHI) % 1.0;
+        var top    = master;
+        var fused  = (left + right + top + top) / 4.0;
+        return { master: master, left: left, right: right, top: top, fused: fused };
+      }
+
+      function phaseToXY(phase, r) {
+        var a = phase * 2 * Math.PI - Math.PI / 2;
+        return { x: CX + r * Math.cos(a), y: CY + r * Math.sin(a) };
+      }
+
+      function drawWheel(phases) {
+        ctx.clearRect(0, 0, 200, 200);
+        // Ring and tick marks
+        ctx.strokeStyle = '#0d1f35'; ctx.lineWidth = 1;
+        ctx.beginPath(); ctx.arc(CX, CY, RING, 0, Math.PI * 2); ctx.stroke();
+        [0, 0.25, 0.5, 0.75].forEach(function(t) {
+          var p = phaseToXY(t, RING); var p2 = phaseToXY(t, RING - 5);
+          ctx.beginPath(); ctx.moveTo(p.x, p.y); ctx.lineTo(p2.x, p2.y); ctx.stroke();
+        });
+        // Center dot
+        ctx.beginPath(); ctx.arc(CX, CY, 2, 0, Math.PI * 2);
+        ctx.fillStyle = '#1a2a3a'; ctx.fill();
+
+        // Draw fused line first (under dots)
+        var fp = phaseToXY(phases.fused, RING);
+        ctx.beginPath(); ctx.moveTo(CX, CY); ctx.lineTo(fp.x, fp.y);
+        ctx.strokeStyle = 'rgba(118,75,162,0.3)'; ctx.lineWidth = 2; ctx.stroke();
+
+        // Draw satellite lines and dots
+        var keys = ['left', 'right', 'top', 'master'];
+        keys.forEach(function(k) {
+          var s = SAT.find(function(x) { return x.key === k; });
+          var pp = phaseToXY(phases[k === 'top' ? 'top' : k], RING * 0.9);
+          ctx.beginPath(); ctx.moveTo(CX, CY); ctx.lineTo(pp.x, pp.y);
+          ctx.strokeStyle = 'rgba(' + s.glowRgb + ',0.18)'; ctx.lineWidth = 1; ctx.stroke();
+          // Glow
+          var g = ctx.createRadialGradient(pp.x, pp.y, 0, pp.x, pp.y, s.r * 3);
+          g.addColorStop(0, 'rgba(' + s.glowRgb + ',0.35)');
+          g.addColorStop(1, 'rgba(0,0,0,0)');
+          ctx.beginPath(); ctx.arc(pp.x, pp.y, s.r * 3, 0, Math.PI * 2);
+          ctx.fillStyle = g; ctx.fill();
+          // Dot
+          ctx.beginPath(); ctx.arc(pp.x, pp.y, s.r, 0, Math.PI * 2);
+          ctx.fillStyle = s.color; ctx.fill();
+        });
+
+        // Fused dot (on top of everything)
+        var fg = ctx.createRadialGradient(fp.x, fp.y, 0, fp.x, fp.y, 18);
+        fg.addColorStop(0, 'rgba(118,75,162,0.5)');
+        fg.addColorStop(1, 'rgba(0,0,0,0)');
+        ctx.beginPath(); ctx.arc(fp.x, fp.y, 18, 0, Math.PI * 2);
+        ctx.fillStyle = fg; ctx.fill();
+        ctx.beginPath(); ctx.arc(fp.x, fp.y, 5.5, 0, Math.PI * 2);
+        ctx.fillStyle = '#764ba2'; ctx.fill();
+
+        // Phase label at 12-oclock position
+        ctx.fillStyle = '#2a4a6a'; ctx.font = '9px monospace'; ctx.textAlign = 'center';
+        ctx.fillText('0.0', CX, CY - RING - 6);
+        ctx.fillText('0.5', CX, CY + RING + 13);
+        ctx.textAlign = 'left';
+      }
+
+      function bar(phase, color) {
+        var filled = Math.round(phase * 28);
+        var empty  = 28 - filled;
+        var bar    = '';
+        for (var i = 0; i < filled; i++) bar += '█';
+        for (var j = 0; j < empty;  j++) bar += '░';
+        return '<span style="color:' + color + '">' + bar + '</span>'
+          + '<span style="color:#2a4a6a;margin-left:6px;">' + phase.toFixed(4) + '</span>';
+      }
+
+      function drawBars(phases) {
+        var barsEl = document.getElementById('echo-bars');
+        if (!barsEl) return;
+        var rows = SAT.map(function(s) {
+          var v = s.key === 'top' ? phases.top : phases[s.key];
+          return '<div><span style="color:#667eea;display:inline-block;width:120px;">' + s.label + '</span>' + bar(v, s.color) + '</div>';
+        });
+        barsEl.innerHTML = rows.join('');
+
+        var teslaEl = document.getElementById('tesla-bars');
+        if (!teslaEl) return;
+        var harmonics = [[3,'#00c853'],[6,'#667eea'],[9,'#ff9500']];
+        var trows = harmonics.map(function(h) {
+          var v = (phases.master * h[0]) % 1.0;
+          return '<div><span style="color:#667eea;display:inline-block;width:120px;">' + h[0] + 'x harmonic</span>' + bar(v, h[1]) + '</div>';
+        });
+        teslaEl.innerHTML = trows.join('');
+      }
+
+      function tick() {
+        var phases = calc();
+        drawWheel(phases);
+        drawBars(phases);
+        requestAnimationFrame(tick);
+      }
+      tick();
+    })();
+
     async function call(method, path, body, auth, outId) {
       const out = id(outId);
       out.textContent = '…';

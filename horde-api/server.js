@@ -222,10 +222,92 @@ app.get('/', (req, res) => {
     </div>
   </div>
 
+  <div class="section">
+    <div class="label">Lattice Fingerprint &nbsp;<span style="color:#2a4a6a;font-size:0.68rem;">p=17 · 432 F4 SITES · HORDE IDENTITY · 4 clusters × 108 nodes · densest F4 shell in the Trinity · brightness = cluster activations</span></div>
+    <div style="display:flex;align-items:flex-start;gap:24px;">
+      <canvas id="fp-canvas" width="280" height="280" style="border:1px solid #1a2a3a;border-radius:4px;background:#060a0e;"></canvas>
+      <div style="font-size:0.72rem;color:#667eea;line-height:1.8;">
+        <div><span style="display:inline-block;width:10px;height:10px;border-radius:50%;background:#00e5ff;margin-right:6px;"></span>Cluster 0 — Primary Defense</div>
+        <div><span style="display:inline-block;width:10px;height:10px;border-radius:50%;background:#667eea;margin-right:6px;"></span>Cluster 1 — Secondary Defense</div>
+        <div><span style="display:inline-block;width:10px;height:10px;border-radius:50%;background:#00c853;margin-right:6px;"></span>Cluster 2 — Tertiary Defense</div>
+        <div><span style="display:inline-block;width:10px;height:10px;border-radius:50%;background:#ff9500;margin-right:6px;"></span>Cluster 3 — Reserve Swarm</div>
+        <div style="margin-top:12px;color:#2a4a6a;font-size:0.68rem;">
+          HORDE's structural identity.<br>432 swarm nodes — the largest<br>and densest F4 shell in the<br>three-server Trinity. This<br>same pattern appears as<br>432-mode Fingerprint View<br>in the 3D game. Brightness<br>reflects consensus activity.
+        </div>
+        <div id="fp-hash" style="margin-top:12px;font-size:0.65rem;color:#1a2a3a;word-break:break-all;max-width:180px;"></div>
+      </div>
+    </div>
+  </div>
+
   <div class="footer">Auto-refreshes every 10s · Data persisted to horde-data.json · Port ${process.env.PORT || 5002}</div>
 
   <script>
     function id(x) { return document.getElementById(x); }
+
+    // --- Lattice Fingerprint Canvas ---
+    (function initFingerprintCanvas() {
+      const canvas = document.getElementById('fp-canvas');
+      if (!canvas) return;
+      const ctx = canvas.getContext('2d');
+      const W = canvas.width, H = canvas.height, CX = W / 2, CY = H / 2;
+      const CLUSTER_COLORS = ['#00e5ff', '#667eea', '#00c853', '#ff9500'];
+      let sites = [], clusterActivity = [0, 0, 0, 0], maxActivity = 1, animFrame, t = 0;
+
+      function project(site) {
+        return { x: CX + site.x * 30, y: CY + site.y * 30 };
+      }
+
+      function draw() {
+        ctx.clearRect(0, 0, W, H);
+        ctx.strokeStyle = '#0a0f18'; ctx.lineWidth = 0.5;
+        [40, 80, 120].forEach(r => {
+          ctx.beginPath(); ctx.arc(CX, CY, r, 0, Math.PI * 2); ctx.stroke();
+        });
+        const pulse = 0.5 + 0.5 * Math.sin(t * 0.04);
+        for (let i = 0; i < sites.length; i++) {
+          const s = sites[i];
+          const p = project(s);
+          const base = CLUSTER_COLORS[s.arm] || '#667eea';
+          const activity = clusterActivity[s.arm] || 0;
+          const brightness = 0.15 + 0.85 * (activity / maxActivity) * (0.7 + pulse * 0.3);
+          ctx.globalAlpha = brightness;
+          if (brightness > 0.45) {
+            const g = ctx.createRadialGradient(p.x, p.y, 0, p.x, p.y, 5);
+            g.addColorStop(0, base + '33'); g.addColorStop(1, 'rgba(0,0,0,0)');
+            ctx.beginPath(); ctx.arc(p.x, p.y, 5, 0, Math.PI * 2);
+            ctx.fillStyle = g; ctx.fill();
+          }
+          ctx.beginPath(); ctx.arc(p.x, p.y, 1.8, 0, Math.PI * 2);
+          ctx.fillStyle = base; ctx.fill();
+        }
+        ctx.globalAlpha = 1;
+        t++;
+        animFrame = requestAnimationFrame(draw);
+      }
+
+      async function load() {
+        try {
+          const apiKey = id('apiKey') ? id('apiKey').value : '';
+          const [sitesRes, clustersRes] = await Promise.all([
+            fetch('/auth/lattice-sites'),
+            fetch('/api/horde/clusters', { headers: { 'X-Horde-Api-Key': apiKey } })
+          ]);
+          const sitesData = await sitesRes.json();
+          sites = sitesData.sites || [];
+          if (clustersRes.ok) {
+            const cData = await clustersRes.json();
+            (cData.clusters || []).forEach(c => { clusterActivity[c.cluster] = c.activations || 0; });
+            maxActivity = Math.max(...clusterActivity, 1);
+          }
+          const hashEl = document.getElementById('fp-hash');
+          if (hashEl && sitesData.hash) hashEl.textContent = 'ID: ' + sitesData.hash.slice(0, 24) + '…';
+          if (animFrame) cancelAnimationFrame(animFrame);
+          draw();
+        } catch (e) { console.warn('Fingerprint canvas load error:', e); }
+      }
+      load();
+    })();
+
     async function call(method, path, body, auth, outId) {
       const out = id(outId);
       out.textContent = '…';
