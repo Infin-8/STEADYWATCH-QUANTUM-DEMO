@@ -552,12 +552,14 @@
                 var radiusBase = SPHERE_COLLISION_RADIUS;
                 for (i = 0; i < children.length; i++) {
                     childA = children[i];
+                    if (childA.userData.isGlassSphere) continue;
                     posA = childA.userData.worldPos;
                     prevA = childA.userData.previousWorldPosition;
                     if (!posA || !prevA) continue;
                     armA = childA.userData.armIndex;
                     for (j = i + 1; j < children.length; j++) {
                         childB = children[j];
+                        if (childB.userData.isGlassSphere) continue;
                         posB = childB.userData.worldPos;
                         prevB = childB.userData.previousWorldPosition;
                         if (!posB || !prevB) continue;
