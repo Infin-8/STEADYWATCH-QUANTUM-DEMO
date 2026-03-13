@@ -199,6 +199,21 @@
                 mesh.userData.satelliteIndex = i;
                 group.add(mesh);
             }
+            // Nucleus sphere — compact core protected by the Hurwitz quaternion cluster
+            var nucleusMat = new THREE.MeshPhongMaterial({
+                color: new THREE.Color().setHSL((keyIndex / total) % 1, 0.6, 0.85),
+                emissive: col,
+                emissiveIntensity: 0.35,
+                shininess: 180,
+                transparent: true,
+                opacity: 0.45,
+                side: THREE.FrontSide,
+                depthWrite: false
+            });
+            var nucleusSphere = new THREE.Mesh(new THREE.SphereGeometry(CLUSTER_RADIUS * 0.22, 32, 32), nucleusMat);
+            nucleusSphere.userData.isGlassSphere = true;
+            group.add(nucleusSphere);
+
             scene.add(group);
             keyDrops.push({
                 group: group,
@@ -237,7 +252,9 @@
             var list = [];
             for (var i = 0; i < keyDrops.length; i++) {
                 var children = keyDrops[i].group.children;
-                for (var c = 0; c < children.length; c++) list.push(children[c]);
+                for (var c = 0; c < children.length; c++) {
+                    if (!children[c].userData.isGlassSphere) list.push(children[c]);
+                }
             }
             return list;
         }
@@ -270,11 +287,13 @@
             // Now check children between these two drops
             for (let ca = 0; ca < dropA.group.children.length; ca++) {
                 childA = dropA.group.children[ca];
+                if (childA.userData.isGlassSphere) continue;
                 childA.getWorldPosition(worldPosVortex); // reuse your vortex vec or create temp
                 posA = worldPosVortex;
 
                 for (let cb = 0; cb < dropB.group.children.length; cb++) {
                     childB = dropB.group.children[cb];
+                    if (childB.userData.isGlassSphere) continue;
                     childB.getWorldPosition(tempVec); // need a second temp vec3
                     posB = tempVec;
 
@@ -590,6 +609,7 @@
                 var worldPos;
                 for (c = 0; c < children.length; c++) {
                     child = children[c];
+                    if (child.userData.isGlassSphere) continue;
                     var cv = child.userData.vel;
                     if (cv && (cv.x * cv.x + cv.y * cv.y + cv.z * cv.z) > 1e-8) {
                         worldPos = child.userData.worldPos;
@@ -652,6 +672,11 @@
                     var b, blockMesh, minDist, dist, t, factor;
                     for (c = 0; c < d.group.children.length; c++) {
                         child = d.group.children[c];
+                        if (child.userData.isGlassSphere) {
+                            child.material.emissive.setHSL(hue, 0.7, 0.08);
+                            child.material.emissiveIntensity = 0.25 + style.glowIntensity * 0.3;
+                            continue;
+                        }
                         child.material.color.setHSL(hue, sat, light);
                         child.material.emissive.setHSL(hue, 0.7, style.glowIntensity * 2);
                         child.getWorldPosition(worldPosVortex);

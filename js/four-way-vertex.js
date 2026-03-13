@@ -96,18 +96,18 @@
             group.add(mesh);
         }
 
-        // Glass sphere shell — transparent outer casing containing the 4-arm vertex
+        // Nucleus sphere — compact core protected by the Hurwitz quaternion arms
         var glassMat = new THREE.MeshPhongMaterial({
-            color: new THREE.Color().setHSL(hue, 0.25, 0.92),
+            color: new THREE.Color().setHSL(hue, 0.6, 0.85),
             emissive: col,
-            emissiveIntensity: 0.05,
-            shininess: 220,
+            emissiveIntensity: 0.35,
+            shininess: 180,
             transparent: true,
-            opacity: 0.13,
+            opacity: 0.45,
             side: THREE.FrontSide,
             depthWrite: false
         });
-        var glassSphere = new THREE.Mesh(new THREE.SphereGeometry(radius * 1.18, 32, 32), glassMat);
+        var glassSphere = new THREE.Mesh(new THREE.SphereGeometry(radius * 0.22, 32, 32), glassMat);
         glassSphere.userData.isGlassSphere = true;
         group.add(glassSphere);
 
