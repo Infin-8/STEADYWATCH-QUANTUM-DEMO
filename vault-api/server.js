@@ -394,6 +394,11 @@ app.delete('/api/vault/configs/:id', authMiddleware, (req, res) => {
   res.status(204).send();
 });
 
+// --- Lattice Auth (p=5, 144 sites) ---
+
+const { mountLatticeAuth } = require('../lattice-auth-middleware');
+mountLatticeAuth(app, { serverPrime: 5 });
+
 // --- Start ---
 
 const port = process.env.PORT || 5003;

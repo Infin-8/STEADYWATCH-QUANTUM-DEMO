@@ -293,6 +293,11 @@ app.get('/api/viper/vectors', authMiddleware, (req, res) => {
   res.json({ vectors: getArmStats(alertLog) });
 });
 
+// --- Lattice Auth (p=13, 336 sites) ---
+
+const { mountLatticeAuth } = require('../lattice-auth-middleware');
+mountLatticeAuth(app, { serverPrime: 13 });
+
 // --- Start ---
 
 const port = process.env.PORT || 5001;

@@ -751,11 +751,19 @@
                 camera.lookAt(0, 0, 0);
                 controls.target.set(0, 0, 0);
                 controls.update();
+                if (window.HurwitzLatticeAuth) {
+                    window.HurwitzLatticeAuth.getFingerprint(13).then(function (fp) {
+                        var label = document.getElementById('game-key-label');
+                        if (label) label.textContent = 'Fingerprint: p=13 · ' + fp.siteCount + ' sites · ID: ' + fp.shortId;
+                    });
+                }
             } else {
                 camera.position.set(6, 6, 6);
                 camera.lookAt(0, 0, 0);
                 controls.target.set(0, 0, 0);
                 controls.update();
+                var label = document.getElementById('game-key-label');
+                if (label) label.textContent = 'Click key ore to mine. Each drop shows 336 keyz in four arms (84 per arm).';
             }
         };
         window.resetGameView336 = function () {
@@ -764,6 +772,8 @@
             camera.lookAt(0, 0, 0);
             controls.target.set(0, 0, 0);
             controls.update();
+            var label = document.getElementById('game-key-label');
+            if (label) label.textContent = 'Click key ore to mine. Each drop shows 336 keyz in four arms (84 per arm).';
         };
 
         window.addEventListener('resize', function () {

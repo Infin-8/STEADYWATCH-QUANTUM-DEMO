@@ -288,6 +288,11 @@ app.get('/api/horde/clusters', authMiddleware, (req, res) => {
   res.json({ clusters: getClusterStats(responseLog) });
 });
 
+// --- Lattice Auth (p=17, 432 sites) ---
+
+const { mountLatticeAuth } = require('../lattice-auth-middleware');
+mountLatticeAuth(app, { serverPrime: 17 });
+
 // --- Start ---
 
 const port = process.env.PORT || 5002;

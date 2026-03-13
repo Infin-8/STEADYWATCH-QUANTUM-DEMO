@@ -868,11 +868,19 @@
                 camera.lookAt(0, 0, 0);
                 controls.target.set(0, 0, 0);
                 controls.update();
+                if (window.HurwitzLatticeAuth) {
+                    window.HurwitzLatticeAuth.getFingerprint(5).then(function (fp) {
+                        var label = document.getElementById('game-key-label');
+                        if (label) label.textContent = 'Fingerprint: p=5 · ' + fp.siteCount + ' sites · ID: ' + fp.shortId;
+                    });
+                }
             } else {
                 camera.position.set(6, 6, 6);
                 camera.lookAt(0, 0, 0);
                 controls.target.set(0, 0, 0);
                 controls.update();
+                var label = document.getElementById('game-key-label');
+                if (label) label.textContent = 'Click key ghz field (glowing blockz) to mine. Keyz drop as orbz.';
             }
         };
         window.resetGameView = function () {
@@ -881,6 +889,8 @@
             camera.lookAt(0, 0, 0);
             controls.target.set(0, 0, 0);
             controls.update();
+            var label = document.getElementById('game-key-label');
+            if (label) label.textContent = 'Click key ghz field (glowing blockz) to mine. Keyz drop as orbz.';
         };
 
         window.addEventListener('resize', function () {
