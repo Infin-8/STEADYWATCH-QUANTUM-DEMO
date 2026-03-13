@@ -214,6 +214,33 @@
             nucleusSphere.userData.isGlassSphere = true;
             group.add(nucleusSphere);
 
+            // Orbital rings — cesium-style electron orbital paths around the nucleus
+            var torusGeom = new THREE.TorusGeometry(CLUSTER_RADIUS * 0.32, CLUSTER_RADIUS * 0.018, 8, 48);
+            var ringHue = (keyIndex / total) % 1;
+            var ringRotations = [
+                { x: Math.PI / 2, y: 0,               z: 0 },
+                { x: Math.PI / 2, y: Math.PI / 3,     z: Math.PI / 3 },
+                { x: Math.PI / 2, y: Math.PI * 2 / 3, z: -Math.PI / 4 }
+            ];
+            for (var r = 0; r < ringRotations.length; r++) {
+                var ringMat = new THREE.MeshPhongMaterial({
+                    color: new THREE.Color().setHSL((ringHue + r * 0.08) % 1, 0.7, 0.75),
+                    emissive: new THREE.Color().setHSL((ringHue + r * 0.08) % 1, 0.8, 0.3),
+                    emissiveIntensity: 0.4,
+                    shininess: 160,
+                    transparent: true,
+                    opacity: 0.35,
+                    depthWrite: false
+                });
+                var ring = new THREE.Mesh(torusGeom, ringMat);
+                ring.rotation.x = ringRotations[r].x;
+                ring.rotation.y = ringRotations[r].y;
+                ring.rotation.z = ringRotations[r].z;
+                ring.userData.isGlassSphere = true;
+                ring.userData.orbitalRingIndex = r;
+                group.add(ring);
+            }
+
             scene.add(group);
             keyDrops.push({
                 group: group,
@@ -675,8 +702,17 @@
                     for (c = 0; c < d.group.children.length; c++) {
                         child = d.group.children[c];
                         if (child.userData.isGlassSphere) {
-                            child.material.emissive.setHSL(hue, 0.7, 0.08);
-                            child.material.emissiveIntensity = 0.25 + style.glowIntensity * 0.3;
+                            if (child.userData.orbitalRingIndex !== undefined) {
+                                // Orbital ring — slow counter-rotation + emissive pulse
+                                var rIdx = child.userData.orbitalRingIndex;
+                                child.rotation.y = time * (0.4 + rIdx * 0.15) * (rIdx % 2 === 0 ? 1 : -1);
+                                child.material.emissive.setHSL((hue + rIdx * 0.08) % 1, 0.8, 0.12);
+                                child.material.emissiveIntensity = 0.3 + style.glowIntensity * 0.4;
+                            } else {
+                                // Nucleus sphere
+                                child.material.emissive.setHSL(hue, 0.7, 0.08);
+                                child.material.emissiveIntensity = 0.25 + style.glowIntensity * 0.3;
+                            }
                             continue;
                         }
                         child.material.color.setHSL(hue, sat, light);

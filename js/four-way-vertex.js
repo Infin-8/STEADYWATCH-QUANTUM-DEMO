@@ -111,6 +111,32 @@
         glassSphere.userData.isGlassSphere = true;
         group.add(glassSphere);
 
+        // Orbital rings — cesium-style electron orbital paths around the nucleus
+        var torusGeom = new THREE.TorusGeometry(radius * 0.32, radius * 0.018, 8, 48);
+        var ringRotations = [
+            { x: Math.PI / 2, y: 0,              z: 0 },
+            { x: Math.PI / 2, y: Math.PI / 3,    z: Math.PI / 3 },
+            { x: Math.PI / 2, y: Math.PI * 2 / 3, z: -Math.PI / 4 }
+        ];
+        for (var r = 0; r < ringRotations.length; r++) {
+            var ringMat = new THREE.MeshPhongMaterial({
+                color: new THREE.Color().setHSL((hue + r * 0.08) % 1, 0.7, 0.75),
+                emissive: new THREE.Color().setHSL((hue + r * 0.08) % 1, 0.8, 0.3),
+                emissiveIntensity: 0.4,
+                shininess: 160,
+                transparent: true,
+                opacity: 0.35,
+                depthWrite: false
+            });
+            var ring = new THREE.Mesh(torusGeom, ringMat);
+            ring.rotation.x = ringRotations[r].x;
+            ring.rotation.y = ringRotations[r].y;
+            ring.rotation.z = ringRotations[r].z;
+            ring.userData.isGlassSphere = true;
+            ring.userData.orbitalRingIndex = r;
+            group.add(ring);
+        }
+
         return {
             group: group,
             material: mat,

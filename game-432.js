@@ -641,8 +641,15 @@
                     for (c = 0; c < d.group.children.length; c++) {
                         child = d.group.children[c];
                         if (child.userData.isGlassSphere) {
-                            child.material.emissive.setHSL(hue, 0.7, 0.08);
-                            child.material.emissiveIntensity = 0.25 + style.glowIntensity * 0.3;
+                            if (child.userData.orbitalRingIndex !== undefined) {
+                                var rIdx = child.userData.orbitalRingIndex;
+                                child.rotation.y = time * (0.4 + rIdx * 0.15) * (rIdx % 2 === 0 ? 1 : -1);
+                                child.material.emissive.setHSL((hue + rIdx * 0.08) % 1, 0.8, 0.12);
+                                child.material.emissiveIntensity = 0.3 + style.glowIntensity * 0.4;
+                            } else {
+                                child.material.emissive.setHSL(hue, 0.7, 0.08);
+                                child.material.emissiveIntensity = 0.25 + style.glowIntensity * 0.3;
+                            }
                             continue;
                         }
                         child.material.color.setHSL(hue, sat, light);
