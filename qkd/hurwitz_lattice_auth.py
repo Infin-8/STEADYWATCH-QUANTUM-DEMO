@@ -18,6 +18,7 @@ Reference: docs/research/HURWITZ_LATTICE_BIOMETRIC_AUTHENTICATION.md
 """
 
 import hashlib
+import hmac
 import math
 import secrets
 import time
@@ -425,7 +426,7 @@ class HurwitzLatticeAuth:
     def _verify_hello(self, hello: LatticeHello) -> bool:
         """Verify cluster_hash matches the expected F4 shell for prime_claim."""
         expected = self._get_cluster_hash(hello.prime_claim)
-        return hashlib.compare_digest(expected, hello.cluster_hash)
+        return hmac.compare_digest(expected, hello.cluster_hash)
 
     @classmethod
     def _get_cluster_hash(cls, p: int) -> bytes:
