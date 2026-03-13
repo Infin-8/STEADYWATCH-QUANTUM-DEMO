@@ -388,8 +388,10 @@
 
         function onPointerClick(event) {
             var rect = renderer.domElement.getBoundingClientRect();
-            mouse.x = ((event.clientX - rect.left) / rect.width) * 2 - 1;
-            mouse.y = -((event.clientY - rect.top) / rect.height) * 2 + 1;
+            var clientX = event.clientX !== undefined ? event.clientX : event.touches[0].clientX;
+            var clientY = event.clientY !== undefined ? event.clientY : event.touches[0].clientY;
+            mouse.x = ((clientX - rect.left) / rect.width) * 2 - 1;
+            mouse.y = -((clientY - rect.top) / rect.height) * 2 + 1;
             raycaster.setFromCamera(mouse, camera);
             var hits = raycaster.intersectObjects(blockMeshes, true);
             if (hits.length === 0) return;
@@ -449,6 +451,10 @@
         }
 
         renderer.domElement.addEventListener('click', onPointerClick);
+        var touchMoved = false;
+        renderer.domElement.addEventListener('touchstart', function () { touchMoved = false; }, { passive: true });
+        renderer.domElement.addEventListener('touchmove', function () { touchMoved = true; }, { passive: true });
+        renderer.domElement.addEventListener('touchend', function (e) { if (!touchMoved) onPointerClick(e.changedTouches[0]); }, { passive: true });
 
         var labelEl = document.getElementById('game-key-label');
         function updateKeyLabel(drop) {
