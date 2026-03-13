@@ -75,12 +75,13 @@ for (let i = 0; i < SLOTS; i++) {
     .update(sat.satellite_key_hex + sat.seed_hex)
     .digest('hex');
 
-  // Preserve any existing encrypted payload for this slot
-  const existingSlot = existing.slots && existing.slots[i];
+  // Payload: the Hurwitz quaternion key for this satellite (base64 encoded)
+  // In production this would be real ciphertext; in demo the quaternion key IS the protected asset
+  const encryptedPayload = Buffer.from(sat.satellite_key_hex).toString('base64');
 
   slots[i] = {
     keyMaterial,
-    encryptedPayload: existingSlot?.encryptedPayload || null
+    encryptedPayload
   };
 
   summary.push({
