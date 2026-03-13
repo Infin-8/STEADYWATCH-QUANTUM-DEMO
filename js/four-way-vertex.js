@@ -96,6 +96,21 @@
             group.add(mesh);
         }
 
+        // Glass sphere shell — transparent outer casing containing the 4-arm vertex
+        var glassMat = new THREE.MeshPhongMaterial({
+            color: new THREE.Color().setHSL(hue, 0.25, 0.92),
+            emissive: col,
+            emissiveIntensity: 0.05,
+            shininess: 220,
+            transparent: true,
+            opacity: 0.13,
+            side: THREE.FrontSide,
+            depthWrite: false
+        });
+        var glassSphere = new THREE.Mesh(new THREE.SphereGeometry(radius * 1.18, 32, 32), glassMat);
+        glassSphere.userData.isGlassSphere = true;
+        group.add(glassSphere);
+
         return {
             group: group,
             material: mat,

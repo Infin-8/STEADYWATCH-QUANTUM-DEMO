@@ -192,7 +192,7 @@
             var list = [];
             for (var i = 0; i < keyDrops.length; i++) {
                 var children = keyDrops[i].group.children;
-                for (var c = 0; c < children.length; c++) list.push(children[c]);
+                for (var c = 0; c < children.length; c++) { if (!children[c].userData.isGlassSphere) list.push(children[c]); }
             }
             return list;
         }
@@ -222,12 +222,14 @@
 
                     for (var ca = 0; ca < dropA.group.children.length; ca++) {
                         childA = dropA.group.children[ca];
+                        if (childA.userData.isGlassSphere) continue;
                         var vA = childA.userData.vel;
                         if (vA && (vA.x * vA.x + vA.y * vA.y + vA.z * vA.z) > 1e-8) continue;
                         childA.getWorldPosition(worldPosVortex);
 
                         for (var cb = 0; cb < dropB.group.children.length; cb++) {
                             childB = dropB.group.children[cb];
+                            if (childB.userData.isGlassSphere) continue;
                             var vB = childB.userData.vel;
                             if (vB && (vB.x * vB.x + vB.y * vB.y + vB.z * vB.z) > 1e-8) continue;
                             childB.getWorldPosition(tempVec);
@@ -523,6 +525,7 @@
                 var nearestBlock, b, blockMesh, minDist, dist, prevWorld;
                 for (c = 0; c < d.group.children.length; c++) {
                     child = d.group.children[c];
+                    if (child.userData.isGlassSphere) continue;
                     child.getWorldPosition(worldPosVortex);
                     // Skip bounce pass while vel reflection is active — both systems move positions
                     // and they compound into unbounded displacement across multiple drops.
@@ -572,6 +575,11 @@
                     var b, blockMesh, minDist, dist, t, factor;
                     for (c = 0; c < d.group.children.length; c++) {
                         child = d.group.children[c];
+                        if (child.userData.isGlassSphere) {
+                            child.material.emissive.setHSL(hue, 0.5, 0.06);
+                            child.material.emissiveIntensity = 0.04 + style.glowIntensity * 0.12;
+                            continue;
+                        }
                         child.material.color.setHSL(hue, sat, light);
                         child.material.emissive.setHSL(hue, 0.7, style.glowIntensity * 2);
                         child.getWorldPosition(worldPosVortex);
