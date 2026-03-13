@@ -1,0 +1,17 @@
+{
+  "name": "horde-api",
+  "version": "0.1.0",
+  "description": "HORDE — 432-key Hurwitz swarm defense API. Collective consensus threat response across 4 defense clusters.",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "test": "node test-api.js"
+  },
+  "engines": {
+    "node": ">=14"
+  },
+  "dependencies": {
+    "express": "^4.18.2",
+    "cors": "^2.8.5"
+  }
+}

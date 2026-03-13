@@ -39,6 +39,11 @@ viper-api/viper-data.json
 viper-api/node_modules/
 viper-api/package-lock.json
 
+# HORDE live state
+horde-api/horde-data.json
+horde-api/node_modules/
+horde-api/package-lock.json
+
 # Logs
 *.log
 logs/
