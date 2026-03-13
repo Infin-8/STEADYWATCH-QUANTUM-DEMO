@@ -187,21 +187,27 @@ app.get('/', (req, res) => {
   </div>
 
   <div class="section">
-    <div class="label">Echo Phase &nbsp;<span style="color:#2a4a6a;font-size:0.68rem;">HARMONIC SYNC VIA UNSYNC · 4-satellite fusion · UTC clock · golden ratio offsets · φ = 1.618…</span></div>
-    <div style="display:flex;align-items:flex-start;gap:24px;flex-wrap:wrap;">
-      <canvas id="echo-canvas" width="200" height="200" style="border:1px solid #1a3a5a;border-radius:4px;background:#060e1a;flex-shrink:0;"></canvas>
+    <div class="label">Echo Phase &nbsp;<span style="color:#2a4a6a;font-size:0.68rem;">HARMONIC SYNC VIA UNSYNC · 4-satellite fusion · UTC clock · φ=1.618… · 10s cycle · inner ring = Tesla 3·6·9</span></div>
+    <div style="display:flex;gap:28px;flex-wrap:wrap;align-items:flex-start;">
+      <div style="flex-shrink:0;">
+        <canvas id="echo-wheel" width="340" height="340" style="border:1px solid #1a3a5a;border-radius:4px 4px 0 0;background:#060e1a;display:block;"></canvas>
+        <canvas id="echo-wave"  width="340" height="55"  style="border:1px solid #0d2040;border-top:none;border-radius:0 0 4px 4px;background:#060e1a;display:block;"></canvas>
+        <div style="font-size:0.62rem;color:#1a3a5a;text-align:center;margin-top:3px;font-family:monospace;">phase history · <span style="color:#a855f7;">⊕ fused</span> · <span style="color:#2a4a6a;">master</span> · white flash = wrap event</div>
+      </div>
       <div style="flex:1;min-width:220px;">
-        <div id="echo-bars" style="font-size:0.72rem;font-family:monospace;line-height:2;"></div>
-        <div style="margin-top:10px;">
-          <div class="label" style="margin-bottom:4px;">Tesla 3 · 6 · 9</div>
-          <div id="tesla-bars" style="font-size:0.72rem;font-family:monospace;line-height:1.9;"></div>
+        <div id="echo-phase-readout"></div>
+        <div style="margin-top:14px;">
+          <div class="label" style="margin-bottom:6px;">Tesla 3·6·9 harmonics</div>
+          <div id="echo-tesla-readout"></div>
         </div>
-        <div style="margin-top:10px;color:#2a4a6a;font-size:0.68rem;line-height:1.8;">
-          L/R satellites orbit ±φ×0.1 from master.<br>
-          T/B satellites track master exactly (offset = 0).<br>
-          Fused signal = average of all 4 — the unsync IS the sync.<br>
-          When L wraps past 0, the fusion becomes non-trivial.<br>
-          <span style="color:#1a3a5a;margin-top:4px;display:block;">Seed: SHQKD-Echo-Resonance-81 → 81 slot keys</span>
+        <div id="echo-fusion-eq" style="margin-top:14px;"></div>
+        <div id="echo-singularity" style="margin-top:8px;min-height:18px;"></div>
+        <div id="echo-wrap-info" style="margin-top:4px;"></div>
+        <div style="margin-top:14px;color:#2a4a6a;font-size:0.68rem;line-height:1.9;">
+          L/R orbit ±φ×0.1 from master &nbsp;·&nbsp; T/B track master.<br>
+          When L wraps past 0, fusion becomes non-trivial.<br>
+          The unsync IS the sync — interference IS the key.
+          <div style="margin-top:6px;color:#1a3a5a;">Seed: SHQKD-Echo-Resonance-81 → 81 slot keys</div>
         </div>
       </div>
     </div>
@@ -380,21 +386,20 @@ app.get('/', (req, res) => {
       load();
     })();
 
-    // --- Live Echo Phase Display ---
+    // --- Live Echo Phase Display (v2) ---
     (function initEchoPhase() {
-      var canvas = document.getElementById('echo-canvas');
-      if (!canvas) return;
-      var ctx = canvas.getContext('2d');
-      var CX = 100, CY = 100, RING = 74;
+      var wheel = document.getElementById('echo-wheel');
+      var wave  = document.getElementById('echo-wave');
+      if (!wheel) return;
+      var wctx = wheel.getContext('2d');
+      var vctx = wave ? wave.getContext('2d') : null;
+      var WW = 340, WH = 340, WCX = 170, WCY = 170, RING = 130, IRING = 60;
       var PHI = 1.618033988749895, FACTOR = 0.1, DURATION = 10.0;
-
-      var SAT = [
-        { key: 'master',  label: 'M  Master',     color: '#c8d8e8', glowRgb: '200,216,232', r: 5 },
-        { key: 'left',    label: 'L  Left  −φ×f', color: '#ff6b6b', glowRgb: '255,107,107', r: 4 },
-        { key: 'right',   label: 'R  Right +φ×f', color: '#00e5ff', glowRgb: '0,229,255',   r: 4 },
-        { key: 'top',     label: 'T  Top   ±0',   color: '#ffcc00', glowRgb: '255,204,0',   r: 3.5 },
-        { key: 'fused',   label: '⊕  Fused',       color: '#764ba2', glowRgb: '118,75,162',  r: 5.5 }
-      ];
+      var SAT_RGB = { master:'200,216,232', left:'255,107,107', right:'0,229,255', top:'255,204,0', fused:'168,85,247' };
+      var SAT_HEX = { master:'#c8d8e8',    left:'#ff6b6b',     right:'#00e5ff',   top:'#ffcc00',   fused:'#a855f7'   };
+      var TESLA   = [[3,'#00c853','0,200,83'],[6,'#667eea','102,126,234'],[9,'#ff9500','255,149,0']];
+      var wfMaster = [], wfFused = [], wrapMarkers = [];
+      var wrapCount = 0, prevMaster = -1;
 
       function calc() {
         var utc = Date.now() / 1000;
@@ -403,99 +408,220 @@ app.get('/', (req, res) => {
         var right  = (master + FACTOR * PHI) % 1.0;
         var top    = master;
         var fused  = (left + right + top + top) / 4.0;
-        return { master: master, left: left, right: right, top: top, fused: fused };
+        return { master:master, left:left, right:right, top:top, fused:fused };
       }
 
-      function phaseToXY(phase, r) {
+      function p2xy(phase, r) {
         var a = phase * 2 * Math.PI - Math.PI / 2;
-        return { x: CX + r * Math.cos(a), y: CY + r * Math.sin(a) };
+        return { x: WCX + r * Math.cos(a), y: WCY + r * Math.sin(a) };
+      }
+
+      function dot(phase, r, dotR, rgb, alpha) {
+        var p = p2xy(phase, r);
+        var g = wctx.createRadialGradient(p.x, p.y, 0, p.x, p.y, dotR * 4);
+        g.addColorStop(0, 'rgba(' + rgb + ',' + (alpha * 0.55) + ')');
+        g.addColorStop(1, 'rgba(0,0,0,0)');
+        wctx.beginPath(); wctx.arc(p.x, p.y, dotR * 4, 0, Math.PI * 2);
+        wctx.fillStyle = g; wctx.fill();
+        wctx.beginPath(); wctx.arc(p.x, p.y, dotR, 0, Math.PI * 2);
+        wctx.fillStyle = 'rgba(' + rgb + ',' + alpha + ')'; wctx.fill();
       }
 
       function drawWheel(phases) {
-        ctx.clearRect(0, 0, 200, 200);
-        // Ring and tick marks
-        ctx.strokeStyle = '#0d1f35'; ctx.lineWidth = 1;
-        ctx.beginPath(); ctx.arc(CX, CY, RING, 0, Math.PI * 2); ctx.stroke();
+        // Persistence fade — organic trail effect
+        wctx.fillStyle = 'rgba(6,14,26,0.80)';
+        wctx.fillRect(0, 0, WW, WH);
+
+        // Satellite dots (fade creates trails automatically)
+        dot(phases.master, RING,        6,   SAT_RGB.master, 1.0);
+        dot(phases.left,   RING,        5,   SAT_RGB.left,   0.95);
+        dot(phases.right,  RING,        5,   SAT_RGB.right,  0.95);
+        dot(phases.top,    RING * 0.88, 4.5, SAT_RGB.top,    0.85);
+        dot(phases.fused,  RING * 0.76, 7,   SAT_RGB.fused,  1.0);
+
+        // Tesla harmonic dots — inner ring
+        for (var ti = 0; ti < TESLA.length; ti++) {
+          var h = TESLA[ti];
+          dot((phases.master * h[0]) % 1.0, IRING, 2.5, h[2], 0.75);
+        }
+
+        // === Static UI — redrawn each frame on top of faded trails ===
+
+        // Rings
+        wctx.strokeStyle = '#0d2040'; wctx.lineWidth = 1.2;
+        wctx.beginPath(); wctx.arc(WCX, WCY, RING, 0, Math.PI * 2); wctx.stroke();
+        wctx.strokeStyle = '#091428'; wctx.lineWidth = 0.8;
+        wctx.beginPath(); wctx.arc(WCX, WCY, IRING, 0, Math.PI * 2); wctx.stroke();
+
+        // Clock ticks
+        wctx.strokeStyle = '#1a3a5a'; wctx.lineWidth = 1;
         [0, 0.25, 0.5, 0.75].forEach(function(t) {
-          var p = phaseToXY(t, RING); var p2 = phaseToXY(t, RING - 5);
-          ctx.beginPath(); ctx.moveTo(p.x, p.y); ctx.lineTo(p2.x, p2.y); ctx.stroke();
-        });
-        // Center dot
-        ctx.beginPath(); ctx.arc(CX, CY, 2, 0, Math.PI * 2);
-        ctx.fillStyle = '#1a2a3a'; ctx.fill();
-
-        // Draw fused line first (under dots)
-        var fp = phaseToXY(phases.fused, RING);
-        ctx.beginPath(); ctx.moveTo(CX, CY); ctx.lineTo(fp.x, fp.y);
-        ctx.strokeStyle = 'rgba(118,75,162,0.3)'; ctx.lineWidth = 2; ctx.stroke();
-
-        // Draw satellite lines and dots
-        var keys = ['left', 'right', 'top', 'master'];
-        keys.forEach(function(k) {
-          var s = SAT.find(function(x) { return x.key === k; });
-          var pp = phaseToXY(phases[k === 'top' ? 'top' : k], RING * 0.9);
-          ctx.beginPath(); ctx.moveTo(CX, CY); ctx.lineTo(pp.x, pp.y);
-          ctx.strokeStyle = 'rgba(' + s.glowRgb + ',0.18)'; ctx.lineWidth = 1; ctx.stroke();
-          // Glow
-          var g = ctx.createRadialGradient(pp.x, pp.y, 0, pp.x, pp.y, s.r * 3);
-          g.addColorStop(0, 'rgba(' + s.glowRgb + ',0.35)');
-          g.addColorStop(1, 'rgba(0,0,0,0)');
-          ctx.beginPath(); ctx.arc(pp.x, pp.y, s.r * 3, 0, Math.PI * 2);
-          ctx.fillStyle = g; ctx.fill();
-          // Dot
-          ctx.beginPath(); ctx.arc(pp.x, pp.y, s.r, 0, Math.PI * 2);
-          ctx.fillStyle = s.color; ctx.fill();
+          var pa = p2xy(t, RING), pb = p2xy(t, RING + 10);
+          wctx.beginPath(); wctx.moveTo(pa.x, pa.y); wctx.lineTo(pb.x, pb.y); wctx.stroke();
         });
 
-        // Fused dot (on top of everything)
-        var fg = ctx.createRadialGradient(fp.x, fp.y, 0, fp.x, fp.y, 18);
-        fg.addColorStop(0, 'rgba(118,75,162,0.5)');
-        fg.addColorStop(1, 'rgba(0,0,0,0)');
-        ctx.beginPath(); ctx.arc(fp.x, fp.y, 18, 0, Math.PI * 2);
-        ctx.fillStyle = fg; ctx.fill();
-        ctx.beginPath(); ctx.arc(fp.x, fp.y, 5.5, 0, Math.PI * 2);
-        ctx.fillStyle = '#764ba2'; ctx.fill();
+        // L-R spread arc (shows the ±φ×f bracket)
+        var la = phases.left * 2 * Math.PI - Math.PI / 2;
+        var arcSpan = 2 * FACTOR * PHI * 2 * Math.PI;
+        wctx.beginPath(); wctx.arc(WCX, WCY, RING + 16, la, la + arcSpan, false);
+        wctx.strokeStyle = 'rgba(255,204,100,0.28)'; wctx.lineWidth = 2.5; wctx.stroke();
+        var lcap = p2xy(phases.left, RING + 16), rcap = p2xy(phases.right, RING + 16);
+        wctx.beginPath(); wctx.arc(lcap.x, lcap.y, 2, 0, Math.PI * 2);
+        wctx.fillStyle = 'rgba(255,107,107,0.6)'; wctx.fill();
+        wctx.beginPath(); wctx.arc(rcap.x, rcap.y, 2, 0, Math.PI * 2);
+        wctx.fillStyle = 'rgba(0,229,255,0.6)'; wctx.fill();
 
-        // Phase label at 12-oclock position
-        ctx.fillStyle = '#2a4a6a'; ctx.font = '9px monospace'; ctx.textAlign = 'center';
-        ctx.fillText('0.0', CX, CY - RING - 6);
-        ctx.fillText('0.5', CX, CY + RING + 13);
-        ctx.textAlign = 'left';
+        // Fused spoke
+        var fp = p2xy(phases.fused, RING * 0.76);
+        wctx.beginPath(); wctx.moveTo(WCX, WCY); wctx.lineTo(fp.x, fp.y);
+        wctx.strokeStyle = 'rgba(168,85,247,0.2)'; wctx.lineWidth = 1.5; wctx.stroke();
+
+        // Singularity glow at 12 o'clock
+        var dist = Math.min(phases.master, 1 - phases.master);
+        var singGlow = Math.max(0, 1 - dist / 0.06);
+        if (singGlow > 0) {
+          var sp = p2xy(0.0, RING);
+          var sg = wctx.createRadialGradient(sp.x, sp.y, 0, sp.x, sp.y, 24);
+          sg.addColorStop(0, 'rgba(255,255,255,' + (singGlow * 0.75) + ')');
+          sg.addColorStop(1, 'rgba(0,0,0,0)');
+          wctx.beginPath(); wctx.arc(sp.x, sp.y, 24, 0, Math.PI * 2);
+          wctx.fillStyle = sg; wctx.fill();
+        }
+        var sp0 = p2xy(0.0, RING + 5);
+        wctx.beginPath(); wctx.arc(sp0.x, sp0.y, 2.5, 0, Math.PI * 2);
+        wctx.fillStyle = singGlow > 0.2 ? 'rgba(255,255,255,' + (0.4 + singGlow * 0.6) + ')' : '#1a3a5a';
+        wctx.fill();
+
+        // Labels
+        wctx.font = '9px monospace'; wctx.textAlign = 'center'; wctx.fillStyle = '#2a4a6a';
+        wctx.fillText('0.0', WCX, WCY - RING - 18);
+        wctx.fillText('0.5', WCX, WCY + RING + 20);
+        wctx.fillStyle = '#2a4a6a'; wctx.fillText('±φ', WCX + RING + 24, WCY + 4);
+        wctx.font = '8px monospace';
+        var ml = p2xy(phases.left,  RING - 14); wctx.fillStyle = SAT_HEX.left;  wctx.fillText('L', ml.x, ml.y + 3);
+        var mr = p2xy(phases.right, RING - 14); wctx.fillStyle = SAT_HEX.right; wctx.fillText('R', mr.x, mr.y + 3);
+        var mf = p2xy(phases.fused, RING * 0.76 - 14); wctx.fillStyle = SAT_HEX.fused; wctx.fillText('⊕', mf.x, mf.y + 3);
+        wctx.textAlign = 'left';
+
+        // Center
+        wctx.beginPath(); wctx.arc(WCX, WCY, 3.5, 0, Math.PI * 2);
+        wctx.fillStyle = '#0d2040'; wctx.fill();
+        wctx.strokeStyle = '#1a3a5a'; wctx.lineWidth = 1;
+        wctx.beginPath(); wctx.arc(WCX, WCY, 3.5, 0, Math.PI * 2); wctx.stroke();
       }
 
-      function bar(phase, color) {
-        var filled = Math.round(phase * 28);
-        var empty  = 28 - filled;
-        var bar    = '';
-        for (var i = 0; i < filled; i++) bar += '█';
-        for (var j = 0; j < empty;  j++) bar += '░';
-        return '<span style="color:' + color + '">' + bar + '</span>'
-          + '<span style="color:#2a4a6a;margin-left:6px;">' + phase.toFixed(4) + '</span>';
+      function drawWave(phases) {
+        if (!vctx) return;
+        wfMaster.push(phases.master);
+        wfFused.push(phases.fused);
+        if (wfMaster.length > 340) wfMaster.shift();
+        if (wfFused.length > 340) wfFused.shift();
+
+        vctx.fillStyle = '#060e1a'; vctx.fillRect(0, 0, 340, 55);
+        vctx.strokeStyle = '#0d1f35'; vctx.lineWidth = 0.5;
+        vctx.beginPath(); vctx.moveTo(0, 27); vctx.lineTo(340, 27); vctx.stroke();
+
+        // Wrap flash lines
+        for (var wi = wrapMarkers.length - 1; wi >= 0; wi--) {
+          var wx = 340 - wrapMarkers[wi].age;
+          if (wx >= 0) {
+            vctx.strokeStyle = 'rgba(255,255,255,' + Math.max(0, 0.55 - wrapMarkers[wi].age / 280) + ')';
+            vctx.lineWidth = 1;
+            vctx.beginPath(); vctx.moveTo(wx, 0); vctx.lineTo(wx, 55); vctx.stroke();
+          }
+          wrapMarkers[wi].age++;
+          if (wrapMarkers[wi].age > 340) wrapMarkers.splice(wi, 1);
+        }
+
+        // Master waveform (dim)
+        if (wfMaster.length > 1) {
+          vctx.strokeStyle = 'rgba(200,216,232,0.2)'; vctx.lineWidth = 1;
+          vctx.beginPath();
+          for (var mi = 0; mi < wfMaster.length; mi++) {
+            var mx = mi + (340 - wfMaster.length), my = 51 - wfMaster[mi] * 46;
+            if (mi === 0) vctx.moveTo(mx, my); else vctx.lineTo(mx, my);
+          }
+          vctx.stroke();
+        }
+
+        // Fused waveform (bright purple)
+        if (wfFused.length > 1) {
+          vctx.strokeStyle = 'rgba(168,85,247,0.9)'; vctx.lineWidth = 1.5;
+          vctx.beginPath();
+          for (var fi = 0; fi < wfFused.length; fi++) {
+            var fx = fi + (340 - wfFused.length), fy = 51 - wfFused[fi] * 46;
+            if (fi === 0) vctx.moveTo(fx, fy); else vctx.lineTo(fx, fy);
+          }
+          vctx.stroke();
+          vctx.beginPath(); vctx.arc(339, 51 - wfFused[wfFused.length - 1] * 46, 3, 0, Math.PI * 2);
+          vctx.fillStyle = '#a855f7'; vctx.fill();
+        }
       }
 
-      function drawBars(phases) {
-        var barsEl = document.getElementById('echo-bars');
-        if (!barsEl) return;
-        var rows = SAT.map(function(s) {
-          var v = s.key === 'top' ? phases.top : phases[s.key];
-          return '<div><span style="color:#667eea;display:inline-block;width:120px;">' + s.label + '</span>' + bar(v, s.color) + '</div>';
-        });
-        barsEl.innerHTML = rows.join('');
+      function bar(val, color) {
+        var w = (val * 100).toFixed(1);
+        return '<div style="display:flex;align-items:center;gap:8px;">'
+          + '<div style="background:#0a1628;border:1px solid #0d2040;border-radius:2px;height:5px;width:130px;overflow:hidden;">'
+          + '<div style="background:' + color + ';height:100%;width:' + w + '%;"></div></div>'
+          + '<span style="color:' + color + ';font-size:0.68rem;font-family:monospace;">' + val.toFixed(4) + '</span>'
+          + '</div>';
+      }
 
-        var teslaEl = document.getElementById('tesla-bars');
-        if (!teslaEl) return;
-        var harmonics = [[3,'#00c853'],[6,'#667eea'],[9,'#ff9500']];
-        var trows = harmonics.map(function(h) {
+      function updateReadouts(phases) {
+        var sats = [
+          ['M  Master',     phases.master, SAT_HEX.master],
+          ['L  Left  −φ×f', phases.left,   SAT_HEX.left  ],
+          ['R  Right +φ×f', phases.right,  SAT_HEX.right ],
+          ['T/B  ±0',       phases.top,    SAT_HEX.top   ],
+          ['⊕  Fused',      phases.fused,  SAT_HEX.fused ]
+        ];
+        var el = document.getElementById('echo-phase-readout');
+        if (el) el.innerHTML = sats.map(function(s) {
+          return '<div style="display:flex;align-items:center;gap:8px;margin-bottom:7px;">'
+            + '<span style="color:#667eea;font-size:0.68rem;font-family:monospace;width:115px;">' + s[0] + '</span>'
+            + bar(s[1], s[2]) + '</div>';
+        }).join('');
+
+        var tel = document.getElementById('echo-tesla-readout');
+        if (tel) tel.innerHTML = TESLA.map(function(h) {
           var v = (phases.master * h[0]) % 1.0;
-          return '<div><span style="color:#667eea;display:inline-block;width:120px;">' + h[0] + 'x harmonic</span>' + bar(v, h[1]) + '</div>';
-        });
-        teslaEl.innerHTML = trows.join('');
+          return '<div style="display:flex;align-items:center;gap:8px;margin-bottom:7px;">'
+            + '<span style="color:#667eea;font-size:0.68rem;font-family:monospace;width:115px;">' + h[0] + 'x harmonic</span>'
+            + bar(v, h[1]) + '</div>';
+        }).join('');
+
+        var eel = document.getElementById('echo-fusion-eq');
+        if (eel) eel.innerHTML = '<div style="background:#0d1f35;border:1px solid #1a3a5a;border-radius:4px;padding:8px 12px;font-size:0.68rem;font-family:monospace;line-height:2;">'
+          + '<span style="color:#2a4a6a;">( </span>'
+          + '<span style="color:#ff6b6b;">' + phases.left.toFixed(4) + '</span>'
+          + '<span style="color:#2a4a6a;"> + </span>'
+          + '<span style="color:#00e5ff;">' + phases.right.toFixed(4) + '</span>'
+          + '<span style="color:#2a4a6a;"> + </span>'
+          + '<span style="color:#ffcc00;">' + phases.top.toFixed(4) + '</span>'
+          + '<span style="color:#2a4a6a;"> × 2 ) ÷ 4  =  </span>'
+          + '<span style="color:#a855f7;font-weight:bold;">' + phases.fused.toFixed(6) + '</span>'
+          + '</div>';
+
+        var dist = Math.min(phases.master, 1 - phases.master);
+        var sel = document.getElementById('echo-singularity');
+        if (sel) sel.innerHTML = dist < 0.05
+          ? '<div style="color:#fff;font-size:0.68rem;font-family:monospace;letter-spacing:0.1em;">◈ SINGULARITY — all harmonics converge at 0.0</div>'
+          : '<div style="color:#2a4a6a;font-size:0.65rem;font-family:monospace;">◇ Singularity at 0.0 · master dist: ' + dist.toFixed(4) + '</div>';
+
+        var wel = document.getElementById('echo-wrap-info');
+        if (wel) wel.innerHTML = '<div style="color:#1a3a5a;font-size:0.65rem;font-family:monospace;">Wrap events: <span style="color:#667eea;">' + wrapCount + '</span></div>';
       }
 
       function tick() {
         var phases = calc();
+        if (prevMaster >= 0 && prevMaster > 0.85 && phases.master < 0.15) {
+          wrapCount++;
+          wrapMarkers.push({ age: 0 });
+        }
+        prevMaster = phases.master;
         drawWheel(phases);
-        drawBars(phases);
+        drawWave(phases);
+        updateReadouts(phases);
         requestAnimationFrame(tick);
       }
       tick();
