@@ -16,7 +16,6 @@
     var BOUNCE_RADIUS = 0.58;
     var BOUNCE_RADIUS_336 = 0.72;
     var BOUNCE_BACK_FACTOR = 0.4;
-    var MAX_DROPS = 4;
 
     function smoothstep(t) {
         t = t < 0 ? 0 : t > 1 ? 1 : t;
@@ -159,31 +158,7 @@
             scene.add(mesh);
         }
 
-        function removeOldestDrop() {
-            var old = keyDrops[0];
-            if (!old) return;
-            if (hoveredKeyDrop === old) hoveredKeyDrop = null;
-            var disposed = {};
-            for (var c = old.group.children.length - 1; c >= 0; c--) {
-                var ch = old.group.children[c];
-                if (ch.geometry && !disposed[ch.geometry.uuid]) {
-                    ch.geometry.dispose();
-                    disposed[ch.geometry.uuid] = true;
-                }
-                if (ch.material) ch.material.dispose();
-            }
-            scene.remove(old.group);
-            keyDrops.splice(0, 1);
-            for (var i = 0; i < keyDrops.length; i++) {
-                var children = keyDrops[i].group.children;
-                for (var j = 0; j < children.length; j++) {
-                    if (children[j].userData.keyDropIndex !== undefined) children[j].userData.keyDropIndex = i;
-                }
-            }
-        }
-
         function spawnKeyDrop(wx, wy, wz, prime, keyIndex) {
-            if (keyDrops.length >= MAX_DROPS) removeOldestDrop();
             var drop = window.FourWayVertex.createFourWayVertexGroup(wx, wy, wz, keyIndex, {
                 radius: CLUSTER_RADIUS,
                 keyDropIndex: keyDrops.length
