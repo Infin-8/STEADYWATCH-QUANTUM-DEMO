@@ -1,141 +1,146 @@
 # THE VAULT™ — User Guide
 
-This guide explains how to run and use THE VAULT™: the 81-slot key store, the 3D Keyz board, and the API.
+THE VAULT™ is a quantum-backed key store where the 9×9 Hurwitz Quaternion game board IS the interface. Each block on the board is a key slot. Mining a block releases the cryptographic key for that slot. The crystal surface you see first is the vault door — you must rotate the board to see what's beneath.
 
 ---
 
-## Quick start
-
-1. **Start the API** (in a terminal):
-   ```bash
-   cd vault-api
-   npm install
-   npm start
-   ```
-   The API runs at `http://localhost:5003` by default.
-
-2. **Open THE VAULT page** in your browser:
-   - Locally: open `game.html` from the demo (e.g. `http://localhost:8080/game.html` if you serve the folder).
-   - Live: [STEADYWATCH-QUANTUM-DEMO](https://infin-8.github.io/STEADYWATCH-QUANTUM-DEMO/game.html) (VAULT™ link).
-
-3. **Load default config** (optional): On THE VAULT page, use the controls under the 3D view. Click **Load default config**. If the API is running locally and the page is loaded over HTTP, it fetches the signature config; otherwise it uses the built-in default so the panel always shows the config (key at 0, 144 Hurwitz moat, unlocked key moat).
-
----
-
-## What THE VAULT does
-
-- **81 slots** — Each slot holds key material (and optionally an encrypted payload). Slots are indexed 0–80 and map to the 9×9 Keyz board.
-- **Request key** — You request key release for a slot; the API returns the key material (and whether that slot has a stored payload). In the 3D game, clicking a key ore block does this when the Vault API is configured.
-- **Store payload** — You can store an encrypted payload in a slot via the API. The API does not encrypt or decrypt; you send ciphertext and use the slot key yourself to encrypt/decrypt.
-- **Configs** — Named key configurations (e.g. signature tier: key at slot 0, 144 Hurwitz moat, unlocked key moat). You can list and load them via the API or the “Load default config” button.
-
----
-
-## Using the 3D game (THE VAULT page)
-
-- **Mine blocks** — Click a glowing key ore block. The block is removed and a key drop (orb cluster) appears. This is the same Keyz game behavior.
-- **Vault API** — The viz controls panel under the game has an optional **API base URL** and **API key**. If you run the API locally and open the page over **HTTP** (e.g. `http://localhost:...`), set the base to `http://localhost:5003` and the key to `vault-demo-key-change-in-production`. Then clicking a key ore block also sends a key-release request to the API and shows “Key released for slot N” (or an error).
-- **Load default config** — Fills the panel with the signature config (Config name, Tier, Crown slot, Moat). Works even when the API is not reachable (uses a built-in default). If the API is reachable, it uses the config from the API.
-- **HTTPS vs HTTP** — If you open THE VAULT page from an HTTPS site (e.g. GitHub Pages), the browser will not allow requests to `http://localhost:5003` (mixed content). In that case the 3D game and “Load default config” still work; key release to the API only works if you use an HTTPS API URL or open the page from HTTP (e.g. run the demo locally).
-
----
-
-## Using the API
-
-### Authentication
-
-Send your API key in the header:
-
-```http
-X-Vault-Api-Key: vault-demo-key-change-in-production
-```
-
-Demo default key: `vault-demo-key-change-in-production`. Set `VAULT_API_KEY` when starting the server to use your own key.
-
-### Health and slots (no auth)
-
-- **Health:** `GET /api/vault/health` — Returns `{ "status": "ok", "slots": 81 }`.
-- **Slots:** `GET /api/vault/slots` — Returns `{ "slots": 81, "filled": [0, 1, ...] }` (indices of slots that have a stored payload).
-
-### Request key release (auth required)
-
-- **Endpoint:** `POST /api/vault/request`
-- **Body:** `{ "slotIndex": 0 }` (0–80)
-- **Response:** `{ "ok": true, "slotIndex": 0, "keyReleased": true, "keyMaterial": "<hex>", "hasPayload": false }`
-
-Use `keyMaterial` to decrypt a payload you stored in that slot (or for your own crypto). `hasPayload` is `true` if something was stored with **Store**.
-
-### Store a payload (auth required)
-
-- **Endpoint:** `POST /api/vault/store`
-- **Body:** `{ "slotIndex": 0, "encryptedPayload": "<base64 or string>" }`
-- **Response:** `{ "ok": true, "slotIndex": 0 }`
-
-The API stores your ciphertext as-is; it does not encrypt. You should encrypt your secret with the slot key (from a previous **Request** or from your own derivation) before sending.
-
-**Full example (run in order; API at `http://localhost:5003`, demo key):**
-
-```bash
-# Store something in slot 0 (e.g. base64 "test")
-curl -X POST http://localhost:5003/api/vault/store \
-  -H "Content-Type: application/json" \
-  -H "X-Vault-Api-Key: vault-demo-key-change-in-production" \
-  -d '{"slotIndex": 0, "encryptedPayload": "dGVzdA=="}'
-
-# Which slots have payloads?
-curl -s http://localhost:5003/api/vault/slots
-# → {"slots":81,"filled":[0]}
-
-# Get key for slot 0 (hasPayload will be true)
-curl -X POST http://localhost:5003/api/vault/request \
-  -H "Content-Type: application/json" \
-  -H "X-Vault-Api-Key: vault-demo-key-change-in-production" \
-  -d '{"slotIndex": 0}'
-```
-
-### Configs (auth required)
-
-- **Default config:** `GET /api/vault/configs/default` — Returns the signature config (key at 0, 144 Hurwitz moat, unlocked key moat).
-- **List configs:** `GET /api/vault/configs` — Returns `{ "configs": [...] }`.
-- **Get one:** `GET /api/vault/configs/:id`
-- **Create:** `POST /api/vault/configs` with body `{ "name": "...", "tier": "...", "crownSlotIndex": 0, "moatLayers": [...], "slotRoles": {} }`
-- **Update:** `PATCH /api/vault/configs/:id` (signature config cannot be modified)
-- **Delete:** `DELETE /api/vault/configs/:id` (signature config cannot be deleted)
-
-### Audit log (auth required)
-
-- **Endpoint:** `GET /api/vault/audit?limit=100`
-- **Response:** `{ "audit": [ { "ts": "...", "action": "store"|"request", "slotIndex": 0, "apiKeyId": "..." }, ... ] }`
-
----
-
-## Testing the API
-
-With the API running in one terminal:
+## Starting the Vault
 
 ```bash
 cd vault-api
-npm test
+npm install   # first time only
+npm start
 ```
 
-This runs smoke tests for health, slots, configs/default, request, store, and audit. All should pass.
+The dashboard opens at **http://localhost:5003/**. You'll see:
+- **Slot map** — 9×9 grid showing every slot (cyan = crown at slot 0, purple = payload stored)
+- **Stats** — total slots, payloads stored, audit count, active config
+- **Recent activity** — last 10 store/request actions
+- **API explorer** — interactive panels for every endpoint, no curl needed
+
+---
+
+## The Board and Slot Mapping
+
+The 81 blocks on the 9×9 Hurwitz Quaternion board map to vault slots 0–80:
+
+```
+slot = (4 - bz) × 9 + (bx + 4)
+```
+
+- **Slot 0** — the crown key. This is the identity quaternion position — the center of the key=0 glow, the zero-phase reference of the entire Hurwitz system.
+- **Slots 1–80** — guard and orbital slots, arranged across the board in Hurwitz quaternion order.
+
+The **signature config** (default) defines: crown at slot 0 → 144 Hurwitz moat → unlocked key moat.
+
+---
+
+## Seeding with Real Quantum Entropy
+
+By default the vault uses SHA-256 derived demo keys. To load real IBM quantum hardware entropy:
+
+```bash
+# 1. Stop the server (Ctrl+C)
+# 2. Run the seed script:
+node seed-vault.js
+# 3. Restart:
+npm start
+```
+
+After seeding:
+- 80 of 81 slots use real ibm_marrakesh hardware entropy (~7.80 bits avg)
+- 1 slot uses simulator recovery (satellite 80)
+- Every slot is pre-filled with its Hurwitz quaternion key as the stored payload
+- The vault starts fully populated — all 81 slots purple in the dashboard
+
+To use a different seed run file:
+```bash
+node seed-vault.js --source /path/to/seed_run_results.json
+```
+
+To preview without writing:
+```bash
+node seed-vault.js --dry-run
+```
+
+---
+
+## Using the Dashboard API Explorer
+
+Every endpoint has an interactive panel in the dashboard. The API key field at the top is pre-filled — change it if you've set a custom `VAULT_API_KEY`.
+
+**Request a key (releasing a slot):**
+1. Find the **POST /api/vault/request** panel
+2. Enter a slot index (0–80)
+3. Click **Send**
+4. The response shows `keyMaterial` (64-char hex) and `hasPayload`
+
+**Store a payload:**
+1. Find the **POST /api/vault/store** panel
+2. Enter the slot index and your encrypted payload (base64 or string)
+3. Click **Send**
+
+The API does not encrypt for you — send ciphertext. Use the `keyMaterial` from a request to encrypt/decrypt client-side.
+
+**View audit log:**
+- Use the **GET /api/vault/audit** panel, set a limit, click Send
+- Every store and request action is logged with timestamp, action, slot index, and API key prefix
+
+---
+
+## Using the 3D Game with the Vault
+
+1. Start the vault server (`npm start`)
+2. Open the game (`game.html`) served over HTTP locally
+3. In the controls panel under the 3D view, enable **Vault API**, set:
+   - Base URL: `http://localhost:5003`
+   - API key: `vault-demo-key-change-in-production`
+4. Mine a key ore block — the game sends `POST /api/vault/request` for that slot and shows "Key released for slot N"
+
+> **Note:** If you open the game from an HTTPS site (e.g. GitHub Pages), the browser will block requests to `http://localhost`. Run the demo locally over HTTP for full vault integration.
+
+---
+
+## Resetting the Vault
+
+To clear all payloads and audit history and return to a clean state:
+
+```bash
+# Stop the server, then:
+rm vault-data.json
+npm start
+```
+
+To reset and re-seed with quantum entropy in one step:
+
+```bash
+rm vault-data.json
+node seed-vault.js
+npm start
+```
 
 ---
 
 ## Troubleshooting
 
-| Issue | What to do |
-|-------|------------|
-| “Load default config” does nothing or shows error on the live site | Normal when the page is on HTTPS: the browser blocks requests to `http://localhost`. The button still loads the **built-in** default config into the panel. To use the live API, you’d need an HTTPS API URL. |
-| Key release fails from the 3D game | Ensure the API is running (`npm start`), the base URL is correct (e.g. `http://localhost:5003`), and the page is loaded over HTTP if you’re calling an HTTP API. Check the API key. |
-| Store/request return 401 | Add the header `X-Vault-Api-Key` with the same value as `VAULT_API_KEY` (or the demo key). |
-| Port 5003 already in use | Stop the other process using 5003 or set `PORT=5004 npm start` (then use port 5004 in the base URL). |
+| Issue | Fix |
+|-------|-----|
+| Port 5003 already in use | `PORT=5004 npm start` — update the base URL accordingly |
+| 401 Unauthorized | API key mismatch — check `X-Vault-Api-Key` header matches `VAULT_API_KEY` env |
+| Dashboard shows 0 payloads after seeding | Server was running during seed — stop it, run `node seed-vault.js`, restart |
+| Vault game integration not working from HTTPS | Browser blocks HTTP API calls from HTTPS pages — run demo locally over HTTP |
+| `seed-vault.js` says seed file not found | Pass `--source /absolute/path/to/seed_run_results.json` |
 
 ---
 
-## More information
+## Files
 
-- **API reference:** [README.md](README.md)
-- **Product and architecture:** [THE_VAULT.md](THE_VAULT.md)
-- **Configs API sketch:** [VAULT_CONFIGS_API_SKETCH.md](VAULT_CONFIGS_API_SKETCH.md)
-- **Operations and compliance:** [../docs/VAULT_OPS.md](../docs/VAULT_OPS.md)
+| File | Purpose |
+|------|---------|
+| `server.js` | Express API server + dashboard |
+| `seed-vault.js` | Inject IBM quantum entropy into vault slots |
+| `test-api.js` | Smoke tests (`npm test`) |
+| `vault-data.json` | Live vault state (gitignored — not committed) |
+| `README.md` | API reference |
+| `THE_VAULT.md` | Product architecture and vision |
+| `VAULT_CONFIGS_API_SKETCH.md` | Config system design and tiered packages |
