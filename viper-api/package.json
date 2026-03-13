@@ -1,0 +1,17 @@
+{
+  "name": "viper-api",
+  "version": "0.1.0",
+  "description": "VIPER — 336-key Hurwitz threat detection API. Classifies threats by kill chain vector across 4 directional arms.",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "test": "node test-api.js"
+  },
+  "engines": {
+    "node": ">=14"
+  },
+  "dependencies": {
+    "express": "^4.18.2",
+    "cors": "^2.8.5"
+  }
+}

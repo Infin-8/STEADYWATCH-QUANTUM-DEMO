@@ -34,6 +34,11 @@ vault-api/vault-data.json
 vault-api/node_modules/
 vault-api/package-lock.json
 
+# VIPER live state
+viper-api/viper-data.json
+viper-api/node_modules/
+viper-api/package-lock.json
+
 # Logs
 *.log
 logs/
