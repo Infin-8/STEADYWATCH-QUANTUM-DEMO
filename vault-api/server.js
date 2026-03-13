@@ -140,6 +140,17 @@ app.get('/', (req, res) => {
     .footer { color: #2a4a6a; font-size: 0.68rem; margin-top: 32px; }
     a { color: #667eea; text-decoration: none; }
     a:hover { color: #00e5ff; }
+    .api-panel { background: #0d1f35; border: 1px solid #1a3a5a; border-radius: 6px; padding: 14px; }
+    .api-title { font-size: 0.78rem; margin-bottom: 10px; color: #c8d8e8; }
+    .api-field { margin-bottom: 8px; font-size: 0.72rem; }
+    .api-field label { color: #667eea; display: block; margin-bottom: 2px; }
+    .api-field input { background: #0a1628; color: #c8d8e8; border: 1px solid #1a3a5a; padding: 3px 8px; border-radius: 3px; font-family: monospace; font-size: 0.72rem; width: 120px; }
+    .api-out { font-size: 0.68rem; margin-top: 10px; color: #667eea; white-space: pre-wrap; word-break: break-all; max-height: 140px; overflow-y: auto; min-height: 18px; }
+    button { background: #00263a; color: #00e5ff; border: 1px solid #00e5ff44; padding: 4px 14px; border-radius: 3px; font-family: monospace; font-size: 0.72rem; cursor: pointer; margin-top: 4px; }
+    button:hover { background: #003a55; }
+    .method { padding: 1px 6px; border-radius: 3px; font-size: 0.65rem; margin-right: 6px; font-weight: bold; }
+    .method.get { background: #0a2e1a; color: #00c853; }
+    .method.post { background: #1a1a2e; color: #764ba2; }
   </style>
 </head>
 <body>
@@ -184,23 +195,92 @@ app.get('/', (req, res) => {
 
   <div class="section">
     <div class="label">API key</div>
-    <span class="key">${keyPrefix}…</span>
-    <span style="font-size:0.7rem;color:#2a4a6a;margin-left:12px;">Set X-Vault-Api-Key header · full key in VAULT_API_KEY env</span>
+    <input id="apiKey" type="text" value="${DEFAULT_API_KEY}" style="background:#00263a;color:#00e5ff;border:1px solid #00e5ff44;padding:4px 10px;border-radius:4px;font-size:0.78rem;font-family:monospace;width:420px;" />
+    <span style="font-size:0.7rem;color:#2a4a6a;margin-left:12px;">Used for all authenticated requests below</span>
   </div>
 
   <div class="section">
-    <div class="label">Endpoints</div>
-    <div style="font-size:0.75rem;line-height:2;color:#667eea;">
-      <a href="/api/vault/health">GET /api/vault/health</a> &nbsp;·&nbsp;
-      <a href="/api/vault/slots">GET /api/vault/slots</a> &nbsp;·&nbsp;
-      <span style="color:#2a4a6a;">POST /api/vault/store</span> &nbsp;·&nbsp;
-      <span style="color:#2a4a6a;">POST /api/vault/request</span> &nbsp;·&nbsp;
-      <a href="/api/vault/audit">GET /api/vault/audit</a> &nbsp;·&nbsp;
-      <a href="/api/vault/configs">GET /api/vault/configs</a>
+    <div class="label">API Explorer</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;">
+
+      <div class="api-panel">
+        <div class="api-title"><span class="method get">GET</span> /api/vault/health</div>
+        <button onclick="call('GET','/api/vault/health',null,false,'health-out')">Send</button>
+        <pre id="health-out" class="api-out"></pre>
+      </div>
+
+      <div class="api-panel">
+        <div class="api-title"><span class="method get">GET</span> /api/vault/slots</div>
+        <button onclick="call('GET','/api/vault/slots',null,false,'slots-out')">Send</button>
+        <pre id="slots-out" class="api-out"></pre>
+      </div>
+
+      <div class="api-panel">
+        <div class="api-title"><span class="method post">POST</span> /api/vault/request</div>
+        <div class="api-field"><label>slotIndex (0–80)</label><input type="number" id="req-slot" value="0" min="0" max="80" /></div>
+        <button onclick="call('POST','/api/vault/request',{slotIndex:+id('req-slot').value},true,'request-out')">Send</button>
+        <pre id="request-out" class="api-out"></pre>
+      </div>
+
+      <div class="api-panel">
+        <div class="api-title"><span class="method post">POST</span> /api/vault/store</div>
+        <div class="api-field"><label>slotIndex (0–80)</label><input type="number" id="store-slot" value="0" min="0" max="80" /></div>
+        <div class="api-field"><label>encryptedPayload</label><input type="text" id="store-payload" value="dGVzdA==" style="width:200px;" /></div>
+        <button onclick="call('POST','/api/vault/store',{slotIndex:+id('store-slot').value,encryptedPayload:id('store-payload').value},true,'store-out')">Send</button>
+        <pre id="store-out" class="api-out"></pre>
+      </div>
+
+      <div class="api-panel">
+        <div class="api-title"><span class="method get">GET</span> /api/vault/audit</div>
+        <div class="api-field"><label>limit</label><input type="number" id="audit-limit" value="20" min="1" max="500" /></div>
+        <button onclick="call('GET','/api/vault/audit?limit='+id('audit-limit').value,null,true,'audit-out')">Send</button>
+        <pre id="audit-out" class="api-out"></pre>
+      </div>
+
+      <div class="api-panel">
+        <div class="api-title"><span class="method get">GET</span> /api/vault/configs</div>
+        <button onclick="call('GET','/api/vault/configs',null,true,'configs-out')">Send</button>
+        <pre id="configs-out" class="api-out"></pre>
+      </div>
+
+      <div class="api-panel">
+        <div class="api-title"><span class="method get">GET</span> /api/vault/configs/default</div>
+        <button onclick="call('GET','/api/vault/configs/default',null,true,'config-default-out')">Send</button>
+        <pre id="config-default-out" class="api-out"></pre>
+      </div>
+
+      <div class="api-panel">
+        <div class="api-title"><span class="method get">GET</span> /api/vault/configs/:id</div>
+        <div class="api-field"><label>id</label><input type="text" id="config-id" value="signature" /></div>
+        <button onclick="call('GET','/api/vault/configs/'+id('config-id').value,null,true,'config-id-out')">Send</button>
+        <pre id="config-id-out" class="api-out"></pre>
+      </div>
+
     </div>
   </div>
 
   <div class="footer">Auto-refreshes every 10s · Data persisted to vault-data.json · Port ${process.env.PORT || 5003}</div>
+
+  <script>
+    function id(x) { return document.getElementById(x); }
+    async function call(method, path, body, auth, outId) {
+      const out = id(outId);
+      out.textContent = '…';
+      out.style.color = '#667eea';
+      try {
+        const opts = { method, headers: { 'Content-Type': 'application/json' } };
+        if (auth) opts.headers['X-Vault-Api-Key'] = id('apiKey').value;
+        if (body) opts.body = JSON.stringify(body);
+        const r = await fetch(path, opts);
+        const data = await r.json();
+        out.textContent = JSON.stringify(data, null, 2);
+        out.style.color = r.ok ? '#00e5ff' : '#ff6b6b';
+      } catch(e) {
+        out.textContent = 'Error: ' + e.message;
+        out.style.color = '#ff6b6b';
+      }
+    }
+  </script>
 </body>
 </html>`);
 });
