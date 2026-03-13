@@ -794,6 +794,29 @@
             });
         }
 
+        var fingerprintMode432 = false;
+        window.toggleFingerprintView432 = function () {
+            fingerprintMode432 = !fingerprintMode432;
+            if (fingerprintMode432) {
+                camera.position.set(0, 22, 0.1);
+                camera.lookAt(0, 0, 0);
+                controls.target.set(0, 0, 0);
+                controls.update();
+            } else {
+                camera.position.set(6, 6, 6);
+                camera.lookAt(0, 0, 0);
+                controls.target.set(0, 0, 0);
+                controls.update();
+            }
+        };
+        window.resetGameView432 = function () {
+            fingerprintMode432 = false;
+            camera.position.set(6, 6, 6);
+            camera.lookAt(0, 0, 0);
+            controls.target.set(0, 0, 0);
+            controls.update();
+        };
+
         window.addEventListener('resize', function () {
             var w = container.clientWidth;
             var h = container.clientHeight || 600;
