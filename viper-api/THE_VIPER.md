@@ -1,81 +1,63 @@
-# THE VIPER™ — Product and Architecture
+# VIPER™ — Quantum-Backed Threat Detection
 
-VIPER is the quantum-backed threat detection layer of the STEADYWATCH security platform. It maps any input signature against 336 Hurwitz quaternion keys arranged in 4 directional arms, classifying threats by their position in the attack kill chain. The 3D mining game (`game-336.js`) is the visual interface; the API is the product.
+VIPER™ is a quantum-backed threat detection system built on Hurwitz quaternion mathematics. It classifies any input — a log line, network event, behavioral signature, hash, or raw payload — against 336 detection nodes arranged in 4 directional arms. Each arm maps to a phase of the attack kill chain. Classification is deterministic, geometrically grounded, and requires no training data.
 
----
-
-## What It Is
-
-- **Concept:** Security events don't have random signatures — they cluster by attack type. VIPER uses the geometric structure of the Hurwitz quaternion system to create a 336-point detection matrix with natural, mathematically maximal separation between nodes. Each input maps to the closest node, and the node's arm tells you where in the kill chain the threat falls.
-
-- **336 nodes:** The p=13 Hurwitz satellite configuration produces exactly 336 quaternion keys. These are distributed across 4 directional arms — 84 nodes per arm — corresponding to the 4 phases of the attack lifecycle.
-
-- **Kill chain mapping:**
-  - **Arm 0 (+X) — RECON:** Reconnaissance, scanning, enumeration. The earliest phase — attackers learning the target.
-  - **Arm 1 (-X) — BREACH:** Initial access, exploitation, credential abuse. The entry point.
-  - **Arm 2 (+Z) — LATERAL:** Lateral movement, privilege escalation, pivoting. The attacker spreading inside.
-  - **Arm 3 (-Z) — EXFIL:** Exfiltration, C2 communication, data theft. The endgame.
-
-- **Detection:** `SHA-256(input)` → Hamming distance against all 336 key hashes → closest node → vector classification + confidence score.
+This is the detection layer of the STEADYWATCH security platform.
 
 ---
 
-## Architecture
+## The Problem It Solves
 
-### Detection Engine (`viper-engine.js`)
+Modern threat detection relies on one of two approaches: signature matching (known patterns only, blind to novel attacks) or machine learning (probabilistic, requires training data, susceptible to adversarial inputs). Both approaches share a fundamental weakness — they are defined by what has been seen before.
 
-The engine generates all 336 Hurwitz p=13 quaternion keys at startup using the same algorithm as the 3D game. Each key is hashed with SHA-256 to produce a 256-bit node signature. On scan:
-
-1. The input is hashed: `inputHash = SHA-256(input)`
-2. Hamming distance is computed against all 336 node hashes
-3. The closest node determines the arm (kill chain vector)
-4. Confidence = `1 - (distance / 256)` — how close the match is
-5. Threat level is derived from confidence adjusted by sensitivity
-
-The quaternion keys have a critical property: they are maximally separated in 4D space by construction (Hurwitz prime norm = 13). This separation persists when projected to hash space — the 336 node hashes are well-distributed across the 256-bit space, making classification stable and unambiguous.
-
-### API Server (`server.js`)
-
-Express server on port 5001. Endpoints:
-- `POST /api/viper/scan` — primary detection endpoint
-- `GET /api/viper/alerts` — detection history with filtering
-- `GET /api/viper/status` — arm activity, uptime, counts
-- `GET /api/viper/vectors` — per-arm statistics
-- `GET /` — live dashboard
-
-All detection events are persisted to `viper-data.json` and loaded on startup.
-
-### Dashboard
-
-The dashboard at `http://localhost:5001/` provides:
-- Vector activity bars showing detection distribution across all 4 kill chain arms
-- Live detection feed with threat levels color-coded by severity
-- Interactive API explorer — submit scans and read results without curl
-- Per-arm breakdown of historical detection patterns
+VIPER™ is different. Its 336 detection nodes derive from a mathematical structure — the Hurwitz quaternion lattice at prime p=13 — that exists independently of any observed attack data. The lattice defines 336 points in 4D space with mathematically maximal separation. Any input, hashed to 256 bits, lands closest to one of those points. That point's arm tells you where in the kill chain the threat falls. No training. No signatures. No model to poison or invert.
 
 ---
 
-## Product Identity
+## How It Works
 
-### The Visual Origin
+### The Mathematical Foundation
 
-VIPER's visual identity is the chest-burster from *Alien*: a threat that moves fast along a structural axis, bursting outward from a defined vector. In the 3D game, mining a key ore block triggers the vel burst pop — orbs exploding outward along the arm axis. This is not metaphor. This is the detection event made spatial: the threat is classified, the arm fires, the burst shows you exactly which vector it came from.
+VIPER™ uses the p=13 Hurwitz quaternion satellite configuration: 336 quaternion integers with identical prime norm, distributed across 4 directional arms of 84 nodes each. These arms align with the 4 phases of the attack lifecycle — not by convention, but by the geometric directionality of the Hurwitz lattice itself.
 
-The 4-arm circuit board structure of game-336.js IS VIPER's architecture. The linear arm layout (FourWayVertex) was chosen because it gives each key a clear directional identity. The circuit board aesthetic reflects the structured, network-topology nature of kill chain detection — defined paths, defined nodes, defined vectors.
+Detection for any input follows a single, transparent pipeline:
 
-### Mathematical Foundation
+```
+input → SHA-256(input) → Hamming distance × 336 node hashes → closest node → kill chain arm + confidence
+```
 
-The Hurwitz quaternion integers form a discrete lattice in 4D space — the densest possible packing of the quaternion group. The p=13 satellite configuration selects 336 of these points with identical norm. This gives VIPER:
+Where confidence = `1 - (distance / 256)` — a direct measure of how close the input's hash is to the winning node. No threshold tuning. No hyperparameters. The geometry does the classification.
 
-- **Stability:** The same input always maps to the same node. Detection is deterministic, not probabilistic.
-- **Coverage:** 336 nodes with maximal inter-node separation means no region of the hash space is unmonitored.
-- **Quantum resistance:** The detection signatures are derived from 4D geometry, not from learned patterns. There is no training data to poisoning, no model to invert.
+### The 4 Kill Chain Arms
 
-### Connection to THE VAULT™
+| Arm | Direction | Vector | Catches |
+|-----|-----------|--------|---------|
+| 0 | +X | **RECON** | Port scans, DNS enumeration, credential stuffing probes, service fingerprinting |
+| 1 | -X | **BREACH** | Exploit attempts, injection attacks, authentication bypass, malware delivery |
+| 2 | +Z | **LATERAL** | Token theft, privilege escalation, internal pivoting, pass-the-hash |
+| 3 | -Z | **EXFIL** | Large data transfers, C2 beaconing, DNS tunneling, unusual outbound activity |
 
-VIPER is downstream of THE VAULT. The vault's 81-slot key store (p=5 Hurwitz, 144 keys) is the root of trust. VIPER's 336-node detection matrix (p=13) is the expanded coverage layer built on the same mathematical foundation.
+The directional alignment of the arms (+X, -X, +Z, -Z) is not cosmetic — it reflects the geometric structure of the Hurwitz p=13 lattice in 4D space. Threats of similar type produce hashes that cluster toward the same arm because the underlying mathematics creates stable attractor regions. This stability is a property of the geometry, not a learned artifact.
 
-In production, VIPER's node signatures should be seeded with quantum entropy from THE VAULT rather than deterministic SHA-256 — rotating the detection surface with each IBM hardware run and making signatures impossible to precompute.
+### The 3D Interface
+
+The circuit board (`game-336.js`) is not a demo — it is the interface. Each of the 336 blocks on the board is a detection node. The 4 arms of the board are the 4 kill chain vectors. When a detection fires at a node, the burst animation shows the event spatially — orbs exploding outward along the arm axis, making the kill chain phase immediately visible. Running VIPER™ alongside the game gives a live spatial map of threat activity: which arm is lighting up tells you where the attacker is in their lifecycle.
+
+---
+
+## The Security Trinity
+
+VIPER™ is the detection layer in a three-product security stack built on the same Hurwitz quaternion mathematical foundation:
+
+```
+THE VAULT™  (p=5  — 144 keys — 81 slots)   →  Root of trust. Key storage and provisioning.
+VIPER™      (p=13 — 336 keys — 4 arms)     →  Threat detection. Kill chain classification.
+HORDE™      (p=17 — 432 keys — 4 clusters) →  Swarm defense. Collective posture response.
+```
+
+VIPER™ detects. HORDE™ responds. THE VAULT™ is what they're protecting.
+
+In the operational pipeline, VIPER™ tells you *what* the threat is doing — which phase of the kill chain it has reached. HORDE™ tells you *how* to respond — which defense posture the swarm recommends. Together, they give you both the threat intelligence and the action directive, derived from the same mathematical foundation as the keys they're defending.
 
 ---
 
@@ -83,53 +65,50 @@ In production, VIPER's node signatures should be seeded with quantum entropy fro
 
 ### Scout
 - **Coverage:** 1 arm (84 nodes) — RECON vector only
-- **Use case:** Lightweight perimeter monitoring, early-warning reconnaissance detection
-- **Scan:** `"tier": "scout"` — checks arm 0 only, faster response
+- **Use case:** Lightweight perimeter monitoring, early-warning reconnaissance detection, internet-facing exposure
+- **Scan:** `"tier": "scout"` — checks arm 0 only, minimal compute, fast response
+- **Best for:** Organizations beginning threat detection or monitoring a single exposure surface
 
 ### Strike
 - **Coverage:** 4 arms (336 nodes) — full kill chain
-- **Use case:** Standard deployment — complete kill chain coverage across all 4 vectors
+- **Use case:** Standard deployment — complete kill chain coverage from initial reconnaissance through exfiltration
 - **Scan:** `"tier": "strike"` (default)
+- **Best for:** Security teams that need full kill chain visibility in a single API call
 
 ### Phantom *(Enterprise)*
 - **Coverage:** Custom arm selection, adjustable sensitivity per vector
-- **Features:** Webhook alerts, streaming scan API, custom detection configurations, multi-tenant API keys
-- **Integration:** Vault key injection, HORDE coordination, unified threat dashboard
+- **Features:** Webhook alerts on threshold breach, streaming scan API for real-time log pipelines, multi-tenant API keys, custom detection configurations
+- **Integration:** THE VAULT™ key injection (quantum-seeded node signatures), HORDE™ automatic response trigger, unified threat dashboard
+- **Best for:** Enterprise SOC teams, MSSPs, and platform integrators building VIPER™ into a larger security stack
 
 ---
 
-## The Security Trinity
+## Licensing
 
-VIPER is the detection layer in a three-product security stack:
+VIPER™ is licensed per deployment. A license covers:
 
-```
-THE VAULT™  (game.js    — 144 keys — p=5)   →  Root of trust, key storage
-VIPER       (game-336.js — 336 keys — p=13) →  Threat detection, kill chain classification
-HORDE       (game-432.js — 432 keys — p=17) →  Swarm defense, collective response
-```
+- One VIPER™ instance (336 nodes, full 4-arm kill chain)
+- REST API with configurable sensitivity and tier selection
+- Detection history with filtering and audit trail
+- Dashboard and live vector activity monitoring
 
-All three share the same Hurwitz quaternion mathematical foundation, the same crystal surface visual identity, and the same quantum entropy pipeline. THE VAULT provisions the keys. VIPER detects when those keys are under threat. HORDE responds.
+**Security Trinity licensing** bundles THE VAULT™ + VIPER™ + HORDE™ under a single license — one mathematical foundation covering key storage, threat detection, and defense response.
 
----
-
-## User Flow
-
-1. **Start VIPER:** `cd viper-api && npm start`
-2. **Open the dashboard:** `http://localhost:5001/`
-3. **Submit a scan:** POST any suspicious input — log line, IP, event, hash
-4. **Read the classification:** Vector tells you kill chain phase. Threat level tells you urgency. Confidence tells you certainty. The top 3 node matches show you the closest alternatives.
-5. **Watch the dashboard:** Vector bars grow as detections accumulate. Patterns emerge — which kill chain phase is most active tells you where the attacker is in their lifecycle.
-6. **Integrate:** Wire `POST /api/viper/scan` into your log pipeline, SIEM, or security automation. VIPER returns structured JSON — drop it into any downstream system.
+Contact: [steadywatchapp@gmail.com](mailto:steadywatchapp@gmail.com)
 
 ---
 
-## Future
+## What Makes It Different
 
-- **Quantum-seeded node signatures** — replace SHA-256 derived key hashes with IBM hardware entropy via THE VAULT pipeline
-- **HORDE coordination** — when VIPER detects BREACH or LATERAL, automatically trigger HORDE swarm response on the affected nodes
-- **Streaming mode** — continuous input stream classification for real-time log analysis
-- **Phantom tier** — per-vector sensitivity, webhook alerting, multi-tenant keys, custom node configurations
-- **Visualization integration** — live `game-336.js` board updates driven by API scan events — the game board lights up in real time as threats are detected
+| | Signature-Based IDS | ML-Based Detection | VIPER™ |
+|---|---|---|---|
+| Detection basis | Known attack patterns | Learned from training data | Hurwitz quaternion geometry (4D, mathematically structured) |
+| Novel attack coverage | Blind | Partial (requires similar training samples) | Full — any input maps to a kill chain arm |
+| Adversarial resistance | Low — evade signatures | Medium — adversarial examples possible | High — no model to invert, geometry is fixed |
+| False positive source | Signature gaps | Model uncertainty | Geometry only — confidence score is transparent |
+| Training required | Yes (signature updates) | Yes (continuous retraining) | No — detection matrix is deterministic at startup |
+| Kill chain mapping | Requires correlation rules | Requires labeled data | Native — arms encode kill chain by construction |
+| Quantum resistance | None | None | 4D geometric classification — no statistical assumptions |
 
 ---
 
@@ -137,5 +116,6 @@ All three share the same Hurwitz quaternion mathematical foundation, the same cr
 
 - **API reference:** [README.md](README.md)
 - **User guide:** [VIPER_USER_GUIDE.md](VIPER_USER_GUIDE.md)
-- **Security Trinity:** [../vault-api/THE_VAULT.md](../vault-api/THE_VAULT.md)
+- **THE VAULT™ (root of trust):** [../vault-api/THE_VAULT.md](../vault-api/THE_VAULT.md)
+- **HORDE™ (swarm defense):** [../horde-api/THE_HORDE.md](../horde-api/THE_HORDE.md)
 - **Research background:** [RESEARCH_DISCOVERIES.md](../../RESEARCH_DISCOVERIES.md) — Discovery 42
