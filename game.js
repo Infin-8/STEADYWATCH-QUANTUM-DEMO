@@ -405,20 +405,50 @@
         }
         renderer.domElement.addEventListener('mousemove', onMouseMove);
 
+        function buildHurwitzCrystalLayer() {
+            var quats = window.HurwitzKeys ? window.HurwitzKeys.unzipSeed(5) : [];
+            var crystalGeom = new THREE.SphereGeometry(0.14, 8, 8);
+            for (var i = 0; i < quats.length; i++) {
+                var q = quats[i];
+                var pos = project4Dto3D(q.a, q.b, q.c, q.d, 2.5);
+                var ph = (i / quats.length);
+                var cHue = (0.68 + ph * 0.22) % 1;
+                var mat = new THREE.MeshPhysicalMaterial({
+                    color: new THREE.Color().setHSL(cHue, 0.25, 0.88),
+                    emissive: new THREE.Color().setHSL(cHue, 0.6, 0.5),
+                    emissiveIntensity: 0.0,
+                    roughness: 0.0,
+                    metalness: 0.0,
+                    transmission: 0.85,
+                    opacity: 1.0,
+                    transparent: true,
+                    ior: 1.7,
+                    clearcoat: 0.8,
+                    clearcoatRoughness: 0.05,
+                    envMapIntensity: 1.2,
+                    side: THREE.FrontSide,
+                    specularIntensity: 1.0
+                });
+                var mesh = new THREE.Mesh(crystalGeom, mat);
+                mesh.position.set(pos.x, 1.0 + pos.y * 0.15, pos.z);
+                mesh.userData.blockType = BLOCK.GROUND;
+                mesh.userData.crystalPhase = ph * Math.PI * 2;
+                mesh.userData.crystalHue = cHue;
+                scene.add(mesh);
+                blockMeshes.push(mesh);
+            }
+        }
+
         function buildWorld() {
             var i, j;
-            // y=0: p=5 ore (144 satellites) — hidden beneath crystal
+            // y=0: p=5 ore (144 satellites) — beneath the Hurwitz quaternion lattice
             for (i = -4; i <= 4; i++) {
                 for (j = -4; j <= 4; j++) {
                     setBlock(i, 0, j, BLOCK.KEY_ORE_P5);
                 }
             }
-            // y=1: crystal surface — user must rotate to mine beneath
-            for (i = -4; i <= 4; i++) {
-                for (j = -4; j <= 4; j++) {
-                    setBlock(i, 1, j, BLOCK.GROUND);
-                }
-            }
+            // Hurwitz quaternion lattice crystal layer — 144 nodes projected from 4D F4 lattice
+            buildHurwitzCrystalLayer();
         }
 
         buildWorld();
