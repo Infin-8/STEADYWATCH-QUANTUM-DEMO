@@ -345,7 +345,7 @@
                     specularIntensity: 1.0
                 });
                 var mesh = new THREE.Mesh(crystalGeom, mat);
-                mesh.position.set(pos.x, 1.0 + pos.y * 0.15, pos.z);
+                mesh.position.set(pos.x, 1.5 + pos.y * 0.15, pos.z);
                 mesh.userData.blockType = BLOCK.GROUND;
                 mesh.userData.crystalPhase = ph * Math.PI * 2;
                 mesh.userData.crystalHue = cHue;
@@ -356,13 +356,19 @@
 
         function buildWorld() {
             var i, j;
-            // y=0: p=5 ore — beneath the Hurwitz quaternion lattice
+            // y=0: p=5 ore — hidden beneath crystal
             for (i = -4; i <= 4; i++) {
                 for (j = -4; j <= 4; j++) {
                     setBlock(i, 0, j, BLOCK.KEY_ORE_P5);
                 }
             }
-            // Hurwitz quaternion lattice crystal layer — 336 nodes projected from 4D F4 lattice (p=13)
+            // y=1: crystal floor — dense base layer
+            for (i = -4; i <= 4; i++) {
+                for (j = -4; j <= 4; j++) {
+                    setBlock(i, 1, j, BLOCK.GROUND);
+                }
+            }
+            // Hurwitz quaternion lattice nodes — 336 sites projected from 4D (p=13), floating above crystal floor
             buildHurwitzCrystalLayer();
         }
 
