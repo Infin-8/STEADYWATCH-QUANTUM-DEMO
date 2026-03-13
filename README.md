@@ -19,7 +19,50 @@ This repository contains quantum computing research for **Echo Resonance Technol
 
 ---
 
-## 🎉 Latest Breakthrough: Cross-Platform Qubit Aggregation
+## 🎉 Latest Breakthrough: Hurwitz Lattice-Metric Authentication — Biometric-Style QKD Identity
+
+### Hurwitz Lattice-Metric Authentication (HLA): Solving the QKD Bootstrapping Problem
+
+**Date:** March 13, 2026
+**Status:** ✅ **No Pre-Shared Secret Required — Geometric Identity Verified from the Lattice Itself**
+
+**The Problem Solved:**
+QKD protocols have long required a pre-shared secret to authenticate Phase 1. This creates a bootstrapping problem: to establish a quantum-secure channel, you first need a classically-secure channel. Hurwitz Lattice-Metric Authentication eliminates this requirement entirely.
+
+**How It Works — The Biometric Parallel:**
+Each API server in the Security Trinity has a unique Hurwitz prime. The F4 shell around that prime — the set of all Hurwitz quaternion integers with that norm — forms a crystal cluster with a shape that is unique to that prime. No two primes produce the same cluster. This cluster shape is SHA-256 hashed to produce a lattice fingerprint. Any party, independently, can compute the expected fingerprint for a given prime and verify a server's identity without ever having communicated with it before. The cluster shape is the identity — like a geometric fingerprint, but for quantum keys.
+
+**Security Trinity Fingerprints:**
+- **VAULT** (p=5): `e1d594a946e07e52...` — 144 F4 lattice sites
+- **VIPER** (p=13): `aa270de9ab65cbd2...` — 336 F4 lattice sites
+- **HORDE** (p=17): `d4ddded70230b364...` — 432 F4 lattice sites
+
+**The Fingerprint View:**
+All three game pages now include a "Fingerprint View" button. A bird's-eye camera reveals the F4 cluster silhouette unique to each prime — the same geometric object used for authentication, made visible. The label shows the prime, site count, and fingerprint hash: `Fingerprint: p=17 · 432 sites · ID: d4ddded70230...`
+
+**Cross-Environment Hash Parity:**
+The SHA-256 of the sorted F4 shell produces identical results across Python backend, Node.js API servers, and browser JS. The lattice fingerprint is environment-agnostic — any implementation that correctly generates the F4 shell will produce the same hash.
+
+**Test Coverage (All 6 Passing):**
+- ✅ Site counts (144 / 336 / 432 for p=5/13/17)
+- ✅ Hash determinism (same prime always produces same fingerprint)
+- ✅ Mutual auth flow (hello → verify → confirm → session token)
+- ✅ Session seed agreement (XOR of both parties' cluster hashes, independently derivable)
+- ✅ Tamper rejection (modified fingerprint claim rejected)
+- ✅ Cross-prime uniqueness (no two primes produce the same fingerprint)
+
+**New Files:**
+- `qkd/hurwitz_lattice_auth.py` — Python core: F4 shell generator, HurwitzLatticeAuth class, LatticeLink
+- `js/hurwitz-lattice-auth.js` — Browser client: window.HurwitzLatticeAuth
+- `lattice-auth-middleware.js` — Shared Express middleware for all three API servers
+
+**Research Papers:**
+- [`docs/research/HURWITZ_LATTICE_BIOMETRIC_AUTHENTICATION.md`](docs/research/HURWITZ_LATTICE_BIOMETRIC_AUTHENTICATION.md) — Biometric-style authentication for QKD
+- [`docs/research/HURWITZ_DUAL_LATTICE_VISUALIZATION.md`](docs/research/HURWITZ_DUAL_LATTICE_VISUALIZATION.md) — Dual-layer crystal visualization research
+
+---
+
+## 🎉 Previous Breakthrough: Cross-Platform Qubit Aggregation
 
 ### Cross-Platform Qubit Aggregation: Enabling Large-Scale Quantum Algorithms
 
@@ -107,7 +150,7 @@ This repository contains quantum computing research for **Echo Resonance Technol
 
 **Historic Achievement:**
 - **All 6 Protocol Phases Validated:**
-  - ✅ Phase 1: Authentication (PASS)
+  - ✅ Phase 1: Authentication (PASS) — supports both HMAC pre-shared secret and Hurwitz Lattice-Metric Authentication (no pre-shared secret required)
   - ✅ Phase 2: Quantum Key Generation (PASS - 65% raw fidelity)
   - ✅ Phase 3: Error Detection (PASS - 52% error rate detected)
   - ✅ Phase 4: Error Correction (PASS)
@@ -322,9 +365,11 @@ We've implemented and validated the first complete hybrid QKD protocol combining
 
 ### Research Papers
 
+- **[Hurwitz Lattice-Metric Authentication](docs/research/HURWITZ_LATTICE_BIOMETRIC_AUTHENTICATION.md)** ⭐ NEW - Biometric-style geometric identity for QKD — no pre-shared secret required, F4 cluster shapes independently verifiable.
+- **[Hurwitz Dual Lattice Visualization](docs/research/HURWITZ_DUAL_LATTICE_VISUALIZATION.md)** ⭐ NEW - Research paper on dual-layer crystal visualization of F4 lattice structures.
 - **[Cross-Platform Qubit Aggregation](docs/research/CROSS_PLATFORM_QUBIT_AGGREGATION.md)** ⭐ NEW - First cross-platform qubit aggregation system enabling 783 qubits, making Shor's and Grover's algorithms feasible on current hardware.
 
-**[Bell Inequality Breakthrough](docs/research/BELL_INEQUALITY_BREAKTHROUGH.md)** - 
+**[Bell Inequality Breakthrough](docs/research/BELL_INEQUALITY_BREAKTHROUGH.md)** -
   First Bell inequality violation on real hardware with loophole closed (Discovery 41)
 - **[Freedom-of-Choice Loophole Closed](docs/research/FREEDOM_OF_CHOICE_LOOPHOLE_CLOSED.md)** ⭐ NEW - 
   Quantum randomness closes loophole in Bell tests
@@ -449,7 +494,8 @@ STEADYWATCH-QUANTUM-DEMO/
 │   ├── cascade_key_reconciliation.py
 │   ├── ldpc_error_correction.py
 │   ├── quantum_amplified_ldpc.py
-│   └── ghz_echo_resonance_hybrid.py
+│   ├── ghz_echo_resonance_hybrid.py
+│   └── hurwitz_lattice_auth.py       ⭐ NEW - F4 shell generator, HurwitzLatticeAuth, LatticeLink
 │
 ├── examples/                         # NEW: Example Code
 │   ├── qkd_basic_usage.py
@@ -478,8 +524,14 @@ STEADYWATCH-QUANTUM-DEMO/
         ├── QKD_MILESTONE_RESEARCH_PAPER.md
         ├── QKD_ACADEMIC_PAPER.md
         ├── BELL_INEQUALITY_BREAKTHROUGH.md
-        └── CROSS_PLATFORM_QUBIT_AGGREGATION.md  ⭐ NEW
+        ├── CROSS_PLATFORM_QUBIT_AGGREGATION.md  ⭐ NEW
+        ├── HURWITZ_LATTICE_BIOMETRIC_AUTHENTICATION.md  ⭐ NEW - Biometric-style auth for QKD
+        └── HURWITZ_DUAL_LATTICE_VISUALIZATION.md        ⭐ NEW - Dual-layer crystal visualization
 ```
+
+**New root-level files:**
+- `lattice-auth-middleware.js` ⭐ NEW — Shared Express middleware for all three API servers
+- `js/hurwitz-lattice-auth.js` ⭐ NEW — Browser client: window.HurwitzLatticeAuth
 
 **Note:** This is a public demo repository. The complete implementation including the hybrid QKD system (`ghz_echo_resonance_hybrid.py`) and large-scale encryption (`quantum_encryption_large_scale.py`) is available in the private repository. The research paper in `docs/` contains complete technical details and validation results.
 
@@ -906,15 +958,9 @@ This repository contains research code for quantum computing research. Code is p
 
 ---
 
-<<<<<<< HEAD
-**Repository Version:** 1.1  
-**Last Updated:** January 15, 2026  
-**Status:** ✅ Ready for IBM Quantum Review
-=======
-**Repository Version:** 2.2  
-**Last Updated:** January 12, 2026  
-**Status:** ✅ **Complete QKD Protocol Validated on Real Hardware** | 🎉 **Discovery 38: First Complete QKD Protocol** | ⚛️ **All 6 Phases Working** | 🔬 **33% Error Mitigation Improvement** | ✅ **QKD Production-Ready** | 📚 **Research Papers & API Documentation Added** | 🏭 **Quantum Pre-Qualification Test Suite Complete** (7-Layer Manufacturing-Based Quality Control)
->>>>>>> 417c07c8b07b658390c3151bc0c00aafa6f708de
+**Repository Version:** 2.2
+**Last Updated:** March 13, 2026
+**Status:** ✅ **Complete QKD Protocol Validated on Real Hardware** | 🎉 **Hurwitz Lattice-Metric Authentication — Biometric-Style QKD Identity (No Pre-Shared Secret)** | ⚛️ **All 6 Protocol Phases Working** | 🔬 **Hash Parity Verified Across Python/Node/Browser** | ✅ **QKD Production-Ready**
 
 ---
 

@@ -61,6 +61,39 @@ In the operational pipeline, VIPER™ tells you *what* the threat is doing — w
 
 ---
 
+### Lattice-Metric Authentication
+
+**Date added:** March 13, 2026
+
+VIPER™ has a cryptographic identity derived entirely from its Hurwitz prime. No pre-shared secret is required to verify it.
+
+**VIPER's lattice identity:**
+- Prime: p=13
+- Fingerprint: `aa270de9ab65cbd2...` (SHA-256 of sorted p=13 F4 shell)
+- F4 sites: 336
+
+The F4 shell at p=13 contains exactly 336 points — the same 336 nodes that form VIPER™'s detection matrix. This is not a coincidence: VIPER™ detects threats using the same mathematical structure that authenticates its identity. The 336-node detection matrix and the 336 F4 lattice sites are the same mathematical object.
+
+**Cross-prime verification without a pre-shared secret:** VAULT and VIPER can authenticate each other because each knows the other's expected prime. VAULT knows to expect a p=13 fingerprint from VIPER; VIPER knows to expect a p=5 fingerprint from VAULT. Neither needs prior communication to verify the other's identity — they independently compute the expected F4 shell hash and compare. This means the VAULT→VIPER operational pipeline (key provisioning feeding detection) is now authenticated purely from lattice geometry.
+
+**Retrieving the fingerprint:**
+```
+GET /auth/lattice-fingerprint
+```
+Returns VIPER's prime (p=13) and fingerprint hash.
+
+**Auth flow:**
+1. Client sends `POST /auth/lattice-hello` with its prime claim and fingerprint
+2. VIPER verifies by independently computing the expected fingerprint for that prime
+3. VIPER returns its own claim (p=13, `aa270de9ab65cbd2...`)
+4. Client verifies by computing the p=13 F4 shell hash independently
+5. `POST /auth/lattice-confirm` finalizes mutual auth, issues session token
+6. Session seed = XOR(client cluster hash, VIPER cluster hash)
+
+**Fingerprint View:** The game interface includes a "Fingerprint View" button. A bird's-eye camera reveals the F4 cluster silhouette for p=13 — the same 336-site structure used for both detection and authentication. Label: `Fingerprint: p=13 · 336 sites · ID: aa270de9ab65cbd2...`
+
+---
+
 ## Product Tiers
 
 ### Scout
@@ -109,6 +142,7 @@ Contact: [steadywatchapp@gmail.com](mailto:steadywatchapp@gmail.com)
 | Training required | Yes (signature updates) | Yes (continuous retraining) | No — detection matrix is deterministic at startup |
 | Kill chain mapping | Requires correlation rules | Requires labeled data | Native — arms encode kill chain by construction |
 | Quantum resistance | None | None | 4D geometric classification — no statistical assumptions |
+| Authentication | API key / OAuth | Client certificate / PKI | Lattice-metric — no pre-shared secret, geometric identity verified from the F4 lattice itself |
 
 ---
 

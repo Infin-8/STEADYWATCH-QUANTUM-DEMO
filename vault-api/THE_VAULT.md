@@ -60,6 +60,45 @@ All three share the same crystal surface visual identity, the same quantum entro
 
 ---
 
+### Lattice-Metric Authentication
+
+**Date added:** March 13, 2026
+
+THE VAULT™ has a cryptographic identity derived entirely from its Hurwitz prime. No pre-shared secret is required to verify it.
+
+**VAULT's lattice identity:**
+- Prime: p=5
+- Fingerprint: `e1d594a946e07e52...` (SHA-256 of sorted p=5 F4 shell)
+- F4 sites: 144
+
+The F4 shell at p=5 is the set of all Hurwitz quaternion integers with norm equal to 5. This shell contains exactly 144 points. Their sorted SHA-256 hash is THE VAULT™'s lattice fingerprint. Any client that independently generates the p=5 F4 shell and hashes it will arrive at the same fingerprint — no communication with VAULT required beforehand.
+
+**The biometric parallel:** The p=5 cluster shape is VAULT's geometric identity — unique among all Hurwitz primes, independently verifiable, impossible to forge without computing the F4 lattice.
+
+**Retrieving the fingerprint:**
+```
+GET /auth/lattice-fingerprint
+```
+Returns VAULT's prime and fingerprint hash. The endpoint `GET /auth/lattice-fingerprint/:prime` returns the fingerprint for any prime.
+
+**Auth flow:**
+1. Client sends `POST /auth/lattice-hello` with its own prime claim and fingerprint
+2. VAULT verifies the client's claim by independently computing the expected fingerprint for that prime
+3. VAULT returns its own claim (p=5, `e1d594a946e07e52...`)
+4. Client verifies VAULT's claim by computing the p=5 F4 shell hash independently
+5. `POST /auth/lattice-confirm` finalizes mutual authentication and issues a session token
+6. Session seed = XOR(client cluster hash, VAULT cluster hash) — deterministic, independently derivable by either party
+
+**Fingerprint View:** The game interface includes a "Fingerprint View" button. A bird's-eye camera reveals the F4 cluster silhouette for p=5 — the same 144-site geometric object used for authentication, made visually inspectable. Label: `Fingerprint: p=5 · 144 sites · ID: e1d594a946e07e52...`
+
+**New endpoints (all three API servers share this interface):**
+- `POST /auth/lattice-hello` — verify client claim, return server acknowledgment
+- `POST /auth/lattice-confirm` — finalize mutual auth, issue session token
+- `GET /auth/lattice-fingerprint` — return this server's lattice fingerprint
+- `GET /auth/lattice-fingerprint/:prime` — return fingerprint for any prime
+
+---
+
 ## Product Tiers
 
 ### Sovereign
@@ -107,6 +146,7 @@ Contact: [steadywatchapp@gmail.com](mailto:steadywatchapp@gmail.com)
 | Interface | API / console | Physical device | 3D crystal board + REST API |
 | Security stack | Key storage only | Key storage only | Root of trust → VIPER detection → HORDE defense |
 | Quantum resistance | Post-quantum algorithms | Post-quantum algorithms | 4D geometric key identity — no factoring assumption |
+| Authentication | API key / OAuth | Client certificate / PKI | Lattice-metric — no pre-shared secret, geometric identity verified from the F4 lattice itself |
 
 ---
 

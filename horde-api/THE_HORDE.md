@@ -70,6 +70,43 @@ The operational pipeline is direct: feed the same input to both VIPER™ and HOR
 
 ---
 
+### Lattice-Metric Authentication
+
+**Date added:** March 13, 2026
+
+HORDE™ has a cryptographic identity derived entirely from its Hurwitz prime. No pre-shared secret is required to verify it.
+
+**HORDE's lattice identity:**
+- Prime: p=17
+- Fingerprint: `d4ddded70230b364...` (SHA-256 of sorted p=17 F4 shell)
+- F4 sites: 432
+
+HORDE™ has the densest F4 shell in the Security Trinity — 432 sites, compared to 144 (VAULT) and 336 (VIPER). Its lattice identity is the hardest to approximate. The 432 defense nodes that vote on collective posture are the same 432 F4 sites that authenticate HORDE™'s identity: the swarm defense mechanism and the authentication mechanism are the same mathematical object.
+
+**Cross-prime session seeds:** Session seeds between HORDE™ and each peer are independently derivable by either party:
+- HORDE↔VAULT seed = XOR(hash(p=17), hash(p=5))
+- HORDE↔VIPER seed = XOR(hash(p=17), hash(p=13))
+
+Neither party needs to transmit the seed — both can compute it from the publicly verifiable F4 shell hashes.
+
+**Retrieving the fingerprint:**
+```
+GET /auth/lattice-fingerprint
+```
+Returns HORDE's prime (p=17) and fingerprint hash.
+
+**Auth flow:**
+1. Client sends `POST /auth/lattice-hello` with its prime claim and fingerprint
+2. HORDE verifies by independently computing the expected fingerprint for that prime
+3. HORDE returns its own claim (p=17, `d4ddded70230b364...`)
+4. Client verifies by computing the p=17 F4 shell hash independently
+5. `POST /auth/lattice-confirm` finalizes mutual auth, issues session token
+6. Session seed = XOR(client cluster hash, HORDE cluster hash)
+
+**Fingerprint View:** The game interface includes a "Fingerprint View" button. A bird's-eye camera reveals the F4 cluster silhouette for p=17 — the densest and most visually distinctive of the three primes. Label: `Fingerprint: p=17 · 432 sites · ID: d4ddded70230b364...`
+
+---
+
 ## Product Tiers
 
 ### Colony
@@ -118,6 +155,7 @@ Contact: [steadywatchapp@gmail.com](mailto:steadywatchapp@gmail.com)
 | Training required | Yes (rule authoring) | Yes (continuous retraining) | No — defense matrix is deterministic at startup |
 | VIPER™ integration | Requires custom integration | Requires custom integration | Native — same mathematical pipeline, direct input handoff |
 | Quantum resistance | None | None | 4D geometric consensus — no statistical assumptions |
+| Authentication | API key / OAuth | Client certificate / PKI | Lattice-metric — no pre-shared secret, geometric identity verified from the F4 lattice itself |
 
 ---
 
