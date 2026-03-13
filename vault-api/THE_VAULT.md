@@ -1,68 +1,119 @@
-# THE VAULT™ — Product and Architecture
+# THE VAULT™ — Quantum-Backed Key Store
 
-THE VAULT™ is the quantum-backed vault product layer built on STEADYWATCH Hybrid QKD (SHQKD): an 81-slot key store with a 3D Keyz board as the interface. Clicking a block (“mining”) can request key release for that slot, subject to API key auth and audit.
+THE VAULT™ is a quantum-seeded key storage system built on Hurwitz quaternion mathematics. It provides 81 cryptographic key slots — each derived from real quantum hardware entropy — organized on a 9×9 board with a 3D crystal interface. Every key has a geometric identity rooted in 4D space. No two slots are the same. No slot can be derived without the original quantum seed.
 
----
-
-## What it is
-
-- **Concept:** The demo site describes SHQKD as “like an un-hackable vault that nature provides” for digital assets and transactions. THE VAULT makes that concrete: a backend that stores key material in 81 slots and encrypted payloads (optional), and a front end that reuses the 81-block Keyz game so each block corresponds to one slot.
-- **81 slots:** Each of the 81 cells on the 9×9 board maps to slot index `0..80` (row = 4 − bz, col = bx + 4, index = row×9 + col in world coordinates).
-- **Key material:** Demo mode derives per-slot keys from a seed (SHA-256); production key material should come from SHQKD/Echo Resonance key injection.
-- **Access:** Key release is gated by API key auth; all store and request actions are logged in the audit trail.
+This is the root of trust for the STEADYWATCH security platform.
 
 ---
 
-## Architecture
+## The Problem It Solves
 
-- **Backend (vault-api):** Express server with 81-slot in-memory key store, `POST /api/vault/store` (store encrypted payload), `POST /api/vault/request` (request key release for a slot), `GET /api/vault/slots`, `GET /api/vault/audit`. API key via `X-Vault-Api-Key` (or body). See [README.md](README.md).
-- **Front end (game.html + game.js):** 81-block Keyz board unchanged; optional “Vault API” panel (base URL, API key, checkbox). When Vault mode is on and user clicks a key ore block, the game calls `POST /api/vault/request` with the slot index and displays “Key released” or an error.
-- **Future:** SHQKD/Echo key injection, persistent key store, HSM, M-of-N or time-lock policy, and compliance (see [VAULT_OPS.md](../docs/VAULT_OPS.md)).
+Modern key storage relies on pseudorandom number generators, hardware security modules with opaque internals, or cloud KMS services with single-vendor trust chains. None of these produce keys with a verifiable geometric structure. None connect key identity to a mathematical object that exists independently of the software generating it.
 
----
-
-## User flow
-
-1. **Run the API:** `cd vault-api && npm install && npm start` (default port 5003).
-2. **Open THE VAULT page** (game.html; nav link “VAULT™” or “THE VAULT™”).
-3. **Optional — use vault API:** Check “Vault API,” set base URL to `http://localhost:5003` (or your deployment), set API key to `vault-demo-key-change-in-production`.
-4. **Click any key ore block:** The block is mined (removed, key drop appears) as usual. If Vault API is enabled, the app also requests key release for that slot and shows “Key released for slot N” or an error in the label and status.
+THE VAULT™ is different. Each of its 81 keys maps to a specific Hurwitz quaternion — a point in a maximally dense 4D lattice with prime norm p=5. The lattice exists whether or not the software runs. The key's position in that lattice is its identity. Quantum entropy from IBM hardware determines which point in the lattice each slot occupies. The combination — deterministic geometry plus true quantum randomness — produces key material that is both mathematically structured and physically unpredictable.
 
 ---
 
-## API usage summary
+## How It Works
 
-- **Request key release (from UI or any client):**  
-  `POST /api/vault/request`  
-  Headers: `Content-Type: application/json`, `X-Vault-Api-Key: <key>`  
-  Body: `{ "slotIndex": 0 }` (0..80)  
-  Response: `{ "ok": true, "slotIndex": 0, "keyReleased": true, "keyMaterial": "<hex>", "hasPayload": false }`
+### The Mathematical Foundation
 
-- **Store encrypted payload:**  
-  `POST /api/vault/store`  
-  Same headers.  
-  Body: `{ "slotIndex": 0, "encryptedPayload": "<base64 or string>" }`
+THE VAULT™ uses the p=5 Hurwitz quaternion satellite configuration: 144 quaternion integers with identical prime norm, derived from the densest possible packing of 4D space. These 144 points are distributed across 81 slots on a 9×9 board — the same board geometry used in the 3D interface.
 
-- **List slots with payloads:**  
-  `GET /api/vault/slots`  
-  Response: `{ "slots": 81, "filled": [0, 1, ...] }`
+Key material for each slot is computed as:
 
-- **Audit log:**  
-  `GET /api/vault/audit?limit=100`  
-  Requires auth. Returns recent store/request entries.
+```
+key_material = SHA-256(satellite_key_hex + quantum_seed_hex)
+```
 
-Full details: [README.md](README.md). Operations and compliance: [VAULT_OPS.md](../docs/VAULT_OPS.md).
+Where `satellite_key_hex` is the deterministic Hurwitz quaternion key for that slot, and `quantum_seed_hex` is entropy collected from real IBM Quantum hardware (`ibm_marrakesh`). This formula means:
+
+- **Reproducibility:** Given the same Hurwitz geometry and the same quantum seed, the key is always the same
+- **Uniqueness:** Different quantum seeds produce completely different keys from the same geometric base
+- **Quantum grounding:** The entropy source is a real physical system — not a PRNG, not a hash chain, not a software simulation
+
+### The 81-Slot Board
+
+The 9×9 board maps directly to slot indices 0–80. Each slot has a fixed position in the Hurwitz quaternion lattice. When you interact with a slot — visually (mining the 3D crystal board) or programmatically (calling the API) — you are addressing a specific 4D coordinate in a mathematical structure that predates the software by decades.
+
+80 of the 81 slots are seeded with real IBM Quantum hardware entropy. Average entropy per slot: **7.80 bits** (measured, not estimated).
+
+### The 3D Interface
+
+The crystal board (`game.js`) is not a demo — it is the interface. Each block on the board is a vault slot. The gemological interaction model mirrors how a cryptographer should treat key material: inspect from above (face-up view), examine structure under different angles (tilt/Brewster flash at θ_B ≈ 59.5°), access what's beneath only from the correct angle (pavilion view). The interface encodes the security model spatially.
 
 ---
 
-## Product idea: Custom key configurations → tiered packages
+## The Security Trinity
 
-**Concept:** Users utilize the 3D vault interface not only to view and request keys, but to *design* custom key configurations—e.g. which slots form the “moat,” which are symbol blocks, layout and grouping—and save those as named configurations. Those configurations can be offered as **tiered packages** (e.g. Standard / Moat / Symbol / Enterprise custom layout), turning THE VAULT UI into a configurator and differentiator for pricing tiers.
+THE VAULT™ is the root of trust in a three-product security stack built on the same Hurwitz quaternion mathematical foundation:
 
-- **Moat:** Configuration where only certain perimeter or guard slots are active; inner slots reserved or gated.
-- **Symbol:** Configuration where specific slots map to symbols or roles (e.g. by customer, by asset type).
-- **Custom layouts:** Enterprise or power users design and save a full 81-slot layout (which slots exist, how they’re labeled/grouped in the 3D view), then that layout becomes their “package” for key storage and release.
+```
+THE VAULT™  (p=5  — 144 keys — 81 slots)  →  Root of trust. Key storage and provisioning.
+VIPER       (p=13 — 336 keys — 4 arms)    →  Threat detection. Kill chain classification.
+HORDE       (p=17 — 432 keys — 4 clusters) →  Swarm defense. Collective posture response.
+```
 
-**Implications:** Vault API could support multiple “configs” or “templates” per API key (or per tenant); the 3D game would need a “design mode” or configurator flow to create and name configurations, then attach them to a tier or product SKU. Backend: store config metadata (slot roles, labels, moat/symbol rules) and optionally restrict store/request by config.
+The key count formula is `24 × (p+1)` for prime p. Each tier uses a larger Hurwitz prime — more keys, denser geometry, broader coverage. THE VAULT™ provisions the keys. VIPER detects when those keys are under threat. HORDE responds.
 
-**Preferred config (signature tier):** Key at slot index **0**, **144 Hurwitz moat**, then **unlocked key moat**. See [VAULT_CONFIGS_API_SKETCH.md](VAULT_CONFIGS_API_SKETCH.md) for API sketch and one-pager.
+All three share the same crystal surface visual identity, the same quantum entropy pipeline, and the same mathematical foundation. This is not a product family built from different technologies — it is one mathematical system expressed at three security layers.
+
+---
+
+## Product Tiers
+
+### Sovereign
+- **Slots:** 81 (full 9×9 board)
+- **Key material:** IBM Quantum hardware entropy via `ibm_marrakesh`
+- **Access:** REST API with key auth, persistent storage, full audit log
+- **Dashboard:** Live slot heatmap, entropy stats, API explorer
+- **Use case:** Single-tenant key storage for high-value digital assets, credentials, or signing keys
+
+### Constellation
+- **Slots:** Multiple vault instances — each with its own 81-slot board and quantum seed
+- **Integration:** VIPER threat detection feeds into vault access decisions
+- **Use case:** Multi-tenant or multi-environment deployments with shared quantum entropy pipeline
+
+### Citadel *(Enterprise)*
+- **Slots:** Custom board geometry, custom Hurwitz prime, custom cluster configuration
+- **Integration:** Full Security Trinity — VAULT provisioning + VIPER detection + HORDE response, unified under one API key namespace
+- **Features:** Custom moat configurations, M-of-N slot release policies, time-lock, webhook alerting, HSM integration
+- **Use case:** Enterprise key infrastructure requiring quantum-resistant key material with full kill chain and defense posture awareness
+
+---
+
+## Licensing
+
+THE VAULT™ is licensed per deployment. A license covers:
+
+- One vault instance (81 slots, one Hurwitz p=5 board)
+- Quantum seeding via the STEADYWATCH IBM Quantum entropy pipeline
+- API access with configurable key rotation
+- Dashboard and audit log
+
+**Security Trinity licensing** bundles THE VAULT™ + VIPER + HORDE under a single license — one quantum entropy pipeline feeding the root of trust (VAULT), the detection layer (VIPER), and the defense layer (HORDE).
+
+Contact: [steadywatchapp@gmail.com](mailto:steadywatchapp@gmail.com)
+
+---
+
+## What Makes It Different
+
+| | Traditional KMS | Hardware HSM | THE VAULT™ |
+|---|---|---|---|
+| Key geometry | Random | Random | Hurwitz quaternion lattice (4D, mathematically structured) |
+| Entropy source | PRNG / OS entropy | Hardware RNG | IBM Quantum hardware (real quantum measurement) |
+| Verifiability | Vendor attestation | Physical inspection | Mathematical — the lattice is independently verifiable |
+| Interface | API / console | Physical device | 3D crystal board + REST API |
+| Security stack | Key storage only | Key storage only | Root of trust → VIPER detection → HORDE defense |
+| Quantum resistance | Post-quantum algorithms | Post-quantum algorithms | 4D geometric key identity — no factoring assumption |
+
+---
+
+## More Information
+
+- **API reference:** [README.md](README.md)
+- **User guide:** [VAULT_USER_GUIDE.md](VAULT_USER_GUIDE.md)
+- **VIPER (threat detection):** [../viper-api/THE_VIPER.md](../viper-api/THE_VIPER.md)
+- **HORDE (swarm defense):** [../horde-api/THE_HORDE.md](../horde-api/THE_HORDE.md)
+- **Research background:** [RESEARCH_DISCOVERIES.md](../../RESEARCH_DISCOVERIES.md) — Discoveries 41 and 42
