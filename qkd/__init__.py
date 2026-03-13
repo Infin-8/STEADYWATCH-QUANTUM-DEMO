@@ -9,6 +9,18 @@ from .qkd_protocol import (
     MessageType
 )
 
+from .hurwitz_lattice_auth import (
+    HurwitzLatticeAuth,
+    LatticeLink,
+    LatticeHello,
+    LatticeAck,
+    LatticeConfirm,
+    create_lattice_auth,
+    compute_lattice_hash,
+    generate_f4_shell,
+    supported_primes,
+)
+
 from .network_qkd import (
     NetworkQKD,
     NodeRole,
@@ -38,5 +50,14 @@ __all__ = [
     'create_cascade_protocol',
     'LDPCErrorCorrection',
     'create_ldpc_corrector',
+    'HurwitzLatticeAuth',
+    'LatticeLink',
+    'LatticeHello',
+    'LatticeAck',
+    'LatticeConfirm',
+    'create_lattice_auth',
+    'compute_lattice_hash',
+    'generate_f4_shell',
+    'supported_primes',
 ]
 

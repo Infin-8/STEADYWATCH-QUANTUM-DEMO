@@ -55,6 +55,9 @@ class NetworkNode:
     shared_secrets: Dict[str, bytes] = field(default_factory=dict)  # node_id -> shared_secret
     keys: Dict[str, bytes] = field(default_factory=dict)  # session_id -> key
     neighbors: Set[str] = field(default_factory=set)  # Neighbor node IDs
+    # Hurwitz lattice-metric identity (optional)
+    hurwitz_prime: Optional[int] = None   # This node's identity prime
+    lattice_hash: Optional[bytes] = None  # Pre-computed H(F4(prime))
     
     def add_neighbor(self, neighbor_id: str):
         """Add neighbor node"""
@@ -193,12 +196,53 @@ class NetworkQKD:
         
         # Add edge to graph
         self.network_graph.add_edge(
-            node1_id, 
+            node1_id,
             node2_id,
             shared_secret=shared_secret,
             latency=latency
         )
-    
+
+    def add_lattice_link(self, node1_id: str, node1_prime: int,
+                         node2_id: str, node2_prime: int,
+                         latency: float = 1.0):
+        """
+        Add a lattice-authenticated link between two nodes.
+        No pre-shared secret required — session seed is derived from
+        the XOR of both nodes' F4 cluster hashes.
+
+        Args:
+            node1_id:    First node ID
+            node1_prime: Hurwitz prime for node1's lattice identity
+            node2_id:    Second node ID
+            node2_prime: Hurwitz prime for node2's lattice identity
+            latency:     Link latency (seconds)
+        """
+        try:
+            from .hurwitz_lattice_auth import LatticeLink, compute_lattice_hash
+        except ImportError:
+            raise RuntimeError("hurwitz_lattice_auth module not available")
+
+        if node1_id not in self.nodes or node2_id not in self.nodes:
+            raise ValueError("Nodes must exist before adding link")
+
+        # Store prime and hash on each node
+        self.nodes[node1_id].hurwitz_prime = node1_prime
+        self.nodes[node1_id].lattice_hash = compute_lattice_hash(node1_prime)
+        self.nodes[node2_id].hurwitz_prime = node2_prime
+        self.nodes[node2_id].lattice_hash = compute_lattice_hash(node2_prime)
+
+        # Establish lattice link — derives session seed structurally
+        link = LatticeLink.establish(node1_id, node1_prime, node2_id, node2_prime)
+        session_seed = link.get_shared_secret()
+
+        # Delegate to add_link using session seed as shared_secret
+        # This allows lattice links to participate in existing key relay logic
+        self.add_link(node1_id, node2_id, session_seed, latency)
+
+        # Mark edge as lattice-authenticated with elevated trust
+        self.network_graph.edges[node1_id, node2_id]["lattice_authenticated"] = True
+        self.network_graph.edges[node1_id, node2_id]["trust_override"] = link.trust_level
+
     def find_paths(self, source_id: str, destination_id: str, 
                    max_hops: int = 5) -> List[NetworkPath]:
         """
@@ -272,17 +316,23 @@ class NetworkQKD:
         # 2 relays: 0.6
         # etc.
         if len(path) == 2:
-            return 1.0  # Direct path
-        
+            # Check for lattice-authenticated direct link (trust_override)
+            edge = self.network_graph.edges.get((path[0], path[1]), {})
+            return edge.get("trust_override", 1.0)
+
         # Trusted relays maintain higher trust
         trust = 1.0
-        for node_id in path[1:-1]:  # Exclude source and destination
-            node = self.nodes[node_id]
-            if node.role == NodeRole.TRUSTED_RELAY:
-                trust *= 0.9  # Small trust reduction
+        for i in range(len(path) - 1):
+            edge = self.network_graph.edges.get((path[i], path[i+1]), {})
+            if edge.get("lattice_authenticated"):
+                trust *= edge.get("trust_override", 0.95)
             else:
-                trust *= 0.7  # Larger trust reduction
-        
+                node = self.nodes[path[i + 1]] if i + 1 < len(path) - 1 else None
+                if node and node.role == NodeRole.TRUSTED_RELAY:
+                    trust *= 0.9
+                elif node:
+                    trust *= 0.7
+
         return trust
     
     def distribute_key(self, source_id: str, destination_id: str,

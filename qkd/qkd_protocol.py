@@ -39,6 +39,10 @@ class MessageType(Enum):
     PRIVACY_AMP = "PRIVACY_AMP"
     KEY_VERIFY = "KEY_VERIFY"
     KEY_CONFIRM = "KEY_CONFIRM"
+    # Hurwitz lattice-metric authentication (Phase 1 structural auth)
+    LATTICE_HELLO   = "LATTICE_HELLO"    # Prime claim + cluster hash
+    LATTICE_ACK     = "LATTICE_ACK"      # Verification result + verifier claim
+    LATTICE_CONFIRM = "LATTICE_CONFIRM"  # Mutual confirmation + session seed
 
 
 @dataclass
@@ -87,7 +91,8 @@ class QKDProtocol:
                  shared_secret: bytes,
                  num_ghz_qubits: int = 12,
                  num_echo_qubits: int = 400,
-                 backend_name: str = "ibm_fez"):
+                 backend_name: str = "ibm_fez",
+                 hurwitz_prime: Optional[int] = None):
         """
         Initialize QKD protocol.
         
@@ -102,6 +107,16 @@ class QKDProtocol:
         self.shared_secret = shared_secret
         self.session_id = None
         self.session_key = None
+
+        # Hurwitz lattice-metric auth (optional — augments HMAC auth)
+        self.hurwitz_prime = hurwitz_prime
+        self.lattice_auth = None
+        if hurwitz_prime is not None:
+            try:
+                from .hurwitz_lattice_auth import HurwitzLatticeAuth
+                self.lattice_auth = HurwitzLatticeAuth(party_id, hurwitz_prime)
+            except ImportError:
+                pass
         
         # Initialize hybrid system
         self.hybrid_system = GHZEchoResonanceHybrid(
@@ -203,6 +218,22 @@ class QKDProtocol:
         
         return response, message
     
+    def lattice_authenticate(self) -> Optional[Tuple]:
+        """
+        Generate LATTICE_HELLO for Hurwitz lattice-metric authentication.
+        Returns (hello_dict, lattice_auth) if hurwitz_prime was set, else None.
+
+        Usage:
+            result = alice.lattice_authenticate()
+            if result:
+                hello_dict, auth = result
+                # send hello_dict to Bob over classical channel
+        """
+        if self.lattice_auth is None:
+            return None
+        hello = self.lattice_auth.generate_hello()
+        return hello.to_dict(), self.lattice_auth
+
     # ============================================================
     # Phase 2: Quantum Key Generation
     # ============================================================
