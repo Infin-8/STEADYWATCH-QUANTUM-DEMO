@@ -53,34 +53,25 @@
             ? hashKeyIndex(bx, bz, prime) : 0;
 
         if (blockType === BLOCK.GROUND) {
- material = new THREE.MeshPhysicalMaterial({
-        color: new THREE.Color(0xf3e5f5),       // very pale cyan/ice-blue tint (adjust for warmer/cooler crystal)
-        // or try subtle purple: 0xf3e5f5, quartz-like: 0xfafafa (near-white), or emerald: 0xe0f2f1
-
-        roughness: 0.0,                         // super smooth/polished surface
-        metalness: 0.0,                         // non-metallic (pure dielectric like crystal/glass)
-
-        transmission: 0.90,                     // main translucency (0 = opaque, 1 = fully transmissive)
-        opacity: 1.0,                           // keep 1.0 when using transmission (Three.js rule)
-        transparent: true,                      // required for transmission to work properly
-
-        ior: 1.7,                              // index of refraction — glass ~1.5, crystal/quartz ~1.54–1.6
-                                                // higher = more bending/refraction (try 1.45–1.7)
-
-        thickness: 0.5,                         // simulates material depth (affects refraction strength)
-                                                // smaller = thinner crystal feel; larger = chunkier
-
-        clearcoat: 0.8,                         // adds a glossy top layer (like polished crystal facets)
-        clearcoatRoughness: 0.05,               // very low for extra shine
-
-        envMapIntensity: 1.2,                   // boost reflections from scene environment (HDR if you have one)
-
-        side: THREE.DoubleSide,                 // optional: render both sides if geometry has holes/thin parts
-
-        // Optional extras for more "crystal magic"
-         specularIntensity: 1.0,              // if you want stronger highlights (Phong-like)
-        // clearcoatMap: someNormalTexture,     // if you add subtle faceting normals later
-    });
+            var crystalPosHash = (Math.abs(bx * 7 + bz * 13) % 81) / 81;
+            var crystalHue = (0.68 + crystalPosHash * 0.22) % 1;
+            material = new THREE.MeshPhysicalMaterial({
+                color: new THREE.Color().setHSL(crystalHue, 0.25, 0.88),
+                emissive: new THREE.Color().setHSL(crystalHue, 0.6, 0.5),
+                emissiveIntensity: 0.0,
+                roughness: 0.0,
+                metalness: 0.0,
+                transmission: 0.90,
+                opacity: 1.0,
+                transparent: true,
+                ior: 1.7,
+                thickness: 0.5,
+                clearcoat: 0.8,
+                clearcoatRoughness: 0.05,
+                envMapIntensity: 1.2,
+                side: THREE.DoubleSide,
+                specularIntensity: 1.0
+            });
         } else {
             var col = getKeyColor(keyIndex, prime === 5 ? TOTAL_P5 : TOTAL_P13);
             material = new THREE.MeshPhongMaterial({
@@ -100,6 +91,12 @@
         mesh.userData.bz = bz;
         mesh.userData.prime = prime;
         mesh.userData.keyIndex = keyIndex;
+        if (blockType === BLOCK.GROUND) {
+            var ph = (Math.abs(bx * 7 + bz * 13) % 81) / 81;
+            mesh.scale.y = 0.88 + ((Math.abs(bx * 3 + bz * 7) % 15) / 15) * 0.14;
+            mesh.userData.crystalPhase = ph * Math.PI * 2;
+            mesh.userData.crystalHue = (0.68 + ph * 0.22) % 1;
+        }
         return mesh;
     }
 
@@ -525,6 +522,11 @@
 
             for (idx = 0; idx < blockMeshes.length; idx++) {
                 var m = blockMeshes[idx];
+                if (m.userData.blockType === BLOCK.GROUND) {
+                    var pulse = 0.5 + 0.5 * Math.sin(time * 0.7 + m.userData.crystalPhase);
+                    m.material.emissiveIntensity = 0.015 + pulse * 0.035;
+                    continue;
+                }
                 if (m.userData.blockType !== BLOCK.KEY_ORE_P5 && m.userData.blockType !== BLOCK.KEY_ORE_P13) continue;
                 var bp = m.position;
                 phase = (m.userData.keyIndex / (m.userData.prime === 5 ? TOTAL_P5 : TOTAL_P13)) * Math.PI * 2;

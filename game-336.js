@@ -50,8 +50,12 @@
             ? hashKeyIndex(bx, bz, prime) : 0;
 
         if (blockType === BLOCK.GROUND) {
+            var crystalPosHash = (Math.abs(bx * 7 + bz * 13) % 81) / 81;
+            var crystalHue = (0.68 + crystalPosHash * 0.22) % 1;
             material = new THREE.MeshPhysicalMaterial({
-                color: new THREE.Color(0xf3e5f5),
+                color: new THREE.Color().setHSL(crystalHue, 0.25, 0.88),
+                emissive: new THREE.Color().setHSL(crystalHue, 0.6, 0.5),
+                emissiveIntensity: 0.0,
                 roughness: 0.0,
                 metalness: 0.0,
                 transmission: 0.90,
@@ -84,6 +88,12 @@
         mesh.userData.bz = bz;
         mesh.userData.prime = prime;
         mesh.userData.keyIndex = keyIndex;
+        if (blockType === BLOCK.GROUND) {
+            var ph = (Math.abs(bx * 7 + bz * 13) % 81) / 81;
+            mesh.scale.y = 0.88 + ((Math.abs(bx * 3 + bz * 7) % 15) / 15) * 0.14;
+            mesh.userData.crystalPhase = ph * Math.PI * 2;
+            mesh.userData.crystalHue = (0.68 + ph * 0.22) % 1;
+        }
         return mesh;
     }
 
@@ -428,6 +438,11 @@
 
             for (idx = 0; idx < blockMeshes.length; idx++) {
                 var m = blockMeshes[idx];
+                if (m.userData.blockType === BLOCK.GROUND) {
+                    var pulse = 0.5 + 0.5 * Math.sin(time * 0.7 + m.userData.crystalPhase);
+                    m.material.emissiveIntensity = 0.015 + pulse * 0.035;
+                    continue;
+                }
                 if (m.userData.blockType !== BLOCK.KEY_ORE_P5 && m.userData.blockType !== BLOCK.KEY_ORE_P13) continue;
                 var bp = m.position;
                 phase = (m.userData.keyIndex / (m.userData.prime === 5 ? TOTAL_P5 : TOTAL_P13)) * Math.PI * 2;
