@@ -29,6 +29,11 @@ secrets.seed
 *.sqlite
 *.sqlite3
 
+# Vault live state
+vault-api/vault-data.json
+vault-api/node_modules/
+vault-api/package-lock.json
+
 # Logs
 *.log
 logs/

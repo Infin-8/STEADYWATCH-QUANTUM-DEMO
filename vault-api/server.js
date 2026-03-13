@@ -1,11 +1,16 @@
 /**
- * THE VAULT™ API — 81-slot key store.
- * Receives key material (demo: derived from seed), stores encrypted payloads per slot,
- * exposes store/request subject to policy and auth. Audit log for key-release requests.
+ * THE VAULT™ API — 81-slot quantum-backed key store.
+ * Each slot maps to one block on the 9×9 Hurwitz Quaternion board.
+ * Mining a block in the 3D game = requesting key release for that slot.
+ *
+ * Dashboard: http://localhost:5003/
+ * Health:    http://localhost:5003/api/vault/health
  */
 const express = require('express');
 const cors = require('cors');
 const crypto = require('crypto');
+const fs = require('fs');
+const path = require('path');
 
 const app = express();
 app.use(cors());
@@ -13,21 +18,52 @@ app.use(express.json({ limit: '1mb' }));
 
 const SLOTS = 81;
 const DEFAULT_API_KEY = process.env.VAULT_API_KEY || 'vault-demo-key-change-in-production';
+const DATA_FILE = path.join(__dirname, 'vault-data.json');
 
-// Demo key material: 81 slots, each gets a deterministic key from seed (placeholder for SHQKD/Echo)
+// --- Persistence ---
+
 function deriveSlotKey(slotIndex) {
   const seed = process.env.VAULT_KEY_SEED || 'SHQKD-Echo-Resonance-81';
   return crypto.createHash('sha256').update(seed + '-' + slotIndex).digest('hex');
 }
 
-const keyStore = new Map();
-for (let i = 0; i < SLOTS; i++) {
-  keyStore.set(i, { keyMaterial: deriveSlotKey(i), encryptedPayload: null });
+function loadData() {
+  try {
+    if (fs.existsSync(DATA_FILE)) {
+      const raw = JSON.parse(fs.readFileSync(DATA_FILE, 'utf8'));
+      const store = new Map();
+      for (let i = 0; i < SLOTS; i++) {
+        const saved = raw.slots && raw.slots[i];
+        store.set(i, {
+          keyMaterial: (saved && saved.keyMaterial) || deriveSlotKey(i),
+          encryptedPayload: (saved && saved.encryptedPayload) || null
+        });
+      }
+      return { keyStore: store, auditLog: Array.isArray(raw.auditLog) ? raw.auditLog : [] };
+    }
+  } catch (e) {
+    console.warn('  Could not load vault-data.json — starting fresh:', e.message);
+  }
+  const store = new Map();
+  for (let i = 0; i < SLOTS; i++) store.set(i, { keyMaterial: deriveSlotKey(i), encryptedPayload: null });
+  return { keyStore: store, auditLog: [] };
 }
 
-const auditLog = [];
+function saveData() {
+  try {
+    const slots = {};
+    for (let i = 0; i < SLOTS; i++) slots[i] = keyStore.get(i);
+    fs.writeFileSync(DATA_FILE, JSON.stringify({ slots, auditLog }, null, 2));
+  } catch (e) {
+    console.warn('  Could not save vault-data.json:', e.message);
+  }
+}
 
-// Configs: custom key configurations (moat, symbol, tier). In-memory; keyed by id.
+const { keyStore, auditLog } = loadData();
+const startedAt = new Date().toISOString();
+
+// --- Configs ---
+
 const SIGNATURE_CONFIG = {
   id: 'signature',
   name: 'Key-at-zero, 144 Hurwitz moat, unlocked key moat',
@@ -43,6 +79,8 @@ const SIGNATURE_CONFIG = {
 const configsStore = new Map();
 configsStore.set('signature', JSON.parse(JSON.stringify(SIGNATURE_CONFIG)));
 
+// --- Auth ---
+
 function authMiddleware(req, res, next) {
   const apiKey = req.headers['x-vault-api-key'] || req.body?.apiKey || req.query?.apiKey;
   if (!apiKey || apiKey !== DEFAULT_API_KEY) {
@@ -52,6 +90,123 @@ function authMiddleware(req, res, next) {
   next();
 }
 
+// --- Dashboard ---
+
+app.get('/', (req, res) => {
+  const filled = [];
+  for (let i = 0; i < SLOTS; i++) {
+    if (keyStore.get(i)?.encryptedPayload) filled.push(i);
+  }
+  const recent = auditLog.slice(-10).reverse();
+  const keyPrefix = DEFAULT_API_KEY.slice(0, 8);
+
+  const slotGrid = Array.from({ length: SLOTS }, (_, i) => {
+    const hasPayload = !!keyStore.get(i)?.encryptedPayload;
+    const isCrown = i === 0;
+    const color = isCrown ? '#00e5ff' : hasPayload ? '#764ba2' : '#1a2a3a';
+    const border = isCrown ? '2px solid #00e5ff' : hasPayload ? '1px solid #764ba2' : '1px solid #2a3a4a';
+    const title = isCrown ? 'Crown — Slot 0' : hasPayload ? `Slot ${i} — payload stored` : `Slot ${i}`;
+    return `<div title="${title}" style="width:18px;height:18px;background:${color};border:${border};border-radius:2px;display:inline-block;margin:1px;"></div>`;
+  }).join('');
+
+  const auditRows = recent.map(e =>
+    `<tr><td style="color:#667eea;padding:2px 8px 2px 0;">${e.ts.slice(11, 19)}</td><td style="padding:2px 8px 2px 0;color:#aaa;">${e.action}</td><td style="color:#ccc;">slot ${e.slotIndex}</td></tr>`
+  ).join('');
+
+  res.send(`<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta http-equiv="refresh" content="10">
+  <title>THE VAULT™ — Dashboard</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { background: #0a1628; color: #c8d8e8; font-family: 'Courier New', monospace; padding: 32px; min-height: 100vh; }
+    h1 { color: #00e5ff; font-size: 1.4rem; letter-spacing: 0.15em; margin-bottom: 4px; }
+    .sub { color: #667eea; font-size: 0.75rem; margin-bottom: 32px; letter-spacing: 0.1em; }
+    .grid { display: flex; flex-wrap: wrap; gap: 0; margin-bottom: 8px; width: fit-content; }
+    .section { margin-bottom: 28px; }
+    .label { color: #667eea; font-size: 0.7rem; letter-spacing: 0.12em; text-transform: uppercase; margin-bottom: 8px; }
+    .stat { font-size: 1.6rem; color: #fff; font-weight: bold; }
+    .stat-row { display: flex; gap: 40px; margin-bottom: 24px; }
+    .stat-block { }
+    .stat-sub { font-size: 0.7rem; color: #667eea; margin-top: 2px; }
+    table { border-collapse: collapse; font-size: 0.78rem; }
+    .pill { display: inline-block; padding: 2px 10px; border-radius: 999px; font-size: 0.7rem; letter-spacing: 0.1em; }
+    .pill-cyan { background: #00263a; color: #00e5ff; border: 1px solid #00e5ff44; }
+    .pill-purple { background: #1a0a2e; color: #764ba2; border: 1px solid #764ba244; }
+    .key { color: #00e5ff; background: #00263a; padding: 4px 10px; border-radius: 4px; font-size: 0.78rem; }
+    .footer { color: #2a4a6a; font-size: 0.68rem; margin-top: 32px; }
+    a { color: #667eea; text-decoration: none; }
+    a:hover { color: #00e5ff; }
+  </style>
+</head>
+<body>
+  <h1>THE VAULT™</h1>
+  <div class="sub">QUANTUM-BACKED KEY STORE — 81 SLOTS — STEADYWATCH / QUANTUM V^</div>
+
+  <div class="stat-row">
+    <div class="stat-block">
+      <div class="label">Slots</div>
+      <div class="stat">${SLOTS}</div>
+      <div class="stat-sub">9 × 9 Hurwitz board</div>
+    </div>
+    <div class="stat-block">
+      <div class="label">Payloads stored</div>
+      <div class="stat" style="color:${filled.length > 0 ? '#764ba2' : '#2a4a6a'}">${filled.length}</div>
+      <div class="stat-sub">${SLOTS - filled.length} slots available</div>
+    </div>
+    <div class="stat-block">
+      <div class="label">Audit entries</div>
+      <div class="stat">${auditLog.length}</div>
+      <div class="stat-sub">since ${startedAt.slice(0, 10)}</div>
+    </div>
+    <div class="stat-block">
+      <div class="label">Active config</div>
+      <div class="stat" style="font-size:0.9rem;color:#00e5ff;margin-top:6px;">signature</div>
+      <div class="stat-sub">crown at slot 0 · 144 Hurwitz moat</div>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="label">Slot map &nbsp;<span class="pill pill-cyan">cyan = crown (slot 0)</span>&nbsp;<span class="pill pill-purple">purple = payload stored</span></div>
+    <div class="grid">${slotGrid}</div>
+    <div style="font-size:0.68rem;color:#2a4a6a;margin-top:4px;">Row-major 9×9 · slot 0 top-left · maps to game board block (bx, bz)</div>
+  </div>
+
+  <div class="section">
+    <div class="label">Recent activity</div>
+    ${recent.length === 0
+      ? '<div style="color:#2a4a6a;font-size:0.78rem;">No activity yet — mine a block in the 3D game to trigger a key release.</div>'
+      : `<table>${auditRows}</table>`}
+  </div>
+
+  <div class="section">
+    <div class="label">API key</div>
+    <span class="key">${keyPrefix}…</span>
+    <span style="font-size:0.7rem;color:#2a4a6a;margin-left:12px;">Set X-Vault-Api-Key header · full key in VAULT_API_KEY env</span>
+  </div>
+
+  <div class="section">
+    <div class="label">Endpoints</div>
+    <div style="font-size:0.75rem;line-height:2;color:#667eea;">
+      <a href="/api/vault/health">GET /api/vault/health</a> &nbsp;·&nbsp;
+      <a href="/api/vault/slots">GET /api/vault/slots</a> &nbsp;·&nbsp;
+      <span style="color:#2a4a6a;">POST /api/vault/store</span> &nbsp;·&nbsp;
+      <span style="color:#2a4a6a;">POST /api/vault/request</span> &nbsp;·&nbsp;
+      <a href="/api/vault/audit">GET /api/vault/audit</a> &nbsp;·&nbsp;
+      <a href="/api/vault/configs">GET /api/vault/configs</a>
+    </div>
+  </div>
+
+  <div class="footer">Auto-refreshes every 10s · Data persisted to vault-data.json · Port ${process.env.PORT || 5003}</div>
+</body>
+</html>`);
+});
+
+// --- API routes ---
+
 app.get('/api/vault/health', (req, res) => {
   res.json({ status: 'ok', slots: SLOTS, service: 'THE VAULT™ API' });
 });
@@ -59,8 +214,7 @@ app.get('/api/vault/health', (req, res) => {
 app.get('/api/vault/slots', (req, res) => {
   const filled = [];
   for (let i = 0; i < SLOTS; i++) {
-    const s = keyStore.get(i);
-    if (s && s.encryptedPayload) filled.push(i);
+    if (keyStore.get(i)?.encryptedPayload) filled.push(i);
   }
   res.json({ slots: SLOTS, filled });
 });
@@ -73,6 +227,7 @@ app.post('/api/vault/store', authMiddleware, (req, res) => {
   const slot = keyStore.get(slotIndex);
   slot.encryptedPayload = typeof encryptedPayload === 'string' ? encryptedPayload : JSON.stringify(encryptedPayload || '');
   auditLog.push({ ts: new Date().toISOString(), action: 'store', slotIndex, apiKeyId: req.apiKeyId });
+  saveData();
   res.json({ ok: true, slotIndex });
 });
 
@@ -83,6 +238,7 @@ app.post('/api/vault/request', authMiddleware, (req, res) => {
   }
   const slot = keyStore.get(slotIndex);
   auditLog.push({ ts: new Date().toISOString(), action: 'request', slotIndex, apiKeyId: req.apiKeyId });
+  saveData();
   res.json({
     ok: true,
     slotIndex,
@@ -97,13 +253,11 @@ app.get('/api/vault/audit', authMiddleware, (req, res) => {
   res.json({ audit: auditLog.slice(-limit) });
 });
 
-// --- Configs API (custom key configurations → tiered packages) ---
+// --- Configs API ---
+
 app.get('/api/vault/configs', authMiddleware, (req, res) => {
   const list = Array.from(configsStore.values()).map(c => ({
-    id: c.id,
-    name: c.name,
-    tier: c.tier,
-    crownSlotIndex: c.crownSlotIndex
+    id: c.id, name: c.name, tier: c.tier, crownSlotIndex: c.crownSlotIndex
   }));
   res.json({ configs: list });
 });
@@ -160,8 +314,20 @@ app.delete('/api/vault/configs/:id', authMiddleware, (req, res) => {
   res.status(204).send();
 });
 
+// --- Start ---
+
 const port = process.env.PORT || 5003;
 app.listen(port, () => {
-  console.log('THE VAULT™ API listening on port', port);
-  console.log('Demo API key:', DEFAULT_API_KEY.slice(0, 8) + '...');
+  const filled = Array.from({ length: SLOTS }, (_, i) => keyStore.get(i)?.encryptedPayload ? 1 : 0).reduce((a, b) => a + b, 0);
+  console.log('');
+  console.log('  THE VAULT™ — Quantum-Backed Key Store');
+  console.log('  ─────────────────────────────────────');
+  console.log('  Dashboard  →  http://localhost:' + port + '/');
+  console.log('  Health     →  http://localhost:' + port + '/api/vault/health');
+  console.log('');
+  console.log('  Slots:     ' + SLOTS + ' (9×9 Hurwitz board)');
+  console.log('  Payloads:  ' + filled + ' stored');
+  console.log('  API key:   ' + DEFAULT_API_KEY.slice(0, 8) + '…  (set VAULT_API_KEY env to change)');
+  console.log('  Data file: ' + DATA_FILE);
+  console.log('');
 });
