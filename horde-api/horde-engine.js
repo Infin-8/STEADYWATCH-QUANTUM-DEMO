@@ -91,18 +91,27 @@ function generateHurwitzP17() {
   return keys.slice(0, TOTAL_KEYS);
 }
 
+// Cluster is geometric: determined by the 2D projected quadrant of the quaternion.
+//   Q1 (px≥0, py≥0) → cluster 0 SWARM  (+X)
+//   Q2 (px<0, py≥0) → cluster 1 SHIELD (-X)
+//   Q3 (px<0, py<0) → cluster 2 TRACE  (+Z)
+//   Q4 (px≥0, py<0) → cluster 3 ADAPT  (-Z)
 function buildKeyMatrix() {
   const quaternions = generateHurwitzP17();
   return quaternions.map((q, i) => {
-    const cluster = Math.floor(i / KEYS_PER_CLUSTER);
-    const posInCluster = i % KEYS_PER_CLUSTER;
+    const scale = 1.0 / (1 + Math.abs(q[3]) * 0.1);
+    const px = q[0] * scale;
+    const py = q[2] * scale;
+    const cluster = (px >= 0 && py >= 0) ? 0
+                  : (px <  0 && py >= 0) ? 1
+                  : (px <  0 && py <  0) ? 2 : 3;
     const keyHex = crypto.createHash('sha256').update(q.join(',')).digest('hex');
     return {
       index: i,
       cluster,
-      posInCluster,
       swarmCluster: CLUSTERS[cluster],
       quaternion: { a: q[0], b: q[1], c: q[2], d: q[3] },
+      projectedX: px, projectedY: py,
       keyHex
     };
   });
@@ -211,7 +220,7 @@ function getClusterStats(responseLog) {
     name: c.name,
     direction: c.direction,
     description: c.description,
-    nodes: KEYS_PER_CLUSTER,
+    nodes: KEY_MATRIX.filter(k => k.cluster === c.index).length,
     activations: responseLog.filter(r => r.winningCluster === c.index).length
   }));
 }

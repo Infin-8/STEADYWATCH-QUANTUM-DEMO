@@ -13,7 +13,7 @@ const crypto = require('crypto');
 const fs = require('fs');
 const path = require('path');
 
-const { scan, getArmStats, ARM_VECTORS, TOTAL_KEYS, KEYS_PER_ARM } = require('./viper-engine');
+const { scan, getArmStats, KEY_MATRIX, ARM_VECTORS, TOTAL_KEYS } = require('./viper-engine');
 
 const app = express();
 app.use(cors());
@@ -373,6 +373,28 @@ app.get('/api/viper/alerts', authMiddleware, (req, res) => {
 
 app.get('/api/viper/vectors', authMiddleware, (req, res) => {
   res.json({ vectors: getArmStats(alertLog) });
+});
+
+app.get('/api/viper/key-lattice-map', authMiddleware, (req, res) => {
+  const armCounts = ARM_VECTORS.map(v => ({
+    arm: v.index,
+    vector: v.name,
+    direction: v.direction,
+    count: KEY_MATRIX.filter(k => k.arm === v.index).length
+  }));
+  res.json({
+    prime: 13,
+    total: TOTAL_KEYS,
+    arms: armCounts,
+    keyMap: KEY_MATRIX.map(k => ({
+      index: k.index,
+      arm: k.arm,
+      vector: k.vector.name,
+      quaternion: k.quaternion,
+      projectedX: k.projectedX,
+      projectedY: k.projectedY
+    }))
+  });
 });
 
 // --- Lattice Auth (p=13, 336 sites) ---

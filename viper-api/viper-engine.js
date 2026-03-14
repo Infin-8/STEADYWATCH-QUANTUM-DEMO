@@ -96,21 +96,29 @@ function generateHurwitzP13() {
   return primes.slice(0, TOTAL_KEYS);
 }
 
-// Build the key matrix once at startup
+// Build the key matrix once at startup.
+// Arm is geometric: determined by the 2D projected quadrant of the quaternion,
+// not by enumeration order. Matches the fingerprint canvas arm coloring.
+//   Q1 (px≥0, py≥0) → arm 0 RECON   (+X)
+//   Q2 (px<0, py≥0) → arm 1 BREACH  (-X)
+//   Q3 (px<0, py<0) → arm 2 LATERAL (+Z)
+//   Q4 (px≥0, py<0) → arm 3 EXFIL   (-Z)
 function buildKeyMatrix() {
   const quaternions = generateHurwitzP13();
   return quaternions.map((q, i) => {
-    const arm = Math.floor(i / KEYS_PER_ARM);
-    const posInArm = i % KEYS_PER_ARM;
-    const keyHex = crypto.createHash('sha256')
-      .update(q.join(','))
-      .digest('hex');
+    const scale = 1.0 / (1 + Math.abs(q[3]) * 0.1);
+    const px = q[0] * scale;
+    const py = q[2] * scale;
+    const arm = (px >= 0 && py >= 0) ? 0
+              : (px <  0 && py >= 0) ? 1
+              : (px <  0 && py <  0) ? 2 : 3;
+    const keyHex = crypto.createHash('sha256').update(q.join(',')).digest('hex');
     return {
       index: i,
       arm,
-      posInArm,
       vector: ARM_VECTORS[arm],
       quaternion: { a: q[0], b: q[1], c: q[2], d: q[3] },
+      projectedX: px, projectedY: py,
       keyHex
     };
   });
@@ -192,7 +200,7 @@ function getArmStats(alertLog) {
     vector: v.name,
     direction: v.direction,
     description: v.description,
-    keys: KEYS_PER_ARM,
+    keys: KEY_MATRIX.filter(k => k.arm === v.index).length,
     detections: alertLog.filter(a => a.arm === v.index).length
   }));
 }

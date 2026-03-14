@@ -12,7 +12,7 @@ const cors = require('cors');
 const fs = require('fs');
 const path = require('path');
 
-const { swarm, getClusterStats, CLUSTERS, TOTAL_KEYS, KEYS_PER_CLUSTER } = require('./horde-engine');
+const { swarm, getClusterStats, KEY_MATRIX, CLUSTERS, TOTAL_KEYS } = require('./horde-engine');
 
 const app = express();
 app.use(cors());
@@ -368,6 +368,28 @@ app.get('/api/horde/responses', authMiddleware, (req, res) => {
 
 app.get('/api/horde/clusters', authMiddleware, (req, res) => {
   res.json({ clusters: getClusterStats(responseLog) });
+});
+
+app.get('/api/horde/key-lattice-map', authMiddleware, (req, res) => {
+  const clusterCounts = CLUSTERS.map(c => ({
+    cluster: c.index,
+    name: c.name,
+    direction: c.direction,
+    count: KEY_MATRIX.filter(k => k.cluster === c.index).length
+  }));
+  res.json({
+    prime: 17,
+    total: TOTAL_KEYS,
+    clusters: clusterCounts,
+    keyMap: KEY_MATRIX.map(k => ({
+      index: k.index,
+      cluster: k.cluster,
+      posture: k.swarmCluster.name,
+      quaternion: k.quaternion,
+      projectedX: k.projectedX,
+      projectedY: k.projectedY
+    }))
+  });
 });
 
 // --- Lattice Auth (p=17, 432 sites) ---
