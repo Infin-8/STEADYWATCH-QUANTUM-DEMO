@@ -5,7 +5,7 @@
 (function () {
     'use strict';
 
-    var BLOCK = { AIR: 0, GROUND: 1, KEY_ORE_P5: 2, KEY_ORE_P13: 3 };
+    var BLOCK = { AIR: 0, GROUND: 1, KEY_ORE_P5: 2, KEY_ORE_P13: 3, PYRAMID_ORE: 4 };
     var BLOCK_SIZE = 1;
     var TOTAL_P5 = 144;
     var TOTAL_P13 = 336;
@@ -72,6 +72,20 @@
                 side: THREE.DoubleSide,
                 specularIntensity: 1.0
             });
+        } else if (blockType === BLOCK.PYRAMID_ORE) {
+            // Pyramid level: by=2→level1, by=3→level2, by=4→level3, by=5→apex
+            var pyramidLevel = by - 1; // 1-4
+            var levelBright = 0.45 + pyramidLevel * 0.1; // brighter at apex
+            material = new THREE.MeshPhysicalMaterial({
+                color: new THREE.Color().setHSL(0.10, 0.9, levelBright),
+                emissive: new THREE.Color().setHSL(0.10, 1.0, 0.3),
+                emissiveIntensity: 0.3 + pyramidLevel * 0.12,
+                roughness: 0.25,
+                metalness: 0.65,
+                clearcoat: 0.9,
+                clearcoatRoughness: 0.1,
+                envMapIntensity: 1.5
+            });
         } else {
             var col = getKeyColor(keyIndex, prime === 5 ? TOTAL_P5 : TOTAL_P13);
             material = new THREE.MeshPhongMaterial({
@@ -91,6 +105,9 @@
         mesh.userData.bz = bz;
         mesh.userData.prime = prime;
         mesh.userData.keyIndex = keyIndex;
+        if (blockType === BLOCK.PYRAMID_ORE) {
+            mesh.userData.pyramidLevel = by - 1;
+        }
         if (blockType === BLOCK.GROUND) {
             var ph = (Math.abs(bx * 7 + bz * 13) % 81) / 81;
             mesh.scale.y = 0.88 + ((Math.abs(bx * 3 + bz * 7) % 15) / 15) * 0.14;
@@ -324,6 +341,83 @@
             });
         }
 
+        function spawnPyramidDrop(wx, wy, wz, pyramidLevel, keyIndex) {
+            var PYRAMID_HUE = 0.10; // warm gold
+            var col = new THREE.Color().setHSL(PYRAMID_HUE + pyramidLevel * 0.02, 0.95, 0.65);
+            var quats = window.HurwitzKeys.unzipSeed(5); // p=5 quaternion structure
+            var group = new THREE.Group();
+            group.position.set(wx, wy, wz);
+            var sharedGeom = new THREE.SphereGeometry(0.06, 8, 8);
+            var mat = new THREE.MeshPhongMaterial({
+                color: col,
+                emissive: col,
+                emissiveIntensity: 0.5,
+                shininess: 140
+            });
+            var i, q, pos;
+            for (i = 0; i < quats.length; i++) {
+                q = quats[i];
+                pos = project4Dto3D(q.a, q.b, q.c, q.d, CLUSTER_RADIUS);
+                var mesh = new THREE.Mesh(sharedGeom, mat.clone());
+                mesh.position.set(0, 0, 0);
+                mesh.userData.keyDropIndex = keyDrops.length;
+                mesh.userData.baseLocalPosition = new THREE.Vector3(pos.x, pos.y, pos.z);
+                mesh.userData.satelliteIndex = i;
+                group.add(mesh);
+            }
+            var nucleusMat = new THREE.MeshPhongMaterial({
+                color: new THREE.Color().setHSL(PYRAMID_HUE, 0.9, 0.85),
+                emissive: col,
+                emissiveIntensity: 0.5,
+                shininess: 220,
+                transparent: true,
+                opacity: 0.55,
+                side: THREE.FrontSide,
+                depthWrite: false
+            });
+            var nucleusSphere = new THREE.Mesh(new THREE.SphereGeometry(CLUSTER_RADIUS * 0.22, 32, 32), nucleusMat);
+            nucleusSphere.userData.isGlassSphere = true;
+            group.add(nucleusSphere);
+            var torusGeom = new THREE.TorusGeometry(CLUSTER_RADIUS * 0.32, CLUSTER_RADIUS * 0.018, 8, 48);
+            var ringRotations = [
+                { x: Math.PI / 2, y: 0,               z: 0 },
+                { x: Math.PI / 2, y: Math.PI / 3,     z: Math.PI / 3 },
+                { x: Math.PI / 2, y: Math.PI * 2 / 3, z: -Math.PI / 4 }
+            ];
+            for (var r = 0; r < ringRotations.length; r++) {
+                var ringMat = new THREE.MeshPhongMaterial({
+                    color: new THREE.Color().setHSL((PYRAMID_HUE + r * 0.04) % 1, 0.9, 0.7),
+                    emissive: new THREE.Color().setHSL((PYRAMID_HUE + r * 0.04) % 1, 0.9, 0.3),
+                    emissiveIntensity: 0.5,
+                    shininess: 180,
+                    transparent: true,
+                    opacity: 0.45,
+                    depthWrite: false
+                });
+                var ring = new THREE.Mesh(torusGeom, ringMat);
+                ring.rotation.x = ringRotations[r].x;
+                ring.rotation.y = ringRotations[r].y;
+                ring.rotation.z = ringRotations[r].z;
+                ring.userData.isGlassSphere = true;
+                ring.userData.orbitalRingIndex = r;
+                group.add(ring);
+            }
+            scene.add(group);
+            keyDrops.push({
+                group: group,
+                material: mat,
+                prime: 5,
+                keyIndex: keyIndex,
+                total: TOTAL_P5,
+                basePosition: new THREE.Vector3(wx, wy, wz),
+                expansionProgress: 0,
+                expansionSpeed: 0.03,
+                isPyramidKey: true,
+                pyramidHue: PYRAMID_HUE + pyramidLevel * 0.02,
+                pyramidLevel: pyramidLevel
+            });
+        }
+
         // --- Hover effects and tooltips for key drop clusters (like 144-satellites) ---
         var hoveredKeyDrop = null;
         var HOVER_SHININESS = 200;
@@ -541,6 +635,28 @@
             }
             // Hurwitz quaternion lattice nodes — 144 sites projected from 4D, floating above crystal floor
             buildHurwitzCrystalLayer();
+
+            // 3D Pyramid — separate key mechanic (PYRAMID_ORE), not bound to F4 vault slots
+            // Level 1: y=2, 7×7 (±3)
+            for (i = -3; i <= 3; i++) {
+                for (j = -3; j <= 3; j++) {
+                    setBlock(i, 2, j, BLOCK.PYRAMID_ORE);
+                }
+            }
+            // Level 2: y=3, 5×5 (±2)
+            for (i = -2; i <= 2; i++) {
+                for (j = -2; j <= 2; j++) {
+                    setBlock(i, 3, j, BLOCK.PYRAMID_ORE);
+                }
+            }
+            // Level 3: y=4, 3×3 (±1)
+            for (i = -1; i <= 1; i++) {
+                for (j = -1; j <= 1; j++) {
+                    setBlock(i, 4, j, BLOCK.PYRAMID_ORE);
+                }
+            }
+            // Apex: y=5, 1×1
+            setBlock(0, 5, 0, BLOCK.PYRAMID_ORE);
         }
 
         buildWorld();
@@ -563,7 +679,7 @@
             var hit = hits[0];
             var obj = hit.object;
             var bt = obj.userData.blockType;
-            if (bt !== BLOCK.KEY_ORE_P5 && bt !== BLOCK.KEY_ORE_P13) return;
+            if (bt !== BLOCK.KEY_ORE_P5 && bt !== BLOCK.KEY_ORE_P13 && bt !== BLOCK.PYRAMID_ORE) return;
             var bx = obj.userData.bx;
             var by = obj.userData.by;
             var bz = obj.userData.bz;
@@ -573,6 +689,11 @@
             var wx = bx * BLOCK_SIZE;
             var wy = by * BLOCK_SIZE + BLOCK_SIZE * 0.5;
             var wz = bz * BLOCK_SIZE;
+            if (bt === BLOCK.PYRAMID_ORE) {
+                spawnPyramidDrop(wx, wy, wz, obj.userData.pyramidLevel, keyIndex);
+                updateKeyLabel(null);
+                return;
+            }
             spawnKeyDrop(wx, wy, wz, prime, keyIndex);
             updateKeyLabel(null);
 
@@ -677,6 +798,13 @@
                 if (m.userData.blockType === BLOCK.GROUND) {
                     var pulse = 0.5 + 0.5 * Math.sin(time * 0.7 + m.userData.crystalPhase);
                     m.material.emissiveIntensity = 0.015 + pulse * 0.035;
+                    continue;
+                }
+                if (m.userData.blockType === BLOCK.PYRAMID_ORE) {
+                    var pLvl = m.userData.pyramidLevel || 1;
+                    var pPulse = 0.5 + 0.5 * Math.sin(time * 0.8 + pLvl * 1.1 + m.userData.bx * 0.4 + m.userData.bz * 0.3);
+                    m.material.emissiveIntensity = (0.3 + pLvl * 0.12) * (0.6 + pPulse * 0.7);
+                    m.material.emissive.setHSL(0.10 + pPulse * 0.02, 1.0, 0.3 + pPulse * 0.1);
                     continue;
                 }
                 if (m.userData.blockType !== BLOCK.KEY_ORE_P5 && m.userData.blockType !== BLOCK.KEY_ORE_P13) continue;
@@ -847,8 +975,12 @@
                     phase = (d.keyIndex / d.total) * Math.PI * 2;
                     rotationAngle = time + phase;
                     style = styling.calculateUnifiedStyle(d.keyIndex, time, rotationAngle, basePos);
-                    hue = (time * 0.1 + d.keyIndex * 0.1) % 1;
-                    hue = hue < 0 ? hue + 1 : hue;
+                    if (d.isPyramidKey) {
+                        hue = d.pyramidHue + Math.sin(time * 0.3) * 0.03;
+                    } else {
+                        hue = (time * 0.1 + d.keyIndex * 0.1) % 1;
+                        hue = hue < 0 ? hue + 1 : hue;
+                    }
                     sat = 0.7 * (0.8 + style.glowIntensity * 0.4);
                     light = 0.6 * (0.9 + style.lightingFactor * 0.2);
                     var baseIntensity = 0.3 + style.glowIntensity * 0.5;
