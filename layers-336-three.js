@@ -340,6 +340,106 @@
         seedMesh.userData.type = 'seed';
         scene.add(seedMesh);
 
+        // ── LASER SOURCE VISUAL SYSTEM ───────────────────────────────────────
+        // 1. Multi-layer corona — 3 concentric additive shells, each pulsing
+        //    at an independent phase around the seed sphere
+        var coronaMeshes = [
+            { r: 0.65, color: 0xffd700, opacity: 0.20, phase: 0.0 },
+            { r: 1.10, color: 0xffffff, opacity: 0.11, phase: 1.1 },
+            { r: 1.70, color: 0x00e5ff, opacity: 0.06, phase: 2.3 }
+        ].map(function(d) {
+            var m = new THREE.Mesh(
+                new THREE.SphereGeometry(d.r, 20, 20),
+                new THREE.MeshBasicMaterial({
+                    color: d.color, transparent: true, opacity: d.opacity,
+                    blending: THREE.AdditiveBlending, depthWrite: false, side: THREE.BackSide
+                })
+            );
+            m.userData.coronaPhase = d.phase;
+            m.userData.baseOpacity = d.opacity;
+            m.position.set(-slitDistance, 0, 0);
+            scene.add(m);
+            return m;
+        });
+
+        // 2. Laser beam tube + wide soft glow (seed → center)
+        var beamLength = slitDistance * 1.2;
+        var beamMesh = new THREE.Mesh(
+            new THREE.CylinderGeometry(0.025, 0.025, beamLength, 8, 1),
+            new THREE.MeshBasicMaterial({
+                color: 0xffffff, transparent: true, opacity: 0.55,
+                blending: THREE.AdditiveBlending, depthWrite: false
+            })
+        );
+        beamMesh.rotation.z = Math.PI / 2;
+        beamMesh.position.set(-slitDistance + beamLength / 2, 0, 0);
+        scene.add(beamMesh);
+
+        var beamGlowMesh = new THREE.Mesh(
+            new THREE.CylinderGeometry(0.22, 0.06, beamLength, 8, 1),
+            new THREE.MeshBasicMaterial({
+                color: 0xffd700, transparent: true, opacity: 0.07,
+                blending: THREE.AdditiveBlending, depthWrite: false
+            })
+        );
+        beamGlowMesh.rotation.z = Math.PI / 2;
+        beamGlowMesh.position.set(-slitDistance + beamLength / 2, 0, 0);
+        scene.add(beamGlowMesh);
+
+        // 3. Energy pulse rings — pool of 6, spawn at seed, travel to middle,
+        //    expand in radius and fade as they arrive
+        var RING_POOL = 6;
+        var ringPool = [];
+        for (var rpi = 0; rpi < RING_POOL; rpi++) {
+            var ringMesh = new THREE.Mesh(
+                new THREE.TorusGeometry(0.28, 0.03, 6, 32),
+                new THREE.MeshBasicMaterial({
+                    color: 0x00e5ff, transparent: true, opacity: 0,
+                    blending: THREE.AdditiveBlending, depthWrite: false
+                })
+            );
+            ringMesh.rotation.y = Math.PI / 2;
+            ringMesh.userData.progress = rpi / RING_POOL; // stagger start
+            scene.add(ringMesh);
+            ringPool.push(ringMesh);
+        }
+
+        // 4. Lens flare sprites — canvas radial gradients billboarded at seed
+        function makeFlareTex(size, r, g, b) {
+            var cv = document.createElement('canvas');
+            cv.width = size; cv.height = size;
+            var ctx = cv.getContext('2d');
+            var grd = ctx.createRadialGradient(size/2, size/2, 0, size/2, size/2, size/2);
+            grd.addColorStop(0,   'rgba('+r+','+g+','+b+',1)');
+            grd.addColorStop(0.3, 'rgba('+r+','+g+','+b+',0.4)');
+            grd.addColorStop(1,   'rgba(0,0,0,0)');
+            ctx.fillStyle = grd;
+            ctx.fillRect(0, 0, size, size);
+            return new THREE.CanvasTexture(cv);
+        }
+        var flareSprites = [
+            { sc: 3.5,  r: 255, g: 215, b: 0,   op: 0.75 },  // gold core
+            { sc: 6.5,  r: 255, g: 255, b: 255, op: 0.38 },  // white bloom
+            { sc: 10.0, r: 0,   g: 229, b: 255, op: 0.18 }   // cyan outer
+        ].map(function(d) {
+            var sp = new THREE.Sprite(new THREE.SpriteMaterial({
+                map: makeFlareTex(128, d.r, d.g, d.b),
+                transparent: true, opacity: d.op,
+                blending: THREE.AdditiveBlending, depthWrite: false
+            }));
+            sp.scale.set(d.sc, d.sc, 1);
+            sp.userData.baseOpacity = d.op;
+            sp.position.set(-slitDistance, 0, 0);
+            scene.add(sp);
+            return sp;
+        });
+
+        // 5. Dedicated seed PointLight — bright pulsing gold, separate from scene lights
+        var seedLight = new THREE.PointLight(0xffd700, 4, 22);
+        seedLight.position.set(-slitDistance, 0, 0);
+        scene.add(seedLight);
+        // ── END LASER SOURCE ─────────────────────────────────────────────────
+
         var unifiedStyling = new UnifiedQubitStyling();
         var keySphereGeom = new THREE.SphereGeometry(0.12, 12, 12);
 
@@ -592,6 +692,47 @@
             var seedBasePos = new THREE.Vector3(-slitDistance, 0, 0);
             var seedStyle = unifiedStyling.calculateUnifiedStyle(0, time, seedRotationAngle, seedBasePos);
             seedMesh.material.emissiveIntensity = 0.5 + seedStyle.glowIntensity * 0.3;
+
+            // ── LASER SOURCE ANIMATION ───────────────────────────────────────
+            var seedPulse     = 0.5 + 0.5 * Math.sin(time * 2.8);
+            var seedPulseFast = 0.5 + 0.5 * Math.sin(time * 6.1);
+
+            // 1. Corona pulse
+            for (var ci = 0; ci < coronaMeshes.length; ci++) {
+                var cm = coronaMeshes[ci];
+                var cp = 0.5 + 0.5 * Math.sin(time * 2.2 + cm.userData.coronaPhase);
+                cm.material.opacity = cm.userData.baseOpacity * (0.5 + cp * 0.9);
+                cm.scale.setScalar(0.93 + cp * 0.12);
+            }
+
+            // 2. Beam pulse
+            beamMesh.material.opacity     = 0.30 + 0.28 * Math.sin(time * 3.5);
+            beamGlowMesh.material.opacity = 0.04 + 0.05 * Math.sin(time * 2.1);
+
+            // 3. Energy rings travel from seed toward middle, expand, fade
+            for (var rpj = 0; rpj < RING_POOL; rpj++) {
+                var ring = ringPool[rpj];
+                ring.userData.progress += 0.007;
+                if (ring.userData.progress > 1) ring.userData.progress = 0;
+                var rp = ring.userData.progress;
+                ring.position.x = -slitDistance + rp * slitDistance;
+                var rScale = 0.7 + rp * 2.8;
+                ring.scale.set(rScale, rScale, rScale);
+                var rOp = rp < 0.1 ? rp * 10 : (rp > 0.7 ? (1 - rp) / 0.3 : 1.0);
+                ring.material.opacity = Math.max(0, Math.min(1, rOp)) * 0.55;
+                ring.material.color.setHSL((time * 0.08 + rpj * 0.16) % 1, 0.9, 0.7);
+            }
+
+            // 4. Flare sprites breathe
+            for (var fi = 0; fi < flareSprites.length; fi++) {
+                var fp = 0.5 + 0.5 * Math.sin(time * 2.5 + fi * 0.9);
+                flareSprites[fi].material.opacity = flareSprites[fi].userData.baseOpacity * (0.65 + fp * 0.55);
+            }
+
+            // 5. Seed PointLight pulse — gold → white hot
+            seedLight.intensity = 2.5 + seedPulse * 5.5;
+            seedLight.color.setHSL(0.12 + seedPulseFast * 0.06, 1.0, 0.6);
+            // ── END LASER ANIMATION ──────────────────────────────────────────
 
             for (var mi = 0; mi < middleKeys.length; mi++) {
                 var m = middleKeys[mi];
