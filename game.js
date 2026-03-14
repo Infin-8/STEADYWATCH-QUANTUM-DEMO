@@ -77,16 +77,18 @@
             var pyramidLevel = by - 1; // 1-4
             var levelBright = 0.45 + pyramidLevel * 0.1; // brighter at apex
             material = new THREE.MeshPhysicalMaterial({
-                color: new THREE.Color().setHSL(0.10, 0.9, levelBright),
-                emissive: new THREE.Color().setHSL(0.10, 1.0, 0.3),
-                emissiveIntensity: 0.3 + pyramidLevel * 0.12,
-                roughness: 0.25,
-                metalness: 0.65,
-                clearcoat: 0.9,
-                clearcoatRoughness: 0.1,
+                color: new THREE.Color().setHSL(0.14, 0.85, levelBright),
+                emissive: new THREE.Color().setHSL(0.14, 1.0, 0.35),
+                emissiveIntensity: 0.4 + pyramidLevel * 0.12,
+                roughness: 0.1,
+                metalness: 0.3,
+                transmission: 0.55,
+                clearcoat: 1.0,
+                clearcoatRoughness: 0.05,
+                ior: 1.6,
                 envMapIntensity: 1.5,
                 transparent: true,
-                opacity: 0.72,
+                opacity: 0.48,
                 depthWrite: false
             });
         } else {
@@ -346,7 +348,7 @@
         }
 
         function spawnPyramidDrop(wx, wy, wz, pyramidLevel, keyIndex) {
-            var PYRAMID_HUE = 0.10; // warm gold
+            var PYRAMID_HUE = 0.14; // warm gold
             var col = new THREE.Color().setHSL(PYRAMID_HUE + pyramidLevel * 0.02, 0.95, 0.65);
             var quats = window.HurwitzKeys.unzipSeed(5); // p=5 quaternion structure
             var group = new THREE.Group();
@@ -806,7 +808,7 @@
                     var pLvl = m.userData.pyramidLevel || 1;
                     var pPulse = 0.5 + 0.5 * Math.sin(time * 0.8 + pLvl * 1.1 + m.userData.bx * 0.4 + m.userData.bz * 0.3);
                     m.material.emissiveIntensity = (0.3 + pLvl * 0.12) * (0.6 + pPulse * 0.7);
-                    m.material.emissive.setHSL(0.10 + pPulse * 0.02, 1.0, 0.3 + pPulse * 0.1);
+                    m.material.emissive.setHSL(0.14 + pPulse * 0.02, 1.0, 0.3 + pPulse * 0.1);
                     continue;
                 }
                 if (m.userData.blockType !== BLOCK.KEY_ORE_P5 && m.userData.blockType !== BLOCK.KEY_ORE_P13) continue;
