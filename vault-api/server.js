@@ -287,7 +287,7 @@ app.get('/', (req, res) => {
   </div>
 
   <div class="section">
-    <div class="label">Lattice Fingerprint &nbsp;<span style="color:#2a4a6a;font-size:0.68rem;">p=5 · 144 F4 SITES · VAULT IDENTITY · nodes 0–80 = vault slots · nodes 81–143 = moat</span></div>
+    <div class="label">Lattice Fingerprint &nbsp;<span style="color:#2a4a6a;font-size:0.68rem;">p=5 · 144 F4 SITES · VAULT IDENTITY · each of 81 slots bound to nearest F4 node by geometry · unbound nodes = moat</span></div>
     <div style="display:flex;align-items:flex-start;gap:24px;">
       <canvas id="fp-canvas" width="280" height="280" style="border:1px solid #1a3a5a;border-radius:4px;background:#060e1a;"></canvas>
       <div style="font-size:0.72rem;color:#667eea;line-height:1.8;">
@@ -296,7 +296,7 @@ app.get('/', (req, res) => {
         <div><span style="display:inline-block;width:10px;height:10px;border-radius:50%;background:#1a2a3a;border:1px solid #2a4a6a;margin-right:6px;"></span>Empty vault slot (0–80)</div>
         <div><span style="display:inline-block;width:10px;height:10px;border-radius:50%;background:#0d1f35;border:1px dashed #1a3a5a;margin-right:6px;"></span>Hurwitz moat (sites 81–143)</div>
         <div style="margin-top:12px;color:#2a4a6a;font-size:0.68rem;">
-          This is your vault's structural<br>fingerprint — unique to p=5.<br>Same shape as Fingerprint View<br>in the 3D game, colored by<br>live slot occupancy.
+          Each slot bound to its nearest<br>F4 node by Euclidean distance<br>in the projected plane. Moat =<br>F4 nodes with no bound slot.<br>Geometry is the address.
         </div>
         <div id="fp-hash" style="margin-top:12px;font-size:0.65rem;color:#1a3a5a;word-break:break-all;max-width:180px;"></div>
       </div>
@@ -336,9 +336,12 @@ app.get('/', (req, res) => {
         for (let i = 0; i < sites.length; i++) {
           const s = sites[i];
           const p = project(s);
-          const isCrown = i === 0;
-          const isMoat = i >= 81;
-          const isFilled = filledSlots.has(i);
+          // Geometric binding: what slots are bound to this F4 node?
+          const boundSlots = nodeToSlots.get(i) || [];
+          const isVaultNode = boundSlots.length > 0;
+          const isCrown = boundSlots.includes(0);
+          const isFilled = isVaultNode && boundSlots.some(function(si) { return filledSlots.has(si); });
+          const isMoat = !isVaultNode;
           let color, r, glow = false;
           if (isCrown) {
             color = '#00e5ff'; r = 4.5; glow = true;
@@ -347,7 +350,8 @@ app.get('/', (req, res) => {
           } else if (isFilled) {
             color = '#764ba2'; r = 3.5; glow = true;
           } else {
-            color = '#1a2a3a'; r = 2.5;
+            // vault slot, empty — subtle size hint for multi-bound nodes
+            color = '#1a2a3a'; r = boundSlots.length > 1 ? 3.2 : 2.5;
           }
           if (glow) {
             const gr = ctx.createRadialGradient(p.x, p.y, 0, p.x, p.y, r * 3);
@@ -367,18 +371,35 @@ app.get('/', (req, res) => {
         animFrame = requestAnimationFrame(draw);
       }
 
+      // nodeToSlots: F4 node index → array of bound slot indices
+      var nodeToSlots = new Map();
+
       async function load() {
         try {
-          const [sitesRes, slotsRes] = await Promise.all([
+          const [sitesRes, slotsRes, bindingRes] = await Promise.all([
             fetch('/auth/lattice-sites'),
-            fetch('/api/vault/slots')
+            fetch('/api/vault/slots'),
+            fetch('/api/vault/slot-lattice-map')
           ]);
           const sitesData = await sitesRes.json();
           const slotsData = await slotsRes.json();
+          const bindingData = await bindingRes.json();
           sites = sitesData.sites || [];
-          (slotsData.filled || []).forEach(i => filledSlots.add(i));
+          filledSlots = new Set();
+          (slotsData.filled || []).forEach(function(i) { filledSlots.add(i); });
+          // Build geometric node→slots map
+          nodeToSlots = new Map();
+          if (bindingData.binding) {
+            bindingData.binding.forEach(function(b) {
+              if (!nodeToSlots.has(b.latticeNodeIndex)) nodeToSlots.set(b.latticeNodeIndex, []);
+              nodeToSlots.get(b.latticeNodeIndex).push(b.slotIndex);
+            });
+          }
           const hashEl = document.getElementById('fp-hash');
-          if (hashEl && sitesData.hash) hashEl.textContent = 'ID: ' + sitesData.hash.slice(0, 24) + '…';
+          if (hashEl && sitesData.hash) {
+            hashEl.textContent = 'ID: ' + sitesData.hash.slice(0, 24) + '…'
+              + '\n' + (bindingData.uniqueNodes || 0) + ' unique F4 nodes bound to 81 slots';
+          }
           if (animFrame) cancelAnimationFrame(animFrame);
           draw();
         } catch (e) { console.warn('Fingerprint canvas load error:', e); }
@@ -681,6 +702,7 @@ app.post('/api/vault/request', authMiddleware, (req, res) => {
     return res.status(400).json({ error: 'Bad request', message: 'slotIndex must be 0..80' });
   }
   const slot = keyStore.get(slotIndex);
+  const binding = SLOT_LATTICE_MAP[slotIndex];
   auditLog.push({ ts: new Date().toISOString(), action: 'request', slotIndex, apiKeyId: req.apiKeyId });
   saveData();
   res.json({
@@ -688,7 +710,10 @@ app.post('/api/vault/request', authMiddleware, (req, res) => {
     slotIndex,
     keyReleased: true,
     keyMaterial: slot.keyMaterial,
-    hasPayload: !!slot.encryptedPayload
+    hasPayload: !!slot.encryptedPayload,
+    latticeAddress: binding ? binding.latticeCoords : null,
+    latticeNodeIndex: binding ? binding.latticeNodeIndex : null,
+    gridPos: binding ? { row: binding.gridRow, col: binding.gridCol } : null
   });
 });
 
@@ -760,8 +785,69 @@ app.delete('/api/vault/configs/:id', authMiddleware, (req, res) => {
 
 // --- Lattice Auth (p=5, 144 sites) ---
 
-const { mountLatticeAuth } = require('../lattice-auth-middleware');
+const { mountLatticeAuth, generateF4Shell } = require('../lattice-auth-middleware');
 mountLatticeAuth(app, { serverPrime: 5 });
+
+// --- Slot-to-Lattice Geometric Binding ---
+// Each of the 81 vault slots maps to its nearest F4 node in normalized 2D projected space.
+// Grid positions: (col-4)/4, (row-4)/4 → [-1,1]
+// F4 positions: stereographic projection normalized by max extent → [-1,1]
+
+const VAULT_PRIME = 5;
+
+const SLOT_LATTICE_MAP = (function computeBinding() {
+  const f4 = generateF4Shell(VAULT_PRIME);
+  const projected = f4.map((q, idx) => {
+    const [a, b, c, d] = q;
+    const scale = 1.0 / (1 + Math.abs(d) * 0.1);
+    return { idx, x: a * scale, y: c * scale, a, b, c, d };
+  });
+  let maxExtent = 0;
+  for (const s of projected) {
+    const r = Math.sqrt(s.x * s.x + s.y * s.y);
+    if (r > maxExtent) maxExtent = r;
+  }
+  if (maxExtent === 0) maxExtent = 1;
+
+  return Array.from({ length: SLOTS }, (_, i) => {
+    const col = i % 9, row = Math.floor(i / 9);
+    const gx = (col - 4) / 4.0;
+    const gy = (row - 4) / 4.0;
+    let nearest = null, minDist = Infinity;
+    for (const s of projected) {
+      const nx = s.x / maxExtent, ny = s.y / maxExtent;
+      const dist = Math.sqrt((gx - nx) ** 2 + (gy - ny) ** 2);
+      if (dist < minDist) { minDist = dist; nearest = s; }
+    }
+    return {
+      slotIndex: i,
+      gridRow: row, gridCol: col,
+      latticeNodeIndex: nearest.idx,
+      latticeCoords: { a: nearest.a, b: nearest.b, c: nearest.c, d: nearest.d },
+      projectedX: nearest.x, projectedY: nearest.y,
+      distance: +minDist.toFixed(6)
+    };
+  });
+})();
+
+// Build reverse map: F4 node index → set of bound slot indices
+const NODE_TO_SLOTS = new Map();
+for (const b of SLOT_LATTICE_MAP) {
+  if (!NODE_TO_SLOTS.has(b.latticeNodeIndex)) NODE_TO_SLOTS.set(b.latticeNodeIndex, []);
+  NODE_TO_SLOTS.get(b.latticeNodeIndex).push(b.slotIndex);
+}
+
+console.log('  🔗 Slot-lattice binding: ' + SLOTS + ' slots → ' + NODE_TO_SLOTS.size + ' unique F4 nodes (of 144)');
+
+app.get('/api/vault/slot-lattice-map', (req, res) => {
+  res.json({
+    prime: VAULT_PRIME,
+    slots: SLOTS,
+    f4Sites: generateF4Shell(VAULT_PRIME).length,
+    uniqueNodes: NODE_TO_SLOTS.size,
+    binding: SLOT_LATTICE_MAP
+  });
+});
 
 // --- Start ---
 
