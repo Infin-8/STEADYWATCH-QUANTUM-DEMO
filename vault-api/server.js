@@ -450,8 +450,7 @@ app.get('/', (req, res) => {
           }
           const hashEl = document.getElementById('fp-hash');
           if (hashEl && sitesData.hash) {
-            hashEl.textContent = 'ID: ' + sitesData.hash.slice(0, 24) + '…'
-              + '\n' + (bindingData.uniqueNodes || 0) + ' unique F4 nodes bound to 81 slots';
+            hashEl.textContent = 'ID: ' + sitesData.hash.slice(0, 24) + '… · ' + (bindingData.uniqueNodes || 0) + ' F4 nodes bound';
           }
           if (animFrame) cancelAnimationFrame(animFrame);
           draw();
