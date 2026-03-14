@@ -19,7 +19,65 @@ This repository contains quantum computing research for **Echo Resonance Technol
 
 ---
 
-## 🎉 Latest Breakthrough: Hurwitz Lattice-Metric Authentication — Biometric-Style QKD Identity
+## 🎉 Latest Breakthrough: F4 Node Binding — Geometry as Cryptographic Address
+
+### F4 Node Binding: The Lattice Becomes Load-Bearing
+
+**Date:** March 14, 2026
+**Status:** ✅ **Deployed — VAULT™ · VIPER™ · HORDE™ · Geometry IS the Address**
+
+**The Advance:**
+Previous work established the F4 shell as a *visual* identity for each server. This breakthrough makes the geometry *cryptographic*. Every operational unit in the Security Trinity — vault key slots, threat detection keys, swarm defense nodes — is now geometrically bound to its nearest F4 lattice site. The quaternion coordinates of that site are folded into key derivation. Without knowing the F4 structure, you cannot reproduce the keys.
+
+**How It Works:**
+
+Each server's operational units are projected into the same normalized 2D space as the F4 shell, then matched to their nearest quaternion site by Euclidean distance:
+
+```
+Grid slot → nearest F4 node → SHA-256(seed + index + a,b,c,d)
+                                                    ↑
+                                          quaternion coordinates
+                                          of the bound F4 site
+```
+
+**The Trinity Binding:**
+
+| Server | Prime | F4 Sites | Operational Units | Binding Type | Moat |
+|--------|-------|----------|-------------------|--------------|------|
+| VAULT™ | p=5 | 144 | 81 key slots | Grid → nearest F4 node | 95 unbound sites |
+| VIPER™ | p=13 | 336 | 336 detection keys | Direct (key IS quaternion) | None |
+| HORDE™ | p=17 | 432 | 432 swarm nodes | Direct (key IS quaternion) | None |
+
+**Geometric Arm/Cluster Assignment:**
+VIPER and HORDE previously assigned arms/clusters by enumeration order (first 84 = arm 0, etc.). Now each key's arm is determined by which quadrant of the F4 projected plane its quaternion falls in — matching the fingerprint canvas exactly. The unequal distribution reflects real lattice density:
+
+- VIPER p=13 arms: RECON=98 · BREACH=82 · LATERAL=74 · EXFIL=82
+- HORDE p=17 clusters: SWARM=134 · SHIELD=106 · TRACE=86 · ADAPT=106
+
+**The Moat:**
+The 95 F4 sites at p=5 not reachable by any vault slot form a structural guard ring. They appear in the fingerprint hash and fingerprint canvas. Any fingerprint forgery must account for all 144 sites including the moat.
+
+**New Endpoints:**
+- `GET /api/vault/slot-lattice-map` — 81-slot binding table with F4 coordinates
+- `GET /api/viper/key-lattice-map` — 336-key binding with geometric arm assignment
+- `GET /api/horde/key-lattice-map` — 432-node binding with geometric cluster assignment
+
+**Key Release Now Returns Lattice Address:**
+```json
+{
+  "slotIndex": 0,
+  "keyMaterial": "592993727424b499...",
+  "latticeAddress": { "a": -1.5, "b": 0.5, "c": -1.5, "d": 0.5 },
+  "latticeNodeIndex": 13
+}
+```
+
+**Research Paper:**
+- [`docs/research/F4_NODE_BINDING_CRYPTOGRAPHIC_ADDRESS.md`](docs/research/F4_NODE_BINDING_CRYPTOGRAPHIC_ADDRESS.md) ⭐ NEW — Geometric addressing: F4 node binding, moat concept, key derivation formula, security property
+
+---
+
+## 🎉 Previous Breakthrough: Hurwitz Lattice-Metric Authentication — Biometric-Style QKD Identity
 
 ### Hurwitz Lattice-Metric Authentication (HLA): Solving the QKD Bootstrapping Problem
 
@@ -365,8 +423,9 @@ We've implemented and validated the first complete hybrid QKD protocol combining
 
 ### Research Papers
 
-- **[Hurwitz Lattice-Metric Authentication](docs/research/HURWITZ_LATTICE_BIOMETRIC_AUTHENTICATION.md)** ⭐ NEW - Biometric-style geometric identity for QKD — no pre-shared secret required, F4 cluster shapes independently verifiable.
-- **[Hurwitz Dual Lattice Visualization](docs/research/HURWITZ_DUAL_LATTICE_VISUALIZATION.md)** ⭐ NEW - Research paper on dual-layer crystal visualization of F4 lattice structures.
+- **[F4 Node Binding: Geometric Cryptographic Address](docs/research/F4_NODE_BINDING_CRYPTOGRAPHIC_ADDRESS.md)** ⭐ NEW - F4 lattice geometry as load-bearing key derivation input — slot-to-node binding, moat concept, geometric arm assignment.
+- **[Hurwitz Lattice-Metric Authentication](docs/research/HURWITZ_LATTICE_BIOMETRIC_AUTHENTICATION.md)** - Biometric-style geometric identity for QKD — no pre-shared secret required, F4 cluster shapes independently verifiable.
+- **[Hurwitz Dual Lattice Visualization](docs/research/HURWITZ_DUAL_LATTICE_VISUALIZATION.md)** - Research paper on dual-layer crystal visualization of F4 lattice structures.
 - **[Cross-Platform Qubit Aggregation](docs/research/CROSS_PLATFORM_QUBIT_AGGREGATION.md)** ⭐ NEW - First cross-platform qubit aggregation system enabling 783 qubits, making Shor's and Grover's algorithms feasible on current hardware.
 
 **[Bell Inequality Breakthrough](docs/research/BELL_INEQUALITY_BREAKTHROUGH.md)** -
@@ -526,7 +585,8 @@ STEADYWATCH-QUANTUM-DEMO/
         ├── BELL_INEQUALITY_BREAKTHROUGH.md
         ├── CROSS_PLATFORM_QUBIT_AGGREGATION.md  ⭐ NEW
         ├── HURWITZ_LATTICE_BIOMETRIC_AUTHENTICATION.md  ⭐ NEW - Biometric-style auth for QKD
-        └── HURWITZ_DUAL_LATTICE_VISUALIZATION.md        ⭐ NEW - Dual-layer crystal visualization
+        ├── HURWITZ_DUAL_LATTICE_VISUALIZATION.md        - Dual-layer crystal visualization
+        └── F4_NODE_BINDING_CRYPTOGRAPHIC_ADDRESS.md     ⭐ NEW - Geometric addressing & key derivation
 ```
 
 **New root-level files:**
@@ -958,9 +1018,9 @@ This repository contains research code for quantum computing research. Code is p
 
 ---
 
-**Repository Version:** 2.2
-**Last Updated:** March 13, 2026
-**Status:** ✅ **Complete QKD Protocol Validated on Real Hardware** | 🎉 **Hurwitz Lattice-Metric Authentication — Biometric-Style QKD Identity (No Pre-Shared Secret)** | ⚛️ **All 6 Protocol Phases Working** | 🔬 **Hash Parity Verified Across Python/Node/Browser** | ✅ **QKD Production-Ready**
+**Repository Version:** 2.3
+**Last Updated:** March 14, 2026
+**Status:** ✅ **F4 Node Binding — Geometry as Cryptographic Address** | 🎉 **Hurwitz Lattice-Metric Authentication — Biometric-Style QKD Identity** | ✅ **Geometric Arm/Cluster Assignment Across Trinity** | 🔬 **47/47 Security Tests Passing** | ✅ **QKD Production-Ready**
 
 ---
 
