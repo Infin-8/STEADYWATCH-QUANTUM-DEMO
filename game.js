@@ -137,7 +137,7 @@
         var height = container.clientHeight || 600;
 
         var camera = new THREE.PerspectiveCamera(60, width / height, 0.1, 1000);
-        camera.position.set(1.97, 7.89, -1.94);
+        camera.position.set(1.97, 7.87, -1.97);
         camera.lookAt(0, 5, 0);
 
         var renderer = new THREE.WebGLRenderer({ antialias: true });
@@ -152,10 +152,6 @@
         controls.minDistance = 4;
         controls.maxDistance = 50;
         controls.target.set(0, 5, 0);
-        controls.addEventListener('change', function () {
-            var p = camera.position;
-            console.log('camera.position.set(' + p.x.toFixed(2) + ', ' + p.y.toFixed(2) + ', ' + p.z.toFixed(2) + ');  target:', controls.target.x.toFixed(2), controls.target.y.toFixed(2), controls.target.z.toFixed(2));
-        });
 
         var ambientLight = new THREE.AmbientLight(0x667eea, 0.4);
         scene.add(ambientLight);
@@ -1132,7 +1128,7 @@
                     });
                 }
             } else {
-                camera.position.set(1.97, 7.89, -1.94);
+                camera.position.set(1.97, 7.87, -1.97);
                 camera.lookAt(0, 5, 0);
                 controls.target.set(0, 5, 0);
                 controls.update();
@@ -1142,7 +1138,7 @@
         };
         window.resetGameView = function () {
             fingerprintMode = false;
-            camera.position.set(1.97, 7.89, -1.94);
+            camera.position.set(1.97, 7.87, -1.97);
             camera.lookAt(0, 5, 0);
             controls.target.set(0, 5, 0);
             controls.update();
