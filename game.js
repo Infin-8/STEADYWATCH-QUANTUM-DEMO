@@ -137,8 +137,9 @@
         var height = container.clientHeight || 600;
 
         var camera = new THREE.PerspectiveCamera(60, width / height, 0.1, 1000);
-        camera.position.set(1.40, 8.48, -1.40);
+        camera.position.set(5.45, -4.05, 5.45);
         camera.lookAt(0, 5, 0);
+
 
         var renderer = new THREE.WebGLRenderer({ antialias: true });
         renderer.setSize(width, height);
