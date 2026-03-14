@@ -323,9 +323,21 @@
         function buildHurwitzCrystalLayer() {
             var quats = window.HurwitzKeys ? window.HurwitzKeys.unzipSeed(13) : [];
             var crystalGeom = new THREE.SphereGeometry(0.10, 8, 8);
+            // Board-aligned distribution: snap each node to its nearest 9x9 cell.
+            // p=13 components span [-3,3] so 49 of 81 cells are populated (~6.9 nodes/cell).
+            var cellCounts = {};
             for (var i = 0; i < quats.length; i++) {
                 var q = quats[i];
-                var pos = project4Dto3D(q.a, q.b, q.c, q.d, 2.5);
+                var dScale = 1.0 / (1 + Math.abs(q.d) * 0.1);
+                var px = q.a * dScale;
+                var pz = q.c * dScale;
+                var boardX = Math.max(-4, Math.min(4, Math.round(px)));
+                var boardZ = Math.max(-4, Math.min(4, Math.round(pz)));
+                var cellKey = boardX + ',' + boardZ;
+                var stackIdx = cellCounts[cellKey] || 0;
+                cellCounts[cellKey] = stackIdx + 1;
+                var jx = Math.sin(i * 7.3) * 0.28;
+                var jz = Math.cos(i * 5.1) * 0.28;
                 var ph = (i / quats.length);
                 var cHue = (0.68 + ph * 0.22) % 1;
                 var mat = new THREE.MeshPhysicalMaterial({
@@ -345,7 +357,7 @@
                     specularIntensity: 1.0
                 });
                 var mesh = new THREE.Mesh(crystalGeom, mat);
-                mesh.position.set(pos.x, 1.5 + pos.y * 0.15, pos.z);
+                mesh.position.set(boardX + jx, 1.5 + stackIdx * 0.22, boardZ + jz);
                 mesh.userData.blockType = BLOCK.GROUND;
                 mesh.userData.crystalPhase = ph * Math.PI * 2;
                 mesh.userData.crystalHue = cHue;
