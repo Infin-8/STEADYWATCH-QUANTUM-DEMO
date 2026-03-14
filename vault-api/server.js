@@ -347,7 +347,7 @@ app.get('/', (req, res) => {
         <div><span style="display:inline-block;width:10px;height:10px;border-radius:50%;background:#00e5ff;margin-right:6px;"></span>Crown — slot 0 (key zero)</div>
         <div><span style="display:inline-block;width:10px;height:10px;border-radius:50%;background:#764ba2;margin-right:6px;"></span>Slot with payload stored</div>
         <div><span style="display:inline-block;width:10px;height:10px;border-radius:50%;background:#1a2a3a;border:1px solid #2a4a6a;margin-right:6px;"></span>Empty vault slot (0–80)</div>
-        <div><span style="display:inline-block;width:10px;height:10px;border-radius:50%;background:#0d1f35;border:1px dashed #1a3a5a;margin-right:6px;"></span>Hurwitz moat (sites 81–143)</div>
+        <div><span style="display:inline-block;width:10px;height:10px;border-radius:50%;background:#1a0e00;border:1px solid #7a5500;margin-right:6px;"></span>Hurwitz moat — unbound F4 nodes (sites 81–143)</div>
         <div style="margin-top:12px;color:#2a4a6a;font-size:0.68rem;">
           Each slot bound to its nearest<br>F4 node by Euclidean distance<br>in the projected plane. Moat =<br>F4 nodes with no bound slot.<br>Geometry is the address.
         </div>
@@ -399,7 +399,7 @@ app.get('/', (req, res) => {
           if (isCrown) {
             color = '#00e5ff'; r = 4.5; glow = true;
           } else if (isMoat) {
-            color = '#0d2a3a'; r = 1.8;
+            color = '#1a0e00'; r = 1.8;
           } else if (isFilled) {
             color = '#764ba2'; r = 3.5; glow = true;
           } else {
@@ -416,7 +416,7 @@ app.get('/', (req, res) => {
           ctx.beginPath(); ctx.arc(p.x, p.y, r, 0, Math.PI * 2);
           ctx.fillStyle = color; ctx.fill();
           if (isMoat) {
-            ctx.strokeStyle = '#1a3a5a'; ctx.lineWidth = 0.4;
+            ctx.strokeStyle = '#7a5500'; ctx.lineWidth = 0.8;
             ctx.stroke();
           }
         }
