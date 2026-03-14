@@ -271,7 +271,7 @@
         }
 
         function spawnPyramidDrop(wx, wy, wz, pyramidLevel, keyIndex) {
-            var PYRAMID_HUE = 0.40;
+            var PYRAMID_HUE = 0.10;
             var col = new THREE.Color().setHSL(PYRAMID_HUE + pyramidLevel * 0.02, 0.95, 0.65);
             var quats = window.HurwitzKeys.unzipSeed(5);
             var group = new THREE.Group();
