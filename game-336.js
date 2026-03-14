@@ -132,7 +132,7 @@
 
         var camera = new THREE.PerspectiveCamera(60, width / height, 0.1, 1000);
         camera.position.set(6, 6, 6);
-        camera.lookAt(0, 0, 0);
+        camera.lookAt(0, 2.5, 0);
 
         var renderer = new THREE.WebGLRenderer({ antialias: true });
         renderer.setSize(width, height);
@@ -145,6 +145,7 @@
         controls.dampingFactor = 0.05;
         controls.minDistance = 4;
         controls.maxDistance = 50;
+        controls.target.set(0, 2.5, 0);
 
         var ambientLight = new THREE.AmbientLight(0x667eea, 0.4);
         scene.add(ambientLight);
@@ -951,8 +952,8 @@
                 }
             } else {
                 camera.position.set(6, 6, 6);
-                camera.lookAt(0, 0, 0);
-                controls.target.set(0, 0, 0);
+                camera.lookAt(0, 2.5, 0);
+                controls.target.set(0, 2.5, 0);
                 controls.update();
                 var label = document.getElementById('game-key-label');
                 if (label) label.textContent = 'Click key ore to mine. Each drop shows 336 keyz in four arms (84 per arm).';
@@ -961,8 +962,8 @@
         window.resetGameView336 = function () {
             fingerprintMode336 = false;
             camera.position.set(6, 6, 6);
-            camera.lookAt(0, 0, 0);
-            controls.target.set(0, 0, 0);
+            camera.lookAt(0, 2.5, 0);
+            controls.target.set(0, 2.5, 0);
             controls.update();
             var label = document.getElementById('game-key-label');
             if (label) label.textContent = 'Click key ore to mine. Each drop shows 336 keyz in four arms (84 per arm).';
