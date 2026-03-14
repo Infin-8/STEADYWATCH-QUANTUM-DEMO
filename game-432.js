@@ -549,6 +549,7 @@
         }
 
         buildWorld();
+        scene.rotation.y = Math.PI / 4;
 
         function worldToSlotIndex(bx, bz) {
             var row = 4 - bz;
