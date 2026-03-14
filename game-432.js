@@ -86,7 +86,10 @@
                 metalness: 0.65,
                 clearcoat: 0.9,
                 clearcoatRoughness: 0.1,
-                envMapIntensity: 1.5
+                envMapIntensity: 1.5,
+                transparent: true,
+                opacity: 0.72,
+                depthWrite: false
             });
         } else {
             var col = getKeyColor(keyIndex, prime === 5 ? TOTAL_P5 : TOTAL_P13);
