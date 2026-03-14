@@ -14,6 +14,9 @@ const path = require('path');
 
 const { swarm, getClusterStats, KEY_MATRIX, CLUSTERS, TOTAL_KEYS } = require('./horde-engine');
 
+// Geometric cluster counts (unequal — reflects real F4 density per quadrant)
+const CLUSTER_KEY_COUNTS = [0, 1, 2, 3].map(i => KEY_MATRIX.filter(k => k.cluster === i).length);
+
 const app = express();
 app.use(cors());
 app.use(express.json({ limit: '1mb' }));
@@ -131,7 +134,7 @@ app.get('/', (req, res) => {
     <div class="stat-block">
       <div class="label">Swarm Nodes</div>
       <div class="stat" style="color:#00c853;">${TOTAL_KEYS}</div>
-      <div class="stat-sub">4 clusters × ${KEYS_PER_CLUSTER} nodes · p=17 Hurwitz</div>
+      <div class="stat-sub">432 nodes · 4 geometric clusters · p=17 Hurwitz</div>
     </div>
     <div class="stat-block">
       <div class="label">Total Responses</div>
@@ -340,7 +343,7 @@ app.get('/api/horde/status', authMiddleware, (req, res) => {
   res.json({
     status: 'active',
     nodes: TOTAL_KEYS,
-    nodesPerCluster: KEYS_PER_CLUSTER,
+    clusterNodeCounts: CLUSTER_KEY_COUNTS,
     clusters: getClusterStats(responseLog),
     totalResponses: responseLog.length,
     upSince: startedAt
@@ -407,7 +410,7 @@ app.listen(port, () => {
   console.log('  Dashboard  →  http://localhost:' + port + '/');
   console.log('  Health     →  http://localhost:' + port + '/api/horde/health');
   console.log('');
-  console.log('  Nodes:     ' + TOTAL_KEYS + ' (4 clusters × ' + KEYS_PER_CLUSTER + ' · p=17 Hurwitz)');
+  console.log('  Nodes:     ' + TOTAL_KEYS + ' p=17 Hurwitz · clusters ' + CLUSTER_KEY_COUNTS.join('/') + ' (geometric)');
   console.log('  Postures:  SWARM · SHIELD · TRACE · ADAPT');
   console.log('  API key:   ' + DEFAULT_API_KEY.slice(0, 8) + '…  (set HORDE_API_KEY env to change)');
   console.log('');

@@ -15,6 +15,9 @@ const path = require('path');
 
 const { scan, getArmStats, KEY_MATRIX, ARM_VECTORS, TOTAL_KEYS } = require('./viper-engine');
 
+// Geometric arm counts (unequal — reflects real F4 density per quadrant)
+const ARM_KEY_COUNTS = [0, 1, 2, 3].map(i => KEY_MATRIX.filter(k => k.arm === i).length);
+
 const app = express();
 app.use(cors());
 app.use(express.json({ limit: '1mb' }));
@@ -138,7 +141,7 @@ app.get('/', (req, res) => {
     <div class="stat-block">
       <div class="label">Detection Nodes</div>
       <div class="stat" style="color:#ff2d55;">${TOTAL_KEYS}</div>
-      <div class="stat-sub">4 arms × ${KEYS_PER_ARM} keys · p=13 Hurwitz</div>
+      <div class="stat-sub">336 keys · 4 geometric arms · p=13 Hurwitz</div>
     </div>
     <div class="stat-block">
       <div class="label">Total Detections</div>
@@ -345,7 +348,7 @@ app.get('/api/viper/status', authMiddleware, (req, res) => {
   res.json({
     status: 'active',
     keys: TOTAL_KEYS,
-    keysPerArm: KEYS_PER_ARM,
+    armKeyCounts: ARM_KEY_COUNTS,
     arms: getArmStats(alertLog),
     totalDetections: alertLog.length,
     upSince: startedAt
@@ -412,7 +415,7 @@ app.listen(port, () => {
   console.log('  Dashboard  →  http://localhost:' + port + '/');
   console.log('  Health     →  http://localhost:' + port + '/api/viper/health');
   console.log('');
-  console.log('  Keys:      ' + TOTAL_KEYS + ' (4 arms × ' + KEYS_PER_ARM + ' · p=13 Hurwitz)');
+  console.log('  Keys:      ' + TOTAL_KEYS + ' p=13 Hurwitz · arms ' + ARM_KEY_COUNTS.join('/') + ' (geometric)');
   console.log('  Vectors:   RECON · BREACH · LATERAL · EXFIL');
   console.log('  API key:   ' + DEFAULT_API_KEY.slice(0, 8) + '…  (set VIPER_API_KEY env to change)');
   console.log('');
