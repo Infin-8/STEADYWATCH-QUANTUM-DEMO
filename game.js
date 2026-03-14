@@ -135,7 +135,7 @@
         var height = container.clientHeight || 600;
 
         var camera = new THREE.PerspectiveCamera(60, width / height, 0.1, 1000);
-        camera.position.set(0, 2, 16);
+        camera.position.set(6, 6, 6);
         camera.lookAt(0, 0, 0);
 
         var renderer = new THREE.WebGLRenderer({ antialias: true });
@@ -1124,7 +1124,7 @@
                     });
                 }
             } else {
-                camera.position.set(0, 2, 16);
+                camera.position.set(6, 6, 6);
                 camera.lookAt(0, 0, 0);
                 controls.target.set(0, 0, 0);
                 controls.update();
@@ -1134,7 +1134,7 @@
         };
         window.resetGameView = function () {
             fingerprintMode = false;
-            camera.position.set(0, 2, 16);
+            camera.position.set(6, 6, 6);
             camera.lookAt(0, 0, 0);
             controls.target.set(0, 0, 0);
             controls.update();
