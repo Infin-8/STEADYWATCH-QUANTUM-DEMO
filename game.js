@@ -693,8 +693,6 @@
             var wy = by * BLOCK_SIZE + BLOCK_SIZE * 0.5;
             var wz = bz * BLOCK_SIZE;
             if (bt === BLOCK.PYRAMID_ORE) {
-                spawnPyramidDrop(wx, wy, wz, obj.userData.pyramidLevel, keyIndex);
-                updateKeyLabel(null);
                 return;
             }
             spawnKeyDrop(wx, wy, wz, prime, keyIndex);
