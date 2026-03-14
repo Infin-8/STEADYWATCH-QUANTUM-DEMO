@@ -207,7 +207,7 @@
             sp.position.set(0, beaconH + 1, 0); scene.add(sp); return sp;
         });
 
-        var beaconLight = new THREE.PointLight(BEACON_COLOR, 5, 32);
+        var beaconLight = new THREE.PointLight(BEACON_COLOR, 1.2, 18);
         beaconLight.position.set(0, beaconH + 1, 0);
         scene.add(beaconLight);
         // ── END VAULT BEACON ─────────────────────────────────────────────
@@ -666,7 +666,7 @@
                 var bfp = 0.5 + 0.5 * Math.sin(time * 1.0 + bfi * 0.9);
                 beaconFlares[bfi].material.opacity = beaconFlares[bfi].userData.baseOp * (0.65 + bfp * 0.55);
             }
-            beaconLight.intensity = 3 + bPulse * 5;
+            beaconLight.intensity = 0.8 + bPulse * 1.2;
             beaconLight.color.setHSL(BEACON_HUE + bFast * 0.06, 1.0, 0.6);
             // ── END BEACON ANIMATION ─────────────────────────────────────
 
