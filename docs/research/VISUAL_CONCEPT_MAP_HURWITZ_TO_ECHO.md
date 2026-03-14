@@ -119,5 +119,55 @@ The geometry was always the address. Now it looks like it.
 
 ---
 
+## The Biometric Scanner Emergence
+
+**Observed:** March 14, 2026
+
+When the game board is viewed in fingerprint mode (top-down camera) with the beacon beam active and the camera slightly zoomed out, the scene is indistinguishable from a biometric laser fingerprint scanner or iris/eye scanner.
+
+This was not designed. It emerged.
+
+### Why It Looks Like a Scanner
+
+A biometric scanner works as follows:
+1. A coherent light source projects downward onto a surface
+2. The surface geometry — fingerprint ridges, iris patterns — reflects the light in a unique pattern
+3. That pattern encodes identity
+
+The beacon beam + Hurwitz lattice does exactly this:
+1. The beacon projects downward from above onto the 9×9 board
+2. The F4 node geometry — slot bindings, arm assignments, moat ring — reflects the beam in a unique pattern
+3. That pattern **is** the identity — it is derived from the quaternion coordinates, not painted on
+
+The critical difference from a conventional biometric scanner: in a standard scanner the light **reveals** a pre-existing surface pattern. Here, the light **descends onto geometry that is itself the cryptographic key material**. The pattern underneath the beam is not a representation of identity — it is identity, in the form of Hurwitz quaternion lattice coordinates that drive key derivation directly.
+
+### The Iris Parallel
+
+An iris scanner works because the iris pattern is structural — grown from genetic information, stable over a lifetime, unique to each individual. It cannot be copied by observing it. Knowing what it looks like does not help you reproduce it.
+
+The Hurwitz lattice has the same property. Each prime shell (p=5, p=13, p=17) produces a geometrically unique pattern that:
+- Is deterministically derived from the prime — it cannot be different
+- Is stable — the same prime always produces the same pattern
+- Cannot be reverse-engineered by visual observation — seeing the projected geometry does not reveal the quaternion coordinates beneath it
+
+**Viewing the fingerprint mode is not a security risk. The pattern is visible. The key material is not.**
+
+### The Beacon as the Illumination Source
+
+In both real biometric scanners and in this system, the light source is structurally necessary — not decorative. Without illumination, the pattern cannot be read. The beacon beam in fingerprint mode plays the same functional role as the laser in an iris scanner: it makes the geometry legible to the observer while the underlying structure remains cryptographically opaque.
+
+Each prime has its own beacon color for the same reason iris scanners use specific wavelengths — different materials respond differently to different frequencies:
+- **p=5 VAULT** — gold/white: the dense protected core, 25-cell diamond
+- **p=13 VIPER** — cyan: the reaching arms, 49-cell detection surface
+- **p=17 HORDE** — purple: the full perimeter, 81-cell coverage
+
+### Implication
+
+The accidental emergence of the biometric scanner appearance is the strongest visual confirmation yet that the system is doing what it claims to do. A cryptographic identity system that **looks like an identity scanner** when viewed correctly — without being designed to — is expressing a deep structural truth about what it is.
+
+The geometry is the biometric. The lattice is the iris. The beacon is the scanner light. The fingerprint mode is the read operation.
+
+---
+
 *Part of the SteadyWatch / Quantum V^ research series.*
 *See also: `F4_NODE_BINDING_CRYPTOGRAPHIC_ADDRESS.md`, `HURWITZ_DUAL_LATTICE_VISUALIZATION.md`*
