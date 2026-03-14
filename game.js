@@ -153,6 +153,12 @@
         controls.maxDistance = 50;
         controls.target.set(0, 5, 0);
 
+        controls.addEventListener('change', function() {
+            var p = camera.position;
+            var t = controls.target;
+            console.log("camera.position.set(" + p.x.toFixed(2) + ", " + p.y.toFixed(2) + ", " + p.z.toFixed(2) + ");  target:'" + t.x.toFixed(2) + "''" + t.y.toFixed(2) + "''" + t.z.toFixed(2) + "'");
+        });
+
         var ambientLight = new THREE.AmbientLight(0x667eea, 0.4);
         scene.add(ambientLight);
         var pointLight1 = new THREE.PointLight(0x667eea, 1, 80);
