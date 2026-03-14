@@ -11,6 +11,34 @@ from qiskit import QuantumCircuit, QuantumRegister, ClassicalRegister
 import numpy as np
 
 
+# ---------------------------------------------------------------------------
+# F4 Hurwitz Lattice Constants
+# ---------------------------------------------------------------------------
+
+# The 4 unit quaternions that define the arm/cluster directions in the F4 root
+# system — identical to the geometric arm assignment in VIPER and HORDE engines.
+#   Arm 0 (+X): (1, 0, 0, 0)  → RECON  / SWARM
+#   Arm 1 (-X): (-1, 0, 0, 0) → BREACH / SHIELD
+#   Arm 2 (+Z): (0, 0, 1, 0)  → LATERAL/ TRACE
+#   Arm 3 (-Z): (0, 0,-1, 0)  → EXFIL  / ADAPT
+#
+# Projected angle in the (a, c) plane: arctan2(c, a)
+# These replace the golden-ratio approximation as the satellite phase reference.
+F4_ARM_ANGLES = [
+    np.arctan2(0, 1),    # Arm 0  +X →  0
+    np.arctan2(0, -1),   # Arm 1  -X →  π
+    np.arctan2(1, 0),    # Arm 2  +Z →  π/2
+    np.arctan2(-1, 0),   # Arm 3  -Z → -π/2
+]
+# Normalized to [0, 1) phase offsets: [0, 0.5, 0.25, 0.75]
+F4_PHASE_OFFSETS = [a / (2 * np.pi) % 1.0 for a in F4_ARM_ANGLES]
+
+# Hurwitz prime anchors — the three lattice shells powering VAULT, VIPER, HORDE.
+# These are elevated in harmonic circuits with a stronger echo resonance boost.
+HURWITZ_PRIMES = frozenset([5, 13, 17])
+HURWITZ_PRIME_ECHO_BOOST = 3.0  # Amplification factor relative to standard harmonics
+
+
 def create_echo_resonance_circuit(master_phase=0.0, echo_resonance_factor=0.1):
     """
     Create 4-point satellite echo resonance quantum circuit.
@@ -35,25 +63,24 @@ def create_echo_resonance_circuit(master_phase=0.0, echo_resonance_factor=0.1):
     
     # Master clock initialization (atomic clock sync)
     circuit.h(master_reg[0])  # Superposition state
-    
-    # Echo resonance: 4-directional satellites
-    # Left, Right, Top, Bottom satellites
-    golden_ratio = 1.618033988749895
-    direction_offsets = [-1.0, 1.0, 0.0, 0.0]  # Left, Right, Top, Bottom
-    
+
+    # Echo resonance: 4-directional satellites locked to F4 Hurwitz lattice geometry.
+    # Phase offsets are derived from the projected angles of the 4 arm unit quaternions
+    # (+X, -X, +Z, -Z) — the same reference frame used by VIPER/HORDE arm assignment.
+    # F4_PHASE_OFFSETS = [0, 0.5, 0.25, 0.75]  (replaces golden-ratio approximation)
     for i in range(4):
         # Entangle satellite with master
         circuit.cx(master_reg[0], satellite_reg[i])
-        
-        # Echo offset based on direction and golden ratio
-        echo_phase = master_phase + (direction_offsets[i] * echo_resonance_factor * golden_ratio)
-        
-        # Apply echo resonance phase gate
+
+        # Lattice-locked echo offset: F4 arm angle + scaled resonance factor
+        echo_phase = master_phase + (F4_PHASE_OFFSETS[i] * echo_resonance_factor)
+
+        # Apply lattice-locked phase gate
         circuit.rz(echo_phase * 2 * np.pi, satellite_reg[i])
-    
+
     # Natural fusion measurement
     circuit.measure(satellite_reg, classical_reg)
-    
+
     return circuit
 
 
@@ -149,55 +176,47 @@ def create_harmonic_superposition_circuit(
         QuantumCircuit: Harmonic superposition circuit with subharmonic
     """
     if harmonics is None:
-        harmonics = [2, 3, 4, 5, 6, 7, 8, 9, 12, 15, 17]
-    
+        # Hurwitz prime anchors (5=VAULT, 13=VIPER, 17=HORDE) are structural.
+        # 13 added to complete the trinity; surrounding harmonics bridge between them.
+        harmonics = [2, 3, 4, 5, 6, 7, 8, 9, 12, 13, 15, 17]
+
     # Calculate number of qubits: fundamental + subharmonic (if included) + harmonics
     num_qubits = 1 + (1 if include_subharmonic else 0) + len(harmonics)
     qubit_reg = QuantumRegister(num_qubits, 'qubit')
     classical_reg = ClassicalRegister(num_qubits, 'measure')
     circuit = QuantumCircuit(qubit_reg, classical_reg)
-    
+
     # Fundamental frequency qubit (qubit 0)
     circuit.h(qubit_reg[0])
-    
+
     qubit_index = 1
-    
+
     # Subharmonic qubit (0.5x speed - slower than fundamental)
     if include_subharmonic:
-        # Create subharmonic state
         circuit.h(qubit_reg[qubit_index])
-        
-        # Entangle with fundamental (subharmonic relationship: 0.5x)
         circuit.cx(qubit_reg[0], qubit_reg[qubit_index])
-        
-        # Apply subharmonic phase (0.5x speed)
         subharmonic_phase = (0.5 * 2 * np.pi) % (2 * np.pi)
         circuit.rz(subharmonic_phase, qubit_reg[qubit_index])
-        
-        # Echo resonance for subharmonic
         echo_phase = subharmonic_phase * echo_resonance_factor
         circuit.rz(echo_phase, qubit_reg[qubit_index])
-        
         qubit_index += 1
-    
-    # Harmonic qubits (2x, 3x, 4x, etc.)
+
+    # Harmonic qubits — Hurwitz prime harmonics (5, 13, 17) receive a 3x echo boost
+    # as structural anchors of the F4 lattice. All others use standard echo factor.
     for harmonic in harmonics:
-        # Create harmonic state
         circuit.h(qubit_reg[qubit_index])
-        
-        # Entangle with fundamental (harmonic relationship)
         circuit.cx(qubit_reg[0], qubit_reg[qubit_index])
-        
-        # Apply harmonic phase
+
         harmonic_phase = (harmonic * 2 * np.pi) % (2 * np.pi)
         circuit.rz(harmonic_phase, qubit_reg[qubit_index])
-        
-        # Echo resonance for harmonic
-        echo_phase = harmonic_phase * echo_resonance_factor
+
+        # Hurwitz prime anchors: amplified echo resonance (VAULT p=5, VIPER p=13, HORDE p=17)
+        boost = HURWITZ_PRIME_ECHO_BOOST if harmonic in HURWITZ_PRIMES else 1.0
+        echo_phase = harmonic_phase * echo_resonance_factor * boost
         circuit.rz(echo_phase, qubit_reg[qubit_index])
-        
+
         qubit_index += 1
-    
+
     circuit.measure(qubit_reg, classical_reg)
     return circuit
 
@@ -307,41 +326,37 @@ def create_singularity_measurement_circuit(
         QuantumCircuit: Singularity measurement circuit with all harmonics at phase 0.0
     """
     if harmonics is None:
-        harmonics = [2, 3, 4, 5, 6, 7, 8, 9, 12, 15, 17]
-    
+        # Hurwitz prime anchors (5=VAULT, 13=VIPER, 17=HORDE) included as structural anchors.
+        harmonics = [2, 3, 4, 5, 6, 7, 8, 9, 12, 13, 15, 17]
+
     # Calculate number of qubits: fundamental + subharmonic (if included) + harmonics
     num_qubits = 1 + (1 if include_subharmonic else 0) + len(harmonics)
     qubit_reg = QuantumRegister(num_qubits, 'qubit')
     classical_reg = ClassicalRegister(num_qubits, 'measure')
     circuit = QuantumCircuit(qubit_reg, classical_reg)
-    
+
     # At Singularity, all phases = 0.0, so all qubits are initialized to |0⟩
     # We still prepare them in superposition, but with phase = 0.0
-    
+
     # Fundamental qubit (qubit 0) - phase = 0.0 at Singularity
-    circuit.h(qubit_reg[0])  # Superposition
-    # Phase = 0.0 (no phase gate needed at Singularity)
-    
+    circuit.h(qubit_reg[0])
+
     qubit_index = 1
-    
+
     # Subharmonic qubit (0.5x) - phase = 0.0 at Singularity
     if include_subharmonic:
-        circuit.h(qubit_reg[qubit_index])  # Superposition
-        # Entangle with fundamental
+        circuit.h(qubit_reg[qubit_index])
         circuit.cx(qubit_reg[0], qubit_reg[qubit_index])
-        # Phase = 0.0 at Singularity (no phase gate needed)
         qubit_index += 1
-    
-    # Harmonic qubits (2x, 3x, 4x, etc.) - all phase = 0.0 at Singularity
+
+    # Harmonic qubits - all phase = 0.0 at Singularity
     for harmonic in harmonics:
-        circuit.h(qubit_reg[qubit_index])  # Superposition
-        # Entangle with fundamental
+        circuit.h(qubit_reg[qubit_index])
         circuit.cx(qubit_reg[0], qubit_reg[qubit_index])
-        # Phase = 0.0 at Singularity (no phase gate needed)
         qubit_index += 1
-    
+
     # Measure all qubits simultaneously (perfect measurement point)
     circuit.measure(qubit_reg, classical_reg)
-    
+
     return circuit
 
