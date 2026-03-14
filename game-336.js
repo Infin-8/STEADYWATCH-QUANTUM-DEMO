@@ -136,6 +136,79 @@
         pointLight2.position.set(-17, 10, -17);
         scene.add(pointLight2);
 
+        // ── VIPER BEACON (p=13 · cyan) ───────────────────────────────────
+        var BEACON_COLOR = 0x00e5ff;
+        var BEACON_HUE   = 0.52;
+        var beaconH      = 26;
+
+        var beaconSrc = new THREE.Mesh(
+            new THREE.SphereGeometry(0.28, 16, 16),
+            new THREE.MeshBasicMaterial({ color: 0xffffff, transparent: true, opacity: 0.9, blending: THREE.AdditiveBlending, depthWrite: false })
+        );
+        beaconSrc.position.set(0, beaconH + 1, 0);
+        scene.add(beaconSrc);
+
+        var beaconBeam = new THREE.Mesh(
+            new THREE.CylinderGeometry(0.03, 0.02, beaconH, 8, 1),
+            new THREE.MeshBasicMaterial({ color: BEACON_COLOR, transparent: true, opacity: 0.55, blending: THREE.AdditiveBlending, depthWrite: false })
+        );
+        beaconBeam.position.set(0, beaconH / 2 + 1, 0);
+        scene.add(beaconBeam);
+
+        var beaconGlow = new THREE.Mesh(
+            new THREE.CylinderGeometry(0.38, 0.08, beaconH, 8, 1),
+            new THREE.MeshBasicMaterial({ color: BEACON_COLOR, transparent: true, opacity: 0.07, blending: THREE.AdditiveBlending, depthWrite: false })
+        );
+        beaconGlow.position.set(0, beaconH / 2 + 1, 0);
+        scene.add(beaconGlow);
+
+        var beaconCorona = [
+            { r: 0.55, op: 0.20, ph: 0.0 },
+            { r: 0.95, op: 0.11, ph: 1.2 },
+            { r: 1.50, op: 0.06, ph: 2.4 }
+        ].map(function(d) {
+            var m = new THREE.Mesh(
+                new THREE.SphereGeometry(d.r, 16, 16),
+                new THREE.MeshBasicMaterial({ color: BEACON_COLOR, transparent: true, opacity: d.op, blending: THREE.AdditiveBlending, depthWrite: false, side: THREE.BackSide })
+            );
+            m.position.set(0, beaconH + 1, 0);
+            m.userData.phase = d.ph; m.userData.baseOp = d.op;
+            scene.add(m); return m;
+        });
+
+        var BEACON_RINGS = 5;
+        var beaconRings = [];
+        for (var bri = 0; bri < BEACON_RINGS; bri++) {
+            var brm = new THREE.Mesh(
+                new THREE.TorusGeometry(0.25, 0.025, 6, 32),
+                new THREE.MeshBasicMaterial({ color: BEACON_COLOR, transparent: true, opacity: 0, blending: THREE.AdditiveBlending, depthWrite: false })
+            );
+            brm.userData.progress = bri / BEACON_RINGS;
+            scene.add(brm); beaconRings.push(brm);
+        }
+
+        var beaconFlares = [
+            { sc: 3.0, r: 0,   g: 229, b: 255, op: 0.80 },
+            { sc: 5.5, r: 255, g: 255, b: 255, op: 0.35 },
+            { sc: 8.5, r: 0,   g: 229, b: 255, op: 0.15 }
+        ].map(function(d) {
+            var cv = document.createElement('canvas'); cv.width = 128; cv.height = 128;
+            var cx = cv.getContext('2d');
+            var grd = cx.createRadialGradient(64,64,0,64,64,64);
+            grd.addColorStop(0,'rgba('+d.r+','+d.g+','+d.b+',1)');
+            grd.addColorStop(0.3,'rgba('+d.r+','+d.g+','+d.b+',0.4)');
+            grd.addColorStop(1,'rgba(0,0,0,0)');
+            cx.fillStyle = grd; cx.fillRect(0,0,128,128);
+            var sp = new THREE.Sprite(new THREE.SpriteMaterial({ map: new THREE.CanvasTexture(cv), transparent: true, opacity: d.op, blending: THREE.AdditiveBlending, depthWrite: false }));
+            sp.scale.set(d.sc, d.sc, 1); sp.userData.baseOp = d.op;
+            sp.position.set(0, beaconH + 1, 0); scene.add(sp); return sp;
+        });
+
+        var beaconLight = new THREE.PointLight(BEACON_COLOR, 5, 32);
+        beaconLight.position.set(0, beaconH + 1, 0);
+        scene.add(beaconLight);
+        // ── END VIPER BEACON ─────────────────────────────────────────────
+
         var blocks = {};
         var blockMeshes = [];
         var keyDrops = [];
@@ -480,6 +553,36 @@
         function animate() {
             requestAnimationFrame(animate);
             time += 0.02;
+
+            // ── VIPER BEACON ANIMATION ───────────────────────────────────
+            var bPulse = 0.5 + 0.5 * Math.sin(time * 2.6);
+            var bFast  = 0.5 + 0.5 * Math.sin(time * 5.8);
+            for (var bci = 0; bci < beaconCorona.length; bci++) {
+                var bcp = 0.5 + 0.5 * Math.sin(time * 2.2 + beaconCorona[bci].userData.phase);
+                beaconCorona[bci].material.opacity = beaconCorona[bci].userData.baseOp * (0.5 + bcp * 0.9);
+                beaconCorona[bci].scale.setScalar(0.93 + bcp * 0.12);
+            }
+            beaconBeam.material.opacity = 0.30 + 0.28 * Math.sin(time * 3.4);
+            beaconGlow.material.opacity = 0.04 + 0.05 * Math.sin(time * 2.0);
+            for (var brj = 0; brj < BEACON_RINGS; brj++) {
+                var br = beaconRings[brj];
+                br.userData.progress += 0.007;
+                if (br.userData.progress > 1) br.userData.progress = 0;
+                var brp = br.userData.progress;
+                br.position.set(0, beaconH + 1 - brp * beaconH, 0);
+                var brs = 0.6 + brp * 3.0;
+                br.scale.set(brs, brs, brs);
+                var bro = brp < 0.1 ? brp * 10 : (brp > 0.75 ? (1 - brp) / 0.25 : 1.0);
+                br.material.opacity = Math.max(0, Math.min(1, bro)) * 0.5;
+                br.material.color.setHSL((BEACON_HUE + time * 0.05 + brj * 0.1) % 1, 0.9, 0.7);
+            }
+            for (var bfi = 0; bfi < beaconFlares.length; bfi++) {
+                var bfp = 0.5 + 0.5 * Math.sin(time * 2.5 + bfi * 0.9);
+                beaconFlares[bfi].material.opacity = beaconFlares[bfi].userData.baseOp * (0.65 + bfp * 0.55);
+            }
+            beaconLight.intensity = 3 + bPulse * 5;
+            beaconLight.color.setHSL(BEACON_HUE + bFast * 0.06, 1.0, 0.6);
+            // ── END BEACON ANIMATION ─────────────────────────────────────
 
             var idx, phase, rotationAngle, style, hue, sat, light, wobble, scale;
             var c, child;
