@@ -641,18 +641,18 @@
             time += 0.02;
 
             // ── VAULT BEACON ANIMATION ───────────────────────────────────
-            var bPulse = 0.5 + 0.5 * Math.sin(time * 2.6);
-            var bFast  = 0.5 + 0.5 * Math.sin(time * 5.8);
+            var bPulse = 0.5 + 0.5 * Math.sin(time * 1.0);
+            var bFast  = 0.5 + 0.5 * Math.sin(time * 2.1);
             for (var bci = 0; bci < beaconCorona.length; bci++) {
-                var bcp = 0.5 + 0.5 * Math.sin(time * 2.2 + beaconCorona[bci].userData.phase);
+                var bcp = 0.5 + 0.5 * Math.sin(time * 0.9 + beaconCorona[bci].userData.phase);
                 beaconCorona[bci].material.opacity = beaconCorona[bci].userData.baseOp * (0.5 + bcp * 0.9);
                 beaconCorona[bci].scale.setScalar(0.93 + bcp * 0.12);
             }
-            beaconBeam.material.opacity = 0.30 + 0.28 * Math.sin(time * 3.4);
-            beaconGlow.material.opacity = 0.04 + 0.05 * Math.sin(time * 2.0);
+            beaconBeam.material.opacity = 0.30 + 0.28 * Math.sin(time * 1.2);
+            beaconGlow.material.opacity = 0.04 + 0.05 * Math.sin(time * 0.8);
             for (var brj = 0; brj < BEACON_RINGS; brj++) {
                 var br = beaconRings[brj];
-                br.userData.progress += 0.007;
+                br.userData.progress += 0.003;
                 if (br.userData.progress > 1) br.userData.progress = 0;
                 var brp = br.userData.progress;
                 br.position.set(0, beaconH + 1 - brp * beaconH, 0);
@@ -660,10 +660,10 @@
                 br.scale.set(brs, brs, brs);
                 var bro = brp < 0.1 ? brp * 10 : (brp > 0.75 ? (1 - brp) / 0.25 : 1.0);
                 br.material.opacity = Math.max(0, Math.min(1, bro)) * 0.5;
-                br.material.color.setHSL((BEACON_HUE + time * 0.05 + brj * 0.1) % 1, 0.9, 0.7);
+                br.material.color.setHSL((BEACON_HUE + time * 0.02 + brj * 0.1) % 1, 0.9, 0.7);
             }
             for (var bfi = 0; bfi < beaconFlares.length; bfi++) {
-                var bfp = 0.5 + 0.5 * Math.sin(time * 2.5 + bfi * 0.9);
+                var bfp = 0.5 + 0.5 * Math.sin(time * 1.0 + bfi * 0.9);
                 beaconFlares[bfi].material.opacity = beaconFlares[bfi].userData.baseOp * (0.65 + bfp * 0.55);
             }
             beaconLight.intensity = 3 + bPulse * 5;
