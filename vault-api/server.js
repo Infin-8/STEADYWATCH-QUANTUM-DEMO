@@ -20,11 +20,64 @@ const SLOTS = 81;
 const DEFAULT_API_KEY = process.env.VAULT_API_KEY || 'vault-demo-key-change-in-production';
 const DATA_FILE = path.join(__dirname, 'vault-data.json');
 
+// --- Slot-to-Lattice Geometric Binding (computed at startup, before key derivation) ---
+// Each of the 81 vault slots maps to its nearest F4 node by Euclidean distance in
+// normalized 2D projected space. Grid: (col-4)/4, (row-4)/4 → [-1,1].
+// F4: stereographic projection (x=a*scale, y=c*scale) normalized by max extent.
+
+const VAULT_PRIME = 5;
+const { generateF4Shell } = require('../lattice-auth-middleware');
+
+const SLOT_LATTICE_MAP = (function computeBinding() {
+  const f4 = generateF4Shell(VAULT_PRIME);
+  const projected = f4.map((q, idx) => {
+    const [a, b, c, d] = q;
+    const scale = 1.0 / (1 + Math.abs(d) * 0.1);
+    return { idx, x: a * scale, y: c * scale, a, b, c, d };
+  });
+  let maxExtent = 0;
+  for (const s of projected) {
+    const r = Math.sqrt(s.x * s.x + s.y * s.y);
+    if (r > maxExtent) maxExtent = r;
+  }
+  if (maxExtent === 0) maxExtent = 1;
+  return Array.from({ length: SLOTS }, (_, i) => {
+    const col = i % 9, row = Math.floor(i / 9);
+    const gx = (col - 4) / 4.0;
+    const gy = (row - 4) / 4.0;
+    let nearest = null, minDist = Infinity;
+    for (const s of projected) {
+      const nx = s.x / maxExtent, ny = s.y / maxExtent;
+      const dist = Math.sqrt((gx - nx) ** 2 + (gy - ny) ** 2);
+      if (dist < minDist) { minDist = dist; nearest = s; }
+    }
+    return {
+      slotIndex: i,
+      gridRow: row, gridCol: col,
+      latticeNodeIndex: nearest.idx,
+      latticeCoords: { a: nearest.a, b: nearest.b, c: nearest.c, d: nearest.d },
+      projectedX: nearest.x, projectedY: nearest.y,
+      distance: +minDist.toFixed(6)
+    };
+  });
+})();
+
+const NODE_TO_SLOTS = new Map();
+for (const b of SLOT_LATTICE_MAP) {
+  if (!NODE_TO_SLOTS.has(b.latticeNodeIndex)) NODE_TO_SLOTS.set(b.latticeNodeIndex, []);
+  NODE_TO_SLOTS.get(b.latticeNodeIndex).push(b.slotIndex);
+}
+
 // --- Persistence ---
 
 function deriveSlotKey(slotIndex) {
   const seed = process.env.VAULT_KEY_SEED || 'SHQKD-Echo-Resonance-81';
-  return crypto.createHash('sha256').update(seed + '-' + slotIndex).digest('hex');
+  const b = SLOT_LATTICE_MAP[slotIndex];
+  const latticeAddr = b
+    ? b.latticeCoords.a.toFixed(4) + ',' + b.latticeCoords.b.toFixed(4) + ','
+      + b.latticeCoords.c.toFixed(4) + ',' + b.latticeCoords.d.toFixed(4)
+    : '';
+  return crypto.createHash('sha256').update(seed + '-' + slotIndex + '-' + latticeAddr).digest('hex');
 }
 
 function loadData() {
@@ -785,59 +838,8 @@ app.delete('/api/vault/configs/:id', authMiddleware, (req, res) => {
 
 // --- Lattice Auth (p=5, 144 sites) ---
 
-const { mountLatticeAuth, generateF4Shell } = require('../lattice-auth-middleware');
+const { mountLatticeAuth } = require('../lattice-auth-middleware');
 mountLatticeAuth(app, { serverPrime: 5 });
-
-// --- Slot-to-Lattice Geometric Binding ---
-// Each of the 81 vault slots maps to its nearest F4 node in normalized 2D projected space.
-// Grid positions: (col-4)/4, (row-4)/4 → [-1,1]
-// F4 positions: stereographic projection normalized by max extent → [-1,1]
-
-const VAULT_PRIME = 5;
-
-const SLOT_LATTICE_MAP = (function computeBinding() {
-  const f4 = generateF4Shell(VAULT_PRIME);
-  const projected = f4.map((q, idx) => {
-    const [a, b, c, d] = q;
-    const scale = 1.0 / (1 + Math.abs(d) * 0.1);
-    return { idx, x: a * scale, y: c * scale, a, b, c, d };
-  });
-  let maxExtent = 0;
-  for (const s of projected) {
-    const r = Math.sqrt(s.x * s.x + s.y * s.y);
-    if (r > maxExtent) maxExtent = r;
-  }
-  if (maxExtent === 0) maxExtent = 1;
-
-  return Array.from({ length: SLOTS }, (_, i) => {
-    const col = i % 9, row = Math.floor(i / 9);
-    const gx = (col - 4) / 4.0;
-    const gy = (row - 4) / 4.0;
-    let nearest = null, minDist = Infinity;
-    for (const s of projected) {
-      const nx = s.x / maxExtent, ny = s.y / maxExtent;
-      const dist = Math.sqrt((gx - nx) ** 2 + (gy - ny) ** 2);
-      if (dist < minDist) { minDist = dist; nearest = s; }
-    }
-    return {
-      slotIndex: i,
-      gridRow: row, gridCol: col,
-      latticeNodeIndex: nearest.idx,
-      latticeCoords: { a: nearest.a, b: nearest.b, c: nearest.c, d: nearest.d },
-      projectedX: nearest.x, projectedY: nearest.y,
-      distance: +minDist.toFixed(6)
-    };
-  });
-})();
-
-// Build reverse map: F4 node index → set of bound slot indices
-const NODE_TO_SLOTS = new Map();
-for (const b of SLOT_LATTICE_MAP) {
-  if (!NODE_TO_SLOTS.has(b.latticeNodeIndex)) NODE_TO_SLOTS.set(b.latticeNodeIndex, []);
-  NODE_TO_SLOTS.get(b.latticeNodeIndex).push(b.slotIndex);
-}
-
-console.log('  🔗 Slot-lattice binding: ' + SLOTS + ' slots → ' + NODE_TO_SLOTS.size + ' unique F4 nodes (of 144)');
 
 app.get('/api/vault/slot-lattice-map', (req, res) => {
   res.json({
@@ -862,6 +864,7 @@ app.listen(port, () => {
   console.log('');
   console.log('  Slots:     ' + SLOTS + ' (9×9 Hurwitz board)');
   console.log('  Payloads:  ' + filled + ' stored');
+  console.log('  Lattice:   ' + NODE_TO_SLOTS.size + ' F4 nodes bound (of 144) · keys derived from slot + lattice address');
   console.log('  API key:   ' + DEFAULT_API_KEY.slice(0, 8) + '…  (set VAULT_API_KEY env to change)');
   console.log('  Data file: ' + DATA_FILE);
   console.log('');
