@@ -174,8 +174,8 @@
         var beaconH      = 26;
 
         var beaconSrc = new THREE.Mesh(
-            new THREE.SphereGeometry(0.28, 16, 16),
-            new THREE.MeshBasicMaterial({ color: 0xffffff, transparent: true, opacity: 0.9, blending: THREE.AdditiveBlending, depthWrite: false })
+            new THREE.SphereGeometry(0.14, 16, 16),
+            new THREE.MeshBasicMaterial({ color: 0xffffff, transparent: true, opacity: 1.0, blending: THREE.AdditiveBlending, depthWrite: false })
         );
         beaconSrc.position.set(0, beaconH + 1, 0);
         scene.add(beaconSrc);
@@ -195,9 +195,7 @@
         scene.add(beaconGlow);
 
         var beaconCorona = [
-            { r: 0.55, op: 0.20, ph: 0.0 },
-            { r: 0.95, op: 0.11, ph: 1.2 },
-            { r: 1.50, op: 0.06, ph: 2.4 }
+            { r: 1.50, op: 0.04, ph: 2.4 }
         ].map(function(d) {
             var m = new THREE.Mesh(
                 new THREE.SphereGeometry(d.r, 16, 16),
@@ -220,9 +218,9 @@
         }
 
         var beaconFlares = [
-            { sc: 3.0, r: 255, g: 215, b: 0,   op: 0.80 },
-            { sc: 5.5, r: 255, g: 255, b: 255, op: 0.35 },
-            { sc: 8.5, r: 255, g: 215, b: 0,   op: 0.15 }
+            { sc: 2.2, r: 255, g: 255, b: 255, op: 1.00 },
+            { sc: 5.5, r: 255, g: 215, b: 0,   op: 0.40 },
+            { sc: 9.5, r: 255, g: 215, b: 0,   op: 0.12 }
         ].map(function(d) {
             var cv = document.createElement('canvas'); cv.width = 128; cv.height = 128;
             var cx = cv.getContext('2d');
