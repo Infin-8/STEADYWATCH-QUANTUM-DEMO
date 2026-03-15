@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cymatics | STEADYWATCH™</title>
+    <meta name="description" content="Hurwitz quaternion nodes crystallize from a black/white checkerboard like Chladni salt figures on a vibrating plate. Three prime shells. Three frequencies.">
+    <link rel="shortcut icon" href="images/logo.png" type="image/png">
+    <link rel="stylesheet" href="styles.css">
+    <script src="header-hurwitz-bg.js" defer></script>
+    <script src="app.js" defer></script>
+    <style>
+        .cym-stage {
+            background: #000;
+            padding: 0;
+            margin: 0;
+        }
+        #cymatics-visualization {
+            width: 100%;
+            height: 660px;
+            background: #000;
+            display: block;
+        }
+        .cym-info {
+            background: #000;
+            padding: 18px 24px 22px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 10px;
+            border-top: 1px solid rgba(255,255,255,0.06);
+        }
+        .cym-dots {
+            display: flex;
+            gap: 14px;
+            align-items: center;
+        }
+        .cym-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.18);
+            display: inline-block;
+            transition: background 0.4s, box-shadow 0.4s, transform 0.3s;
+        }
+        .cym-meta {
+            display: flex;
+            gap: 22px;
+            align-items: baseline;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+        #cym-shell {
+            font-size: 1.7em;
+            font-weight: 700;
+            letter-spacing: 0.04em;
+            color: #FFD700;
+            transition: color 0.5s;
+        }
+        .cym-detail {
+            font-size: 0.95em;
+            color: rgba(255,255,255,0.55);
+            font-family: monospace;
+        }
+        #cym-phase {
+            font-size: 0.85em;
+            color: rgba(255,255,255,0.35);
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            min-height: 1.2em;
+            font-style: italic;
+        }
+        .cym-explainer {
+            max-width: 680px;
+            margin: 0 auto;
+        }
+        .shell-card {
+            background: white;
+            border-radius: 10px;
+            padding: 22px 26px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+        }
+        .shell-card h3 {
+            margin-bottom: 8px;
+        }
+        .shell-card .hz-badge {
+            display: inline-block;
+            padding: 3px 10px;
+            border-radius: 20px;
+            font-size: 0.8em;
+            font-weight: 600;
+            margin-bottom: 10px;
+        }
+    </style>
+</head>
+
+<!-- Three.js Library -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+<script src="cymatics-visualization.js"></script>
+
+<body>
+    <nav style="background: linear-gradient(135deg, #000000 0%, #1a1a2e 100%) !important;">
+        <div class="container">
+            <a href="https://apps.apple.com/us/app/steadywatch-handheld/id6755752518" class="nav-brand">
+                <img src="images/logo.png" alt="STEADYWATCH Logo">
+                <span><u>STEADYWATCH™</u></span>
+            </a>
+            <button class="mobile-menu-toggle" onclick="toggleMobileMenu()">☰</button>
+            <ul class="nav-links" id="navLinks">
+                <li><a href="index.html" class="quickShadow">Home</a></li>
+                <li><a href="hardware-validation.html" class="quickShadow">Jobs</a></li>
+                <li><a href="144-satellites.html" class="quickShadow">(P == |&gt;)</a></li>
+                <li><a href="layers-336.html" class="quickShadow">13 =&gt; 336</a></li>
+                <li><a href="echo-visual.html" class="quickShadow">Echo</a></li>
+                <li><a href="game.html" class="quickShadow">VAULT™</a></li>
+                <li><a href="contact.html" class="viz-button" style="background: linear-gradient(140deg, #fdfdfd 0%, #6e85eb 100%); padding: 10px; border-radius: 25px; text-shadow: 2px 1px 1px black; border: none !important;">⭐︎ Contact</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <header style="background: black !important; padding-bottom: 30px;">
+        <div class="header-hurwitz-dots" id="header-hurwitz-dots" aria-hidden="true"></div>
+        <div class="header-content">
+            <div class="container">
+                <h2 style="text-shadow: 3px 2px 2px black; font-size: 2.5em;">Cymatics</h2>
+                <p class="subtitle" style="max-width: 600px; margin: 16px auto 0;">
+                    Hurwitz quaternion nodes crystallize from a vibrating plate —
+                    like Chladni salt figures, but the frequency is the prime shell itself.
+                </p>
+                <div style="margin-top: 24px;">
+                    <span style="background: rgba(255,215,0,0.15); color: #FFD700; border: 1px solid rgba(255,215,0,0.3); padding: 6px 14px; border-radius: 20px; font-size: 0.85em; margin: 4px;">VAULT™ &nbsp;144 Hz</span>
+                    <span style="background: rgba(0,229,255,0.12); color: #00E5FF; border: 1px solid rgba(0,229,255,0.3); padding: 6px 14px; border-radius: 20px; font-size: 0.85em; margin: 4px;">VIPER &nbsp;336 Hz</span>
+                    <span style="background: rgba(168,85,247,0.15); color: #a855f7; border: 1px solid rgba(168,85,247,0.3); padding: 6px 14px; border-radius: 20px; font-size: 0.85em; margin: 4px;">HORDE &nbsp;432 Hz</span>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Visualization -->
+    <div class="cym-stage">
+        <div id="cymatics-visualization"></div>
+
+        <div class="cym-info">
+            <div class="cym-dots">
+                <span id="cym-dot-0" class="cym-dot" style="background:#FFD700; box-shadow:0 0 8px #FFD700; transform:scale(1.3);"></span>
+                <span id="cym-dot-1" class="cym-dot"></span>
+                <span id="cym-dot-2" class="cym-dot"></span>
+            </div>
+            <div class="cym-meta">
+                <span id="cym-shell">VAULT™</span>
+                <span id="cym-prime" class="cym-detail">p = 5</span>
+                <span id="cym-hz" class="cym-detail">144 Hz</span>
+                <span id="cym-nodes" class="cym-detail">144 nodes</span>
+            </div>
+            <p id="cym-phase"></p>
+        </div>
+    </div>
+
+    <!-- Explanation -->
+    <div class="section white">
+        <div class="container">
+            <h2 class="section-title">How Chladni Patterns Work</h2>
+            <p class="section-subtitle cym-explainer">
+                Ernst Chladni (1787) scattered salt on a metal plate and drew a bow across the edge.
+                The plate vibrated at a specific frequency — salt migrated to the <em>nodal lines</em>
+                where vibration was zero, forming geometric figures. Every frequency makes a unique pattern.
+                <br><br>
+                Here, the "plate" is the Hurwitz quaternion lattice. The "frequency" is the prime shell.
+                Nodes don't vibrate randomly — they appear exactly at the mathematical positions
+                that satisfy <strong>a² + b² + c² + d² = p</strong>.
+                The pattern is the proof.
+            </p>
+
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 24px; margin-top: 40px;">
+                <div class="shell-card">
+                    <h3 style="color: #FFD700;">VAULT™</h3>
+                    <span class="hz-badge" style="background: rgba(255,215,0,0.12); color: #b8860b;">144 Hz &nbsp;·&nbsp; p = 5</span>
+                    <p style="color: #666; margin: 0; font-size: 0.95em;">144 nodes. The fundamental tone. 144 = 12² appears in the Fibonacci sequence near the golden ratio. Sparse, golden — the seed pattern.</p>
+                </div>
+                <div class="shell-card">
+                    <h3 style="color: #00a8c6;">VIPER</h3>
+                    <span class="hz-badge" style="background: rgba(0,229,255,0.10); color: #008fa8;">336 Hz &nbsp;·&nbsp; p = 13</span>
+                    <p style="color: #666; margin: 0; font-size: 0.95em;">336 nodes. The harmonic overtone. Denser geometry — 336 = 14 × 24 — highest Mermin violation at 89% of quantum maximum.</p>
+                </div>
+                <div class="shell-card">
+                    <h3 style="color: #a855f7;">HORDE</h3>
+                    <span class="hz-badge" style="background: rgba(168,85,247,0.12); color: #7c3aed;">432 Hz &nbsp;·&nbsp; p = 17</span>
+                    <p style="color: #666; margin: 0; font-size: 0.95em;">432 nodes. The resonant resolution. 432 Hz = Verdi tuning, natural A. 432 ÷ 144 = exactly 3 — Tesla's 3·6·9 in the node counts.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Connections -->
+    <div class="section" style="background: #f8f9fa;">
+        <div class="container">
+            <h2 class="section-title">The Parallel</h2>
+            <div style="max-width: 700px; margin: 0 auto; text-align: left;">
+                <table style="width:100%; border-collapse: collapse; font-size: 0.95em;">
+                    <thead>
+                        <tr style="border-bottom: 2px solid #ddd;">
+                            <th style="padding: 10px; color: #667eea;">Domain</th>
+                            <th style="padding: 10px; color: #667eea;">Vibrating Plate</th>
+                            <th style="padding: 10px; color: #667eea;">Frequency</th>
+                            <th style="padding: 10px; color: #667eea;">Pattern</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr style="border-bottom: 1px solid #eee;">
+                            <td style="padding: 10px; color: #333;">Chladni</td>
+                            <td style="padding: 10px; color: #666;">Metal plate</td>
+                            <td style="padding: 10px; color: #666;">Sound Hz</td>
+                            <td style="padding: 10px; color: #666;">Salt nodal lines</td>
+                        </tr>
+                        <tr>
+                            <td style="padding: 10px; color: #333;">Quantum V^</td>
+                            <td style="padding: 10px; color: #666;">Hurwitz F4 lattice</td>
+                            <td style="padding: 10px; color: #666;">Prime shell p</td>
+                            <td style="padding: 10px; color: #666;">Quaternion nodes</td>
+                        </tr>
+                    </tbody>
+                </table>
+                <p style="color: #666; margin-top: 24px; font-style: italic; text-align: center;">
+                    "The pattern is not placed. It emerges. The prime determines the geometry."
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Research link -->
+    <div class="section" style="background: linear-gradient(135deg, #000000 0%, #1a1a2e 100%); color: white; text-align: center;">
+        <div class="container">
+            <h2 class="section-title" style="color: white; text-shadow: 2px 2px 4px rgba(0,0,0,0.5);">
+                Hurwitz-Mermin Experiment
+            </h2>
+            <p style="font-size: 1.05em; margin: 20px 0 30px; max-width: 640px; margin-left: auto; margin-right: auto; opacity: 0.85;">
+                All three prime shells violate the Mermin inequality (classical bound |M| ≤ 2.0),
+                confirming the lattice geometry is quantum — not classical coincidence.
+                Hardware validation on IBM Quantum pending.
+            </p>
+            <div style="display: flex; gap: 16px; justify-content: center; flex-wrap: wrap;">
+                <a class="cta-button" style="background: white; color: #1a1a2e; text-decoration: none; padding: 12px 32px; border-radius: 30px; font-weight: 600;" href="game.html">
+                    VAULT™ →
+                </a>
+                <a class="cta-button" style="background: rgba(255,255,255,0.1); color: white; border: 1px solid rgba(255,255,255,0.3); text-decoration: none; padding: 12px 32px; border-radius: 30px; font-weight: 600;" href="hardware-validation.html">
+                    IBM Results →
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <footer style="background: #1a1a2e; color: white; padding: 40px 0; text-align: center;">
+        <div class="container">
+            <p>&copy; 2025 <u>Quantum V^ LLC</u></p>
+            <p>All Rights Reserved.</p>
+            <p style="margin-top: 10px; opacity: 0.8;">
+                <a href="index.html" style="color: white; text-decoration: none;">| Home</a> |
+                <a href="144-satellites.html" style="color: white; text-decoration: none;">(P == |&gt;)</a> |
+                <a href="layers-336.html" style="color: white; text-decoration: none;">13 =&gt; 336</a> |
+                <a href="echo-visual.html" style="color: white; text-decoration: none;">Echo</a> |
+                <a href="consulting-services.html" style="color: white; text-decoration: none;">Consulting</a> |
+                <a href="contact.html" style="color: white; text-decoration: none;">Contact</a> |
+            </p>
+        </div>
+    </footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            initCymaticsVisualization('cymatics-visualization');
+        });
+    </script>
+</body>
+</html>

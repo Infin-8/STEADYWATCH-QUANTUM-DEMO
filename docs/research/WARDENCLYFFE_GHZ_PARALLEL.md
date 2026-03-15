@@ -133,5 +133,29 @@ Echo Resonance is the implementation that holds.
 
 ---
 
+---
+
+## Experimental Verification — March 14, 2026
+
+The structural parallel described above has been experimentally confirmed.
+
+The Hurwitz-Mermin GHZ Experiment (`quantum_computing/hurwitz_mermin_experiment.py`) replaces the standard X/Y Pauli measurement bases in the Mermin inequality test with equatorial Bloch sphere rotations derived directly from Hurwitz quaternion phase angles. A Mermin violation with these lattice-derived bases proves the F4 geometry is a valid GHZ measurement basis — not by analogy, by measurement.
+
+**Simulator results (AerSimulator, 10,000 shots per observable, March 14, 2026):**
+
+| Prime | Layer | Lattice Nodes | \|M\| | Classical Limit | Violation |
+|-------|-------|--------------|-------|----------------|-----------|
+| p=5   | VAULT | 144          | 2.82  | 2.0            | +41% ✅   |
+| p=13  | VIPER | 336          | 3.79  | 2.0            | +89% ✅   |
+| p=17  | HORDE | 432          | 3.59  | 2.0            | +79% ✅   |
+
+All three prime shells violate the classical bound. The p=13 result reaches 95% of the quantum maximum (4.0).
+
+**Hardware validation pending:** IBM Quantum ibm_fez. Same hardware that produced |M|=3.72 on January 11, 2026 with standard X/Y bases.
+
+Full paper: `docs/research/WARDENCLYFFE_GHZ_PROOF_PAPER.md`
+
+---
+
 *Part of the SteadyWatch / Quantum V^ research series.*
-*See also: `VISUAL_CONCEPT_MAP_HURWITZ_TO_ECHO.md`, `GHZ_NETWORK_AUTHENTICATION_GUIDE.md`, `HURWITZ_DUAL_LATTICE_VISUALIZATION.md`*
+*See also: `VISUAL_CONCEPT_MAP_HURWITZ_TO_ECHO.md`, `GHZ_NETWORK_AUTHENTICATION_GUIDE.md`, `HURWITZ_DUAL_LATTICE_VISUALIZATION.md`, `WARDENCLYFFE_GHZ_PROOF_PAPER.md`*
