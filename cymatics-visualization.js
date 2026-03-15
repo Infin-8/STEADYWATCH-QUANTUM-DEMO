@@ -29,6 +29,12 @@ const CYM = {
     PAUSE_T:    1.2    // pause before first shell
 };
 
+controls.addEventListener('change', function() {
+    var p = camera.position;
+    var t = controls.target;
+    console.log("camera.position.set(" + p.x.toFixed(2) + ", " + p.y.toFixed(2) + ", " + p.z.toFixed(2) + ");  target:'" + t.x.toFixed(2) + "''" + t.y.toFixed(2) + "''" + t.z.toFixed(2) + "'");
+});
+
 // ── Hurwitz node generation ─────────────────────────────────────────────────
 // Generates all Hurwitz quaternions q = (a,b,c,d) with |q|² = p.
 // Includes both integer and half-integer (n+½) quaternions.
