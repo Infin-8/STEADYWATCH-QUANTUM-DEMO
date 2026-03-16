@@ -157,10 +157,10 @@ fragmentShader: `
     float outerFadeWidth = 4.0;              // wider = gentler vanish at rim
 
     // outerAlpha = 1 inside, ramps down to 0 near/outside edge
-    float outerAlpha = smoothstep(0.0, outerFadeWidth, edgeDist);
+    float outerAlpha = smoothstep(0.0, outerFadeWidth, edgeDist - outerAlpha);
 
     // Final alpha: cleared inside blast, but also faded at outer rim
-    float alpha = innerAlpha;
+    float alpha = innerAlpha * outerAlpha;
 
     // Optional: prevent total disappearance too early — minimum visibility
     alpha = max(alpha, 0.08);                // faint ghost if you want subtle trail
