@@ -141,22 +141,31 @@ fragmentShader: `
                    * smoothstep(uWave + 0.7, uWave, dist);
         col += uColor * ring * 0.28;
 
-        // ── DYNAMIC BLAST RADIUS FADE ─────────────────────────────────
-        // The "cleared" zone grows with the wave.
-        // You can offset it (e.g. wave front - delay) or make it lead/lag.
-        float blastRadius = uWave;                    // grows exactly with wave
-        // float blastRadius = uWave - 1.5;           // lags a bit behind front
-        // float blastRadius = uWave + 2.0;           // leads the front (pre-clear)
+    // ── DYNAMIC BLAST RADIUS FADE ────────────────────────────────────────
+    float dist = length(xz);
 
-        float fadeWidth = 3.0;                        // width of the transition band
+    // Core cleared zone (grows with wave)
+    float blastRadius = uWave;               // or uWave - offset if you want lag
+    float innerFadeWidth = 3.0;              // how soft the inner transition is
 
-        // alpha = 0 inside blast, ramps to 1.0 outside
-        float alpha = smoothstep(blastRadius, blastRadius + fadeWidth, dist);
+    float innerAlpha = smoothstep(blastRadius, blastRadius + innerFadeWidth, dist);
 
-        // Optional: stronger near-center suppression or extra effects
-        alpha *= 1.0 - smoothstep(0.0, 8.0, dist) * 0.3;  // slight vignette
+    // NEW: Outer fade near board edges to prevent hard chop
+    // Approximate board half-size (BOARD_SZ/2); adjust if your plane scale differs
+    const float boardHalf = 16.0;            // 32 / 2 = 16
+    float edgeDist = boardHalf - dist;       // distance to nearest edge (approx radial)
+    float outerFadeWidth = 4.0;              // wider = gentler vanish at rim
 
-        gl_FragColor = vec4(clamp(col, 0.0, 1.0), alpha);
+    // outerAlpha = 1 inside, ramps down to 0 near/outside edge
+    float outerAlpha = smoothstep(0.0, outerFadeWidth, edgeDist);
+
+    // Final alpha: cleared inside blast, but also faded at outer rim
+    float alpha = innerAlpha * outerAlpha;
+
+    // Optional: prevent total disappearance too early — minimum visibility
+    alpha = max(alpha, 0.08);                // faint ghost if you want subtle trail
+
+     gl_FragColor = vec4(clamp(col, 0.0, 1.0), alpha);
     }
 `,
     side: THREE.DoubleSide,
