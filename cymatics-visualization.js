@@ -106,8 +106,6 @@ function initCymaticsVisualization(containerId) {
 });
 
 
-    // ── Checkerboard ground (GLSL shader) ─────────────────────────────────
-    const BOARD_SZ = 32;
 // ── Checkerboard ground (GLSL shader) ─────────────────────────────────
 const BOARD_SZ = 32;
 const boardMat = new THREE.ShaderMaterial({
