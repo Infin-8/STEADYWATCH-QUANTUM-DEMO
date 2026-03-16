@@ -113,8 +113,8 @@ const boardMat = new THREE.ShaderMaterial({
         uWave:       { value: 0.0 },
         uColor:      { value: new THREE.Color(0xFFD700) },
         uFadeRadius: { value: 3.5 },       // ← NEW: tweak this (2.0 = tight fade, 5.0 = wider)
-        uBlastOffset: { value: 0.0 },     // shift blast vs wave (negative = lag)
-        uFadeWidth:   { value: 3.0 },
+        //uBlastOffset: { value: 0.0 },     // shift blast vs wave (negative = lag)
+        //uFadeWidth:   { value: 3.0 },
     },
     vertexShader: `
         varying vec2 vUV;
