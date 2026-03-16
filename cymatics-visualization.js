@@ -108,39 +108,50 @@ function initCymaticsVisualization(containerId) {
 
     // ── Checkerboard ground (GLSL shader) ─────────────────────────────────
     const BOARD_SZ = 32;
-    const boardMat = new THREE.ShaderMaterial({
-        uniforms: {
-            uWave:  { value: 0.0 },
-            uColor: { value: new THREE.Color(0xFFD700) }
-        },
-        vertexShader: `
-            varying vec2 vUV;
-            void main() {
-                vUV = uv;
-                gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
-            }
-        `,
-        fragmentShader: `
-            uniform float uWave;
-            uniform vec3  uColor;
-            varying vec2  vUV;
-            void main() {
-                // Recover world-space XZ from UV
-                vec2 xz    = (vUV - 0.5) * ${BOARD_SZ}.0;
-                // Classic black/white checker, 1.4 world-unit tiles
-                vec2  tile  = floor(xz / 1.4);
-                float check = mod(tile.x + tile.y, 2.0);
-                vec3  col   = vec3(check);
-                // Soft ring glow at the wave front
-                float dist = length(xz);
-                float ring = smoothstep(uWave - 2.0, uWave, dist)
-                           * smoothstep(uWave + 0.7, uWave, dist);
-                col += uColor * ring * 0.28;
-                gl_FragColor = vec4(clamp(col, 0.0, 1.0), 1.0);
-            }
-        `,
-        side: THREE.DoubleSide
-    });
+// ── Checkerboard ground (GLSL shader) ─────────────────────────────────
+const BOARD_SZ = 32;
+const boardMat = new THREE.ShaderMaterial({
+    uniforms: {
+        uWave:       { value: 0.0 },
+        uColor:      { value: new THREE.Color(0xFFD700) },
+        uFadeRadius: { value: 3.5 }          // ← NEW: tweak this (2.0 = tight fade, 5.0 = wider)
+    },
+    vertexShader: `
+        varying vec2 vUV;
+        void main() {
+            vUV = uv;
+            gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+        }
+    `,
+    fragmentShader: `
+        uniform float uWave;
+        uniform vec3  uColor;
+        uniform float uFadeRadius;           // ← NEW
+        varying vec2  vUV;
+
+        void main() {
+            // Recover world-space XZ
+            vec2 xz    = (vUV - 0.5) * ${BOARD_SZ}.0;
+            vec2  tile  = floor(xz / 1.4);
+            float check = mod(tile.x + tile.y, 2.0);
+            vec3  col   = vec3(check);
+
+            // Soft ring glow at the wave front
+            float dist = length(xz);
+            float ring = smoothstep(uWave - 2.0, uWave, dist)
+                       * smoothstep(uWave + 0.7, uWave, dist);
+            col += uColor * ring * 0.28;
+
+            // === TRANSPARENT FADEAWAY NEAR EPICENTER ===
+            float alpha = smoothstep(0.0, uFadeRadius, dist);
+            // (0 at center → fully transparent, ramps to 1.0 outside the fade radius)
+
+            gl_FragColor = vec4(clamp(col, 0.0, 1.0), alpha);
+        }
+    `,
+    side: THREE.DoubleSide,
+    transparent: true   // ← IMPORTANT: enables alpha blending
+});
     const board = new THREE.Mesh(new THREE.PlaneGeometry(BOARD_SZ, BOARD_SZ), boardMat);
     board.rotation.x = -Math.PI / 2;
     scene.add(board);
