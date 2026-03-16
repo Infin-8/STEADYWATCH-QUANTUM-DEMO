@@ -326,7 +326,11 @@ fragmentShader: `
 
         controls.update();
 // === HURWITZ CLUSTER SPIN (amplifies the vortex visual) ===
-        nodeGroup.rotation.y += NODE_SPIN_SPEED * (1 + waveR / CYM.MAX_R * 0.6) * dt;
+        if (phase !== 'dissolving') {
+    nodeGroup.rotation.y += NODE_SPIN_SPEED * dt;
+        } else {
+    nodeGroup.rotation.y += NODE_SPIN_SPEED * 0.3 * dt; // slow fade-out spin
+    }
         phaseT += dt;
         
         if (phaseT >= PHASE_DUR[phase]) nextPhase();
