@@ -112,7 +112,9 @@ const boardMat = new THREE.ShaderMaterial({
     uniforms: {
         uWave:       { value: 0.0 },
         uColor:      { value: new THREE.Color(0xFFD700) },
-        uFadeRadius: { value: 3.5 }          // ← NEW: tweak this (2.0 = tight fade, 5.0 = wider)
+        uFadeRadius: { value: 3.5 },       // ← NEW: tweak this (2.0 = tight fade, 5.0 = wider)
+        uBlastOffset: { value: 0.0 },     // shift blast vs wave (negative = lag)
+        uFadeWidth:   { value: 3.0 },
     },
     vertexShader: `
         varying vec2 vUV;
@@ -121,32 +123,42 @@ const boardMat = new THREE.ShaderMaterial({
             gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
         }
     `,
-    fragmentShader: `
-        uniform float uWave;
-        uniform vec3  uColor;
-        uniform float uFadeRadius;           // ← NEW
-        varying vec2  vUV;
+fragmentShader: `
+    uniform float uWave;
+    uniform vec3  uColor;
+    varying vec2  vUV;
 
-        void main() {
-            // Recover world-space XZ
-            vec2 xz    = (vUV - 0.5) * ${BOARD_SZ}.0;
-            vec2  tile  = floor(xz / 1.4);
-            float check = mod(tile.x + tile.y, 2.0);
-            vec3  col   = vec3(check);
+    void main() {
+        // Recover world-space XZ (adjust BOARD_SZ if your scale is different)
+        vec2 xz    = (vUV - 0.5) * 32.0;   // ← match your BOARD_SZ
+        vec2 tile  = floor(xz / 1.4);
+        float check = mod(tile.x + tile.y, 2.0);
+        vec3  col   = vec3(check * 0.85 + 0.15);  // softer black/white if you prefer
 
-            // Soft ring glow at the wave front
-            float dist = length(xz);
-            float ring = smoothstep(uWave - 2.0, uWave, dist)
-                       * smoothstep(uWave + 0.7, uWave, dist);
-            col += uColor * ring * 0.28;
+        // Soft ring glow at the wave front
+        float dist = length(xz);
+        float ring = smoothstep(uWave - 2.0, uWave, dist)
+                   * smoothstep(uWave + 0.7, uWave, dist);
+        col += uColor * ring * 0.28;
 
-            // === TRANSPARENT FADEAWAY NEAR EPICENTER ===
-            float alpha = smoothstep(0.0, uFadeRadius, dist);
-            // (0 at center → fully transparent, ramps to 1.0 outside the fade radius)
+        // ── DYNAMIC BLAST RADIUS FADE ─────────────────────────────────
+        // The "cleared" zone grows with the wave.
+        // You can offset it (e.g. wave front - delay) or make it lead/lag.
+        float blastRadius = uWave;                    // grows exactly with wave
+        // float blastRadius = uWave - 1.5;           // lags a bit behind front
+        // float blastRadius = uWave + 2.0;           // leads the front (pre-clear)
 
-            gl_FragColor = vec4(clamp(col, 0.0, 1.0), alpha);
-        }
-    `,
+        float fadeWidth = 3.0;                        // width of the transition band
+
+        // alpha = 0 inside blast, ramps to 1.0 outside
+        float alpha = smoothstep(blastRadius, blastRadius + fadeWidth, dist);
+
+        // Optional: stronger near-center suppression or extra effects
+        // alpha *= 1.0 - smoothstep(0.0, 8.0, dist) * 0.3;  // slight vignette
+
+        gl_FragColor = vec4(clamp(col, 0.0, 1.0), alpha);
+    }
+`,
     side: THREE.DoubleSide,
     transparent: true   // ← IMPORTANT: enables alpha blending
 });
