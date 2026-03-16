@@ -326,7 +326,7 @@ fragmentShader: `
 
         controls.update();
 // === HURWITZ CLUSTER SPIN (amplifies the vortex visual) ===
-        nodeGroup.rotation.y += NODE_SPIN_SPEED * dt;
+        nodeGroup.rotation.y += NODE_SPIN_SPEED * (1 + waveR / CYM.MAX_R * 0.6) * dt;
         phaseT += dt;
         
         if (phaseT >= PHASE_DUR[phase]) nextPhase();
