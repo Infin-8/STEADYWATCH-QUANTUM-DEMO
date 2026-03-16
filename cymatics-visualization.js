@@ -154,7 +154,7 @@ fragmentShader: `
     
     const float boardHalf = 16.0;            // 32 / 2 = 16
     float edgeDist = boardHalf - dist;       // distance to nearest edge (approx radial)
-    float outerFadeWidth = 2.0;              // wider = gentler vanish at rim
+    float outerFadeWidth = 10.0;              // wider = gentler vanish at rim
 
     // outerAlpha = 1 inside, ramps down to 0 near/outside edge
     float outerAlpha = smoothstep(0.0, outerFadeWidth, edgeDist);
