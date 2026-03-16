@@ -318,6 +318,11 @@
         controls.minDistance = 8;
         controls.maxDistance = 50;
 
+        controls.addEventListener('change', function() {
+        var p = camera.position;
+        var t = controls.target;
+        console.log("camera.position.set(" + p.x.toFixed(2) + ", " + p.y.toFixed(2) + ", " + p.z.toFixed(2) + ");  target:'" + t.x.toFixed(2) + "''" + t.y.toFixed(2) + "''" + t.z.toFixed(2) + "'");
+
         var ambient = new THREE.AmbientLight(0x667eea, 0.5);
         scene.add(ambient);
         var light1 = new THREE.PointLight(0x667eea, 1, 80);
