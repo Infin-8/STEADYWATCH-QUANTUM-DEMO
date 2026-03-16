@@ -143,18 +143,19 @@ fragmentShader: `
 
     // ── DYNAMIC BLAST RADIUS FADE ────────────────────────────────────────
 
+  
     // Core cleared zone (grows with wave)
     float blastRadius = uWave;               // or uWave - offset if you want lag
     float innerFadeWidth = 3.0;              // how soft the inner transition is
 
-    float innerAlpha = smoothstep(blastRadius, blastRadius, dist);
+    float innerAlpha = smoothstep(blastRadius, blastRadius + innerFadeWidth, dist);
 
     // NEW: Outer fade near board edges to prevent hard chop
     // Approximate board half-size (BOARD_SZ/2); adjust if your plane scale differs
     
     const float boardHalf = 16.0;            // 32 / 2 = 16
     float edgeDist = boardHalf - dist;       // distance to nearest edge (approx radial)
-    float outerFadeWidth = 10.0;              // wider = gentler vanish at rim
+    float outerFadeWidth = 4.0;              // wider = gentler vanish at rim
 
     // outerAlpha = 1 inside, ramps down to 0 near/outside edge
     float outerAlpha = smoothstep(0.0, outerFadeWidth, edgeDist);
@@ -163,7 +164,7 @@ fragmentShader: `
     float alpha = innerAlpha * outerAlpha;
 
     // Optional: prevent total disappearance too early — minimum visibility
-    alpha = max(alpha, 0.08);                // faint ghost if you want subtle trail
+    alpha = innerAlpha * outerAlpha
 
      gl_FragColor = vec4(clamp(col, 0.0, 1.0), alpha);
     }
