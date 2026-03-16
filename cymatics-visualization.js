@@ -155,7 +155,7 @@ fragmentShader: `
     
     const float boardHalf = 16.0;            // 32 / 2 = 16
     float edgeDist = boardHalf - dist;       // distance to nearest edge (approx radial)
-    float outerFadeWidth = 4.0;              // wider = gentler vanish at rim
+    float outerFadeWidth = 14.0;              // wider = gentler vanish at rim
 
     // outerAlpha = 1 inside, ramps down to 0 near/outside edge
     float outerAlpha = smoothstep(0.0, outerFadeWidth, edgeDist);
@@ -164,7 +164,7 @@ fragmentShader: `
     float alpha = innerAlpha * outerAlpha;
 
     // Optional: prevent total disappearance too early — minimum visibility
-    alpha = innerAlpha * outerAlpha
+    alpha = max(alpha, 0.08);                // faint ghost if you want subtle trail
 
      gl_FragColor = vec4(clamp(col, 0.0, 1.0), alpha);
     }
