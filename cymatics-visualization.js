@@ -29,7 +29,7 @@ const CYM = {
     PAUSE_T:    1.2    // pause before first shell
 };
 
-
+const NODE_SPIN_SPEED = 0.35;   // rad/s — tweak this (0.2 = slow & majestic, 0.8 = energetic)
 // ── Hurwitz node generation ─────────────────────────────────────────────────
 // Generates all Hurwitz quaternions q = (a,b,c,d) with |q|² = p.
 // Includes both integer and half-integer (n+½) quaternions.
@@ -325,8 +325,10 @@ fragmentShader: `
         globalT += dt;
 
         controls.update();
-
+// === HURWITZ CLUSTER SPIN (amplifies the vortex visual) ===
+        nodeGroup.rotation.y += NODE_SPIN_SPEED * dt;
         phaseT += dt;
+        
         if (phaseT >= PHASE_DUR[phase]) nextPhase();
 
         var sh = CYM_SHELLS[shellIdx];
