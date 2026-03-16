@@ -16,8 +16,8 @@
 
 const CYM_SHELLS = [
     { name: 'VAULT™', prime: 5,  color: 0xFFD700, css: '#FFD700', hz: 144, count: 144, rippleHz: 1.0  },
-    { name: 'VIPER',  prime: 13, color: 0x00E5FF, css: '#00E5FF', hz: 336, count: 336, rippleHz: 2.33 },
-    { name: 'HORDE',  prime: 17, color: 0xa855f7, css: '#a855f7', hz: 432, count: 432, rippleHz: 3.0  }
+    { name: 'VIPER™',  prime: 13, color: 0x00E5FF, css: '#00E5FF', hz: 336, count: 336, rippleHz: 2.33 },
+    { name: 'HORDE™',  prime: 17, color: 0xa855f7, css: '#a855f7', hz: 432, count: 432, rippleHz: 3.0  }
 ];
 
 const CYM = {
