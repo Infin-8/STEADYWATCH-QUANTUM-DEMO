@@ -142,7 +142,6 @@ fragmentShader: `
         col += uColor * ring * 0.28;
 
     // ── DYNAMIC BLAST RADIUS FADE ────────────────────────────────────────
-    float dist = length(xz);
 
     // Core cleared zone (grows with wave)
     float blastRadius = uWave;               // or uWave - offset if you want lag
@@ -152,6 +151,7 @@ fragmentShader: `
 
     // NEW: Outer fade near board edges to prevent hard chop
     // Approximate board half-size (BOARD_SZ/2); adjust if your plane scale differs
+    
     const float boardHalf = 16.0;            // 32 / 2 = 16
     float edgeDist = boardHalf - dist;       // distance to nearest edge (approx radial)
     float outerFadeWidth = 4.0;              // wider = gentler vanish at rim
