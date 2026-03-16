@@ -147,7 +147,7 @@ fragmentShader: `
     float blastRadius = uWave;               // or uWave - offset if you want lag
     float innerFadeWidth = 3.0;              // how soft the inner transition is
 
-    float innerAlpha = smoothstep(blastRadius, blastRadius + innerFadeWidth, dist);
+    float innerAlpha = smoothstep(blastRadius, blastRadius, dist);
 
     // NEW: Outer fade near board edges to prevent hard chop
     // Approximate board half-size (BOARD_SZ/2); adjust if your plane scale differs
