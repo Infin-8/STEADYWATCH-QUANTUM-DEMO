@@ -88,9 +88,8 @@ function initCymaticsVisualization(containerId) {
     scene.background = new THREE.Color(0x000000);
 
     const camera = new THREE.PerspectiveCamera(58, W / H, 0.1, 200);
-    camera.position.set(24.45, 23.84, 24.45);
+    camera.position.set(7.91, 7.71, 7.91);
     camera.lookAt(0, 0, 0);
-
     const controls = new THREE.OrbitControls(camera, renderer.domElement);
     controls.enableDamping  = true;
     controls.dampingFactor  = 0.06;
