@@ -10,7 +10,7 @@
 - [Detailed Results](#detailed-results)
   - [p = 5 (VAULT)](#p--5-vault)
   - [p = 13 (VIPER)](#p--13-viper)
-  - [p = 17 (HORDE)](#p--17-horde)
+  - [p = 17 (LOTUS)](#p--17-LOTUS)
 - [Summary Table](#summary-table)
 - [Hypothesis Evaluation](#hypothesis-evaluation)
   - [Core Hypothesis](#core-hypothesis)
@@ -81,7 +81,7 @@ Each selected Hurwitz quaternion Q = (a, b, c, d) yields phase angle φ → meas
 **M = +3.0054**  
 → Violation: +1.0054 (50.3% above classical)
 
-### p = 17 (HORDE) – 81 cells, 432 nodes
+### p = 17 (LOTUS) – 81 cells, 432 nodes
 
 **Selected nodes**  
 - Q₀: (0.0, 0.0, -4.0, -1.0)   → φ = 0.0°  
@@ -104,7 +104,7 @@ Each selected Hurwitz quaternion Q = (a, b, c, d) yields phase angle φ → meas
 |-------|--------|-------------|---------------|-----------|---------------|----------------------|--------------|
 |     5 | VAULT  |          25 |           144 |    2.296  |       +0.296  |               14.8%  | ✅ Violation |
 |    13 | VIPER  |          49 |           336 |    3.005  |      +1.005   |               50.3%  | ✅ Violation |
-|    17 | HORDE  |          81 |           432 |    2.845  |      +0.845   |               42.3%  | ✅ Violation |
+|    17 | LOTUS  |          81 |           432 |    2.845  |      +0.845   |               42.3%  | ✅ Violation |
 
 *Values rounded to three decimal places where applicable. All runs: 10,000 shots on ibm_fez.*
 
