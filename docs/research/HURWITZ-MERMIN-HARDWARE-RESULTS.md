@@ -97,13 +97,16 @@ Each selected Hurwitz quaternion Q = (a, b, c, d) yields phase angle φ → meas
 **M = +2.8452**  
 → Violation: +0.8452 (42.3% above classical)
 
+
 ## Summary Table
 
-| Prime | Name   | Cells | Nodes | |M|    | Violation | % over classical | Status      |
-|-------|--------|-------|-------|--------|-----------|------------------|-------------|
-| 5     | VAULT  | 25    | 144   | 2.296  | +0.296    | 14.8%            | ✅ Violation |
-| 13    | VIPER  | 49    | 336   | 3.005  | +1.005    | 50.3%            | ✅ Violation |
-| 17    | HORDE  | 81    | 432   | 2.845  | +0.845    | 42.3%            | ✅ Violation |
+| Prime | Name   | Board Cells | Lattice Nodes | **\|M\|** | **Violation** | **% over Classical** | **Status**   |
+|-------|--------|-------------|---------------|-----------|---------------|----------------------|--------------|
+|     5 | VAULT  |          25 |           144 |    2.296  |       +0.296  |               14.8%  | ✅ Violation |
+|    13 | VIPER  |          49 |           336 |    3.005  |      +1.005   |               50.3%  | ✅ Violation |
+|    17 | HORDE  |          81 |           432 |    2.845  |      +0.845   |               42.3%  | ✅ Violation |
+
+*Values rounded to three decimal places where applicable. All runs: 10,000 shots on ibm_fez.*
 
 ## Hypothesis Evaluation
 
