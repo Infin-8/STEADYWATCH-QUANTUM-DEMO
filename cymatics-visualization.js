@@ -122,7 +122,7 @@ const boardMat = new THREE.ShaderMaterial({
             gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
         }
     `,
-fragmentShader: `
+    fragmentShader: `
     uniform float uWave;
     uniform vec3 uColor;
     varying vec2 vUV;
@@ -135,33 +135,28 @@ fragmentShader: `
 
         float dist = length(xz);
 
-        // ── Soft expanding ring glow (you can keep or tweak) ─────────────
+        // Soft ring glow at the wave front
         float ring = smoothstep(uWave - 2.0, uWave, dist)
                    * smoothstep(uWave + 0.7, uWave, dist);
         col += uColor * ring * 0.28;
 
-        // ── SMOOTH BLAST RADIUS FADE (this was the main culprit) ────────
-        
-        float blastRadius = uWave;           // or uWave + uBlastOffset if you want lag
+        // ── SMOOTH BLAST CLEARING ───────────────────────────────────────
+        float blastRadius = uWave;
 
-        // 1. Inner cleared zone — now uses a wide, smooth transition
-        float innerFadeWidth = 6.0;          // ← increase for softer "cleared" edge
-        float innerAlpha = smoothstep(blastRadius - innerFadeWidth, blastRadius, dist);
-        // invert so inside blast = low alpha (cleared/faded)
-        innerAlpha = 1.0 - innerAlpha;
+        // Wide soft transition for the cleared zone (this is the key fix)
+        float innerFadeWidth = 7.0;          // ← tweak this (higher = softer/blurrier edge)
+        float innerAlpha = smoothstep(blastRadius, blastRadius + innerFadeWidth, dist);
+        // innerAlpha is now ~0 deep inside, ~1 outside the blast
 
-        // 2. Outer board-edge fade (much gentler now)
+        // Outer edge fade (prevents hard cutoff at the board rim)
         const float boardHalf = 16.0;
         float edgeDist = boardHalf - dist;
-        float outerFadeWidth = 8.0;          // ← was 7.0, wider = smoother vanish
+        float outerFadeWidth = 9.0;          // ← wider = gentler vanish
         float outerAlpha = smoothstep(0.0, outerFadeWidth, edgeDist);
 
-        // 3. Combine + optional minimum visibility so it never fully disappears
+        // Combine
         float alpha = innerAlpha * outerAlpha;
-        alpha = max(alpha, 0.05);            // faint trail instead of hard cut
-
-        // Optional: add a very soft global falloff so the wave feels more natural at large radii
-        // alpha *= smoothstep(18.0, 12.0, dist); // uncomment if you want extra softness
+        alpha = max(alpha, 0.04);            // faint residual visibility
 
         gl_FragColor = vec4(clamp(col, 0.0, 1.0), alpha);
     }
