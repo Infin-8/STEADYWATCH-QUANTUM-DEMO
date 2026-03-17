@@ -615,10 +615,10 @@
             if (drop) {
                 var k = window.HurwitzKeys.getKey(drop.prime, drop.keyIndex);
                 var q = k ? '(' + k.a + ',' + k.b + ',' + k.c + ',' + k.d + ')' : '';
-                labelEl.textContent = 'Key #' + drop.keyIndex + ' (p=13) ' + q + ' — click key ore to mine';
+                labelEl.textContent = 'Key #' + drop.keyIndex + ' (p=13) ' + q + ' — click/tap key ore to mine';
             } else {
                 var n = keyDrops.length;
-                labelEl.textContent = n + ' keyz mined. Click key ore to mine.';
+                labelEl.textContent = n + ' keyz mined. Click/tap key ore to mine.';
             }
         }
 
