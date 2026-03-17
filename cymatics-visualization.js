@@ -318,6 +318,8 @@ const boardMat = new THREE.ShaderMaterial({
 
         controls.update();
 // === HURWITZ CLUSTER SPIN (amplifies the vortex visual) ===
+        if (phase === 'building' && phaseT < 0.1) nodeGroup.rotation.y = 0; // reset or flip sign
+        
         if (phase !== 'dissolving') {
     nodeGroup.rotation.y += NODE_SPIN_SPEED * dt;
         } else {
