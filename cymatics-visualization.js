@@ -124,50 +124,48 @@ const boardMat = new THREE.ShaderMaterial({
     `,
 fragmentShader: `
     uniform float uWave;
-    uniform vec3  uColor;
-    varying vec2  vUV;
+    uniform vec3 uColor;
+    varying vec2 vUV;
 
     void main() {
-        // Recover world-space XZ (adjust BOARD_SZ if your scale is different)
-        vec2 xz    = (vUV - 0.5) * 32.0;   // ← match your BOARD_SZ
-        vec2 tile  = floor(xz / 1.4);
+        vec2 xz = (vUV - 0.5) * 32.0;
+        vec2 tile = floor(xz / 1.4);
         float check = mod(tile.x + tile.y, 2.0);
-        vec3  col   = vec3(check * 0.85 + 0.15);  // softer black/white if you prefer
+        vec3 col = vec3(check * 0.85 + 0.15);
 
-        // Soft ring glow at the wave front
         float dist = length(xz);
+
+        // ── Soft expanding ring glow (you can keep or tweak) ─────────────
         float ring = smoothstep(uWave - 2.0, uWave, dist)
                    * smoothstep(uWave + 0.7, uWave, dist);
         col += uColor * ring * 0.28;
 
-    // ── DYNAMIC BLAST RADIUS FADE ────────────────────────────────────────
+        // ── SMOOTH BLAST RADIUS FADE (this was the main culprit) ────────
+        
+        float blastRadius = uWave;           // or uWave + uBlastOffset if you want lag
 
-  
-    // Core cleared zone (grows with wave)
-    float blastRadius = uWave;               // or uWave - offset if you want lag
-    float innerFadeWidth = 5.0;              // how soft the inner transition is
+        // 1. Inner cleared zone — now uses a wide, smooth transition
+        float innerFadeWidth = 6.0;          // ← increase for softer "cleared" edge
+        float innerAlpha = smoothstep(blastRadius - innerFadeWidth, blastRadius, dist);
+        // invert so inside blast = low alpha (cleared/faded)
+        innerAlpha = 1.0 - innerAlpha;
 
-    float innerAlpha = smoothstep(blastRadius, blastRadius + innerFadeWidth, dist);
+        // 2. Outer board-edge fade (much gentler now)
+        const float boardHalf = 16.0;
+        float edgeDist = boardHalf - dist;
+        float outerFadeWidth = 8.0;          // ← was 7.0, wider = smoother vanish
+        float outerAlpha = smoothstep(0.0, outerFadeWidth, edgeDist);
 
-    // NEW: Outer fade near board edges to prevent hard chop
-    // Approximate board half-size (BOARD_SZ/2); adjust if your plane scale differs
-    
-    const float boardHalf = 16.0;            // 32 / 2 = 16
-    float edgeDist = boardHalf - dist;       // distance to nearest edge (approx radial)
-    float outerFadeWidth = 7.0;              // wider = gentler vanish at rim
+        // 3. Combine + optional minimum visibility so it never fully disappears
+        float alpha = innerAlpha * outerAlpha;
+        alpha = max(alpha, 0.05);            // faint trail instead of hard cut
 
-    // outerAlpha = 1 inside, ramps down to 0 near/outside edge
-    float outerAlpha = smoothstep(0.0, outerFadeWidth, edgeDist);
+        // Optional: add a very soft global falloff so the wave feels more natural at large radii
+        // alpha *= smoothstep(18.0, 12.0, dist); // uncomment if you want extra softness
 
-    // Final alpha: cleared inside blast, but also faded at outer rim
-    float alpha = innerAlpha * outerAlpha;
-
-    // Optional: prevent total disappearance too early — minimum visibility
-    alpha = max(alpha, 0.06);                // faint ghost if you want subtle trail
-
-     gl_FragColor = vec4(clamp(col, 0.0, 1.0), alpha);
+        gl_FragColor = vec4(clamp(col, 0.0, 1.0), alpha);
     }
-`,
+`
     side: THREE.DoubleSide,
     transparent: true   // ← IMPORTANT: enables alpha blending
 });
