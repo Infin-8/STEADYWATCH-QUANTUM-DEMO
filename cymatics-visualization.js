@@ -165,7 +165,7 @@ fragmentShader: `
 
         gl_FragColor = vec4(clamp(col, 0.0, 1.0), alpha);
     }
-`
+`,
     side: THREE.DoubleSide,
     transparent: true   // ← IMPORTANT: enables alpha blending
 });
