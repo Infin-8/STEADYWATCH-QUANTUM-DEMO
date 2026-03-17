@@ -760,7 +760,7 @@
                 labelEl.textContent = 'Key #' + drop.keyIndex + ' (p=' + drop.prime + ') ' + q + ' — click key ore to mine';
             } else {
                 var n = keyDrops.length;
-                labelEl.textContent = n + ' keyz mined.';
+                labelEl.textContent = n + ' keyz mined. Click/tap key ore to mine';
             }
         }
 
