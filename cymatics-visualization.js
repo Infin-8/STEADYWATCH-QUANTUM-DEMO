@@ -360,8 +360,8 @@ const boardMat = new THREE.ShaderMaterial({
 
             if (phase === 'dissolving') {
                 var dt2 = phaseT / CYM.DISSOLVE_T;
-                // Outer nodes fade first — like a wave collapsing inward
-                op = Math.max(0, 1.0 - dt2 * 1.6 - (nd.d / CYM.MAX_R) * 0.35);
+                // Fade reaches 0 at end of dissolve (dt2=1), outer nodes slightly faster
+                op = Math.max(0, (1.0 - dt2) - (nd.d / CYM.MAX_R) * 0.25 * dt2);
                 sc = Math.max(0.01, 1.0 - dt2 * 0.45);
             } else if (ct < CRYST_DUR) {
                 // Crystallization bounce
