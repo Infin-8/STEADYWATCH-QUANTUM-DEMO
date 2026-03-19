@@ -2,7 +2,8 @@
 
 **Authors:** Nate Vazquez, SteadyWatch / Quantum V^
 **Date:** March 14, 2026
-**Status:** Simulator verified ✅ | Hardware validation pending (IBM ibm_fez)
+**Status:** ✅ Simulator verified | ✅ Hardware validated — ibm_fez (M=3.33) + ibm_marrakesh (M=3.82, 95.5% of quantum max)
+**Full hardware report:** `docs/research/HURWITZ_MERMIN_HARDWARE_VALIDATION.md` (March 18, 2026)
 **arXiv target:** quant-ph
 **Related code:** `quantum_computing/hurwitz_mermin_experiment.py`
 
