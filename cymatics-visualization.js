@@ -6,7 +6,7 @@
  *
  * Sequence: VAULT (p=5, 144 nodes, 144 Hz)
  *        → VIPER (p=13, 336 nodes, 336 Hz)
- *        → HORDE (p=17, 432 nodes, 432 Hz)
+ *        → LOTUS (p=17, 432 nodes, 432 Hz)
  *        → loops
  *
  * Node projection: (a, b) quaternion components → (x, z) world plane.
@@ -111,8 +111,8 @@ const boardMat = new THREE.ShaderMaterial({
     uniforms: {
         uWave:       { value: 0.0 },
         uColor:      { value: new THREE.Color(0xFFD700) },
-        uFadeRadius: { value: 2 },       // ← NEW: tweak this (2.0 = tight fade, 5.0 = wider)
-        uBlastOffset: { value: 0.0 },     // shift blast vs wave (negative = lag)
+        uFadeRadius: { value: 2 },
+        uBlastOffset: { value: 0.0 },
         uFadeWidth:   { value: 3.0 },
     },
     vertexShader: `
@@ -135,34 +135,30 @@ const boardMat = new THREE.ShaderMaterial({
 
         float dist = length(xz);
 
-        // Soft ring glow at the wave front
-        float ring = smoothstep(uWave - 2.0, uWave, dist)
-                   * smoothstep(uWave + 0.7, uWave, dist);
-        col += uColor * ring * 0.28;
+        // Soft ring glow — mix() so it's visible on both black AND white checker tiles
+        float ring = smoothstep(uWave - 3.0, uWave, dist)
+                   * smoothstep(uWave + 1.0, uWave, dist);
+        col = mix(col, uColor * 0.9, ring * 0.42);
 
         // ── SMOOTH BLAST CLEARING ───────────────────────────────────────
         float blastRadius = uWave;
 
-        // Wide soft transition for the cleared zone (this is the key fix)
-        float innerFadeWidth = 7.0;          // ← tweak this (higher = softer/blurrier edge)
+        float innerFadeWidth = 7.0;
         float innerAlpha = smoothstep(blastRadius, blastRadius + innerFadeWidth, dist);
-        // innerAlpha is now ~0 deep inside, ~1 outside the blast
 
-        // Outer edge fade (prevents hard cutoff at the board rim)
         const float boardHalf = 16.0;
         float edgeDist = boardHalf - dist;
-        float outerFadeWidth = 9.0;          // ← wider = gentler vanish
+        float outerFadeWidth = 9.0;
         float outerAlpha = smoothstep(0.0, outerFadeWidth, edgeDist);
 
-        // Combine
         float alpha = innerAlpha * outerAlpha;
-        alpha = max(alpha, 0.04);            // faint residual visibility
+        alpha = max(alpha, 0.04);
 
         gl_FragColor = vec4(clamp(col, 0.0, 1.0), alpha);
     }
 `,
     side: THREE.DoubleSide,
-    transparent: true   // ← IMPORTANT: enables alpha blending
+    transparent: true
 });
     const board = new THREE.Mesh(new THREE.PlaneGeometry(BOARD_SZ, BOARD_SZ), boardMat);
     board.rotation.x = -Math.PI / 2;
@@ -174,7 +170,7 @@ const boardMat = new THREE.ShaderMaterial({
 
     const rings = Array.from({ length: N_RINGS }, () => {
         const m = new THREE.Mesh(
-            new THREE.TorusGeometry(1, 0.04, 6, 80),
+            new THREE.TorusGeometry(1, 0.04, 16, 80),
             new THREE.MeshBasicMaterial({ color: 0xffffff, transparent: true, opacity: 0 })
         );
         m.rotation.x = -Math.PI / 2;

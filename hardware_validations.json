@@ -1403,5 +1403,68 @@
     "links": [
       { "text": "View on IBM Quantum", "url": "https://quantum.ibm.com/jobs/d5uepl4cqoec73dksv90" }
     ]
+  },
+  {
+    "id": "hurwitz-mermin-fez",
+    "category": "ghz",
+    "title": "Hurwitz-Mermin GHZ — ibm_fez (Optimal Triplets)",
+    "backend": "ibm_fez",
+    "qubits": 3,
+    "fidelity": "83%",
+    "jobId": "",
+    "date": "2026-03-18",
+    "executionTime": "~8s",
+    "description": "Mermin inequality test with optimal Hurwitz F4 quaternion triplets on ibm_fez. VAULT (p=5) M=3.33 (83.1% HW efficiency, rank-5 angle-friendly triplet 45°/135°), VIPER (p=13) M=3.30, LOTUS (p=17) M=3.30. All shells violate classical bound M=2. Establishes ibm_fez baseline: Heron r2 processor, non-native angles require additional Rz decomposition.",
+    "isImportant": true,
+    "media": {
+      "type": "screenshot",
+      "path": "images/hurwitz_mermin_fez.png"
+    },
+    "links": [
+      { "text": "Hardware Validation Report", "url": "https://github.com/Infin-8/STEADYWATCH-QUANTUM-DEMO/blob/main/docs/research/HURWITZ_MERMIN_HARDWARE_VALIDATION.md" },
+      { "text": "Research Paper", "url": "https://github.com/Infin-8/STEADYWATCH-QUANTUM-DEMO/blob/main/docs/research/WARDENCLYFFE_GHZ_PROOF_PAPER.md" }
+    ]
+  },
+  {
+    "id": "hurwitz-mermin-marrakesh",
+    "category": "ghz",
+    "title": "Hurwitz-Mermin GHZ — ibm_marrakesh (95.5% Quantum Max)",
+    "backend": "ibm_marrakesh",
+    "qubits": 3,
+    "fidelity": "95.5%",
+    "jobId": "",
+    "date": "2026-03-18",
+    "executionTime": "~8s",
+    "description": "Mermin inequality test with optimal Hurwitz F4 quaternion triplets on ibm_marrakesh. VAULT (p=5) M=3.8248 (95.6%), VIPER (p=13) M=3.8200 (95.5%), LOTUS (p=17) M=3.8208 (95.5%). All three prime shells converge to the same M — confirming the F4 lattice is self-similar across prime scales. Quantum maximum M=4.0; classical bound M=2. This is the headline result: 95.5% of quantum maximum Mermin violation across all three shells.",
+    "isImportant": true,
+    "media": {
+      "type": "screenshot",
+      "path": "images/hurwitz_mermin_marrakesh.png"
+    },
+    "links": [
+      { "text": "Hardware Validation Report", "url": "https://github.com/Infin-8/STEADYWATCH-QUANTUM-DEMO/blob/main/docs/research/HURWITZ_MERMIN_HARDWARE_VALIDATION.md" },
+      { "text": "Research Paper", "url": "https://github.com/Infin-8/STEADYWATCH-QUANTUM-DEMO/blob/main/docs/research/WARDENCLYFFE_GHZ_PROOF_PAPER.md" }
+    ]
+  },
+  {
+    "id": "seed-144-marrakesh",
+    "category": "seed",
+    "title": "VAULT 144-Satellite Seed Run — ibm_marrakesh",
+    "backend": "ibm_marrakesh",
+    "qubits": 10,
+    "fidelity": "100%",
+    "jobId": "d6sp587gtkcc73clr8k0",
+    "date": "2026-03-17",
+    "executionTime": "~8s per batch",
+    "description": "Full 144-satellite seed run for VAULT (p=5 shell, 24×(p+1) nodes) on ibm_marrakesh. 100% uniqueness (144/144 unique seeds), 7.80 bits mean entropy (97.6% of 8-bit max), std dev 0.0185, near-perfect Gaussian entropy distribution. Hardware delta vs AerSimulator: -0.00285 bits (99.96% fidelity). 0 failures. Confirms quantum-seeded key generation at satellite scale produces simulator-quality entropy on live IBM hardware.",
+    "isImportant": true,
+    "media": {
+      "type": "screenshot",
+      "path": "images/seed_144_marrakesh.png"
+    },
+    "links": [
+      { "text": "View on IBM Quantum", "url": "https://quantum.ibm.com/jobs/d6sp587gtkcc73clr8k0" },
+      { "text": "Hardware Validation Report", "url": "https://github.com/Infin-8/STEADYWATCH-QUANTUM-DEMO/blob/main/docs/research/HURWITZ_MERMIN_HARDWARE_VALIDATION.md" }
+    ]
   }
 ]
