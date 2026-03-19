@@ -166,7 +166,8 @@ const boardMat = new THREE.ShaderMaterial({
 
     // ── Ripple ring pool ──────────────────────────────────────────────────
     const N_RINGS = 28;
-    const RING_SPEED = (CYM.MAX_R / CYM.BUILD_T) * 1.18;
+    // Each ring's lifetime — rings ease out over most of the build phase
+    const RING_LIFETIME = CYM.BUILD_T * 0.88;
 
     const rings = Array.from({ length: N_RINGS }, () => {
         const m = new THREE.Mesh(
@@ -176,13 +177,14 @@ const boardMat = new THREE.ShaderMaterial({
         m.rotation.x = -Math.PI / 2;
         m.visible = false;
         scene.add(m);
-        return { mesh: m, r: 0, active: false };
+        return { mesh: m, r: 0, t: 0, active: false };
     });
 
     function emitRing(color) {
         const slot = rings.find(r => !r.active);
         if (!slot) return;
-        slot.r = 0.05;
+        slot.r = 0;
+        slot.t = 0;
         slot.active = true;
         slot.mesh.material.color.setHex(color);
         slot.mesh.material.opacity = 0.88;
@@ -209,6 +211,7 @@ const boardMat = new THREE.ShaderMaterial({
         clearNodes();
         rings.forEach(r => {
             r.active = false;
+            r.t = 0;
             r.mesh.visible = false;
             r.mesh.material.opacity = 0;
         });
@@ -378,17 +381,19 @@ const boardMat = new THREE.ShaderMaterial({
             nd.mesh.material.opacity = Math.max(op, 0);
         }
 
-        // Ripple ring expansion
+        // Ripple ring expansion — ease-out: sin(t*π/2) decelerates naturally toward edge
         for (var i = 0; i < rings.length; i++) {
             var r = rings[i];
             if (!r.active) continue;
-            r.r += RING_SPEED * dt;
-            r.mesh.scale.setScalar(r.r);
-            r.mesh.material.opacity = Math.max(0, (1 - r.r / CYM.MAX_R) * 0.72);
-            if (r.r >= CYM.MAX_R) {
+            r.t += dt / RING_LIFETIME;
+            if (r.t >= 1.0) {
                 r.active = false;
                 r.mesh.visible = false;
+                continue;
             }
+            r.r = CYM.MAX_R * Math.sin(r.t * Math.PI * 0.5);
+            r.mesh.scale.setScalar(Math.max(r.r, 0.05));
+            r.mesh.material.opacity = Math.max(0, (1.0 - r.t) * 0.72);
         }
 
         renderer.render(scene, camera);
