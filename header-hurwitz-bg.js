@@ -122,7 +122,8 @@
 
         for (var i = 0; i < pointCount; i++) {
             var theta = goldenAngle * i;
-            var r = maxR * Math.sqrt((i + 1) / pointCount);
+            var normalizedR = Math.sqrt((i + 1) / pointCount); // 0=center, 1=edge
+            var r = maxR * normalizedR;
             var x = Math.cos(theta) * r;
             var y = Math.sin(theta) * r;
             var rotationAngle = Math.atan2(y, x);
@@ -130,9 +131,16 @@
             var ny = perlin1D(i * 2.3 + 500);
             var leftPct = 50 + (x * 50 + nx * noiseScale);
             var topPct = 50 + (y * 50 + ny * noiseScale);
-            var sizeScale = 1 + perlin1D(i * 3.1 + 1000) * sizeNoiseScale;
-            var opacityScale = 0.85 + perlin1D(i * 4.7 + 2000) * 0.15;
+
+            // Center density boost: inner nodes are larger and brighter.
+            // coreFactor: 3.5 at center, 1.0 at edge — makes the density singularity visible.
+            var coreFactor = 1.0 + (1.0 - normalizedR) * 2.5;
+
+            var sizeScale = (1 + perlin1D(i * 3.1 + 1000) * sizeNoiseScale) * coreFactor;
+            var opacityScale = Math.min(1.0, (0.85 + perlin1D(i * 4.7 + 2000) * 0.15) * coreFactor);
             var style = calculateUnifiedStyle(i, time + i * 0.01, rotationAngle, { x: x, y: y });
+            style.glowIntensity = Math.min(0.75, style.glowIntensity * coreFactor);
+            style.shadowRadius = Math.min(10, style.shadowRadius * coreFactor);
             var colorT = i / Math.max(1, pointCount - 1);
             container.appendChild(createDot('', leftPct, topPct, i, sizeScale, opacityScale, style, colorT));
         }
