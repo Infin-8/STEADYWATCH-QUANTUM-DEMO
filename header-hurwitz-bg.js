@@ -64,9 +64,23 @@
         return { glowIntensity: glow, shadowRadius: sRad, shadowIntensity: sInt };
     }
 
+    function injectTraceStyles() {
+        if (document.getElementById('hurwitz-trace-styles')) return;
+        var s = document.createElement('style');
+        s.id = 'hurwitz-trace-styles';
+        s.textContent =
+            '@keyframes hurwitz-dot-appear {' +
+            '  from { opacity: 0; }' +
+            '  to   { opacity: var(--hurwitz-opacity, 0.85); }' +
+            '}';
+        document.head.appendChild(s);
+    }
+
     function init() {
         var container = document.getElementById('header-hurwitz-dots');
         if (!container || !container.closest('header')) return;
+
+        injectTraceStyles();
 
         var goldenAngle = Math.PI * (3 - Math.sqrt(13));
         var pointCount = 336;
@@ -83,6 +97,11 @@
                 Math.round(color1.g + t * (color2.g - color1.g)) + ',' +
                 Math.round(color1.b + t * (color2.b - color1.b)) + ')';
         }
+        // traceDelay: ms offset so dots appear in spiral order on load.
+        // 1.2ms per step × 336 dots ≈ 400ms total trace, each dot fades in over 120ms.
+        var traceStepMs = 1.2;
+        var traceFadeMs = 120;
+
         function createDot(className, leftPct, topPct, animationIndex, sizeScale, opacityScale, style, colorT) {
             var dot = document.createElement('div');
             dot.className = 'header-hurwitz-dot ' + (className || '');
@@ -104,6 +123,13 @@
             if (opacityScale != null) {
                 dot.style.setProperty('--opacity-scale', String(opacityScale));
             }
+
+            // Spiral trace: each dot starts invisible and fades in at its index-based delay.
+            var targetOpacity = opacityScale != null ? opacityScale : 0.85;
+            var delay = animationIndex != null ? animationIndex * traceStepMs : 0;
+            dot.style.setProperty('--hurwitz-opacity', String(targetOpacity));
+            dot.style.animation = 'hurwitz-dot-appear ' + traceFadeMs + 'ms ease-out ' + delay + 'ms both';
+
             if (style) {
                 var g = style.glowIntensity;
                 var glowPx = Math.round(style.shadowRadius * 4);
@@ -118,7 +144,7 @@
         var centerNx = perlin1D(0) * 0.5;
         var centerNy = perlin1D(100) * 0.5;
         var centerStyle = calculateUnifiedStyle(0, time, 0, { x: 0, y: 0 });
-        container.appendChild(createDot('center', 50 + centerNx * noiseScale, 50 + centerNy * noiseScale, null, 1 + perlin1D(200) * sizeNoiseScale, 0.85 + perlin1D(300) * 0.15, centerStyle, 0.5));
+        container.appendChild(createDot('center', 50 + centerNx * noiseScale, 50 + centerNy * noiseScale, 0, 1 + perlin1D(200) * sizeNoiseScale, 0.85 + perlin1D(300) * 0.15, centerStyle, 0.5));
 
         for (var i = 0; i < pointCount; i++) {
             var theta = goldenAngle * i;
