@@ -1645,7 +1645,7 @@
         "backend": "ibm_fez",
         "qubits": 3,
         "fidelity": "83%",
-        "jobId": "",
+        "jobId": "d6tpcvatnsts73ercm2g",
         "date": "2026-03-18",
         "executionTime": "~8s",
         "description": "Mermin inequality test with optimal Hurwitz F4 quaternion triplets on ibm_fez. VAULT (p=5) M=3.33 (83.1% HW efficiency, rank-5 angle-friendly triplet 45\u00b0/135\u00b0), VIPER (p=13) M=3.30, LOTUS (p=17) M=3.30. All shells violate classical bound M=2. Establishes ibm_fez baseline: Heron r2 processor, non-native angles require additional Rz decomposition.",
@@ -1663,7 +1663,41 @@
                 "text": "Research Paper",
                 "url": "https://github.com/Infin-8/STEADYWATCH-QUANTUM-DEMO/blob/main/docs/research/WARDENCLYFFE_GHZ_PROOF_PAPER.md"
             }
-        ]
+        ],
+        "jobIds": {
+            "VAULT_optimal_M3.33": {
+                "PPP": "d6tpcvatnsts73ercm2g",
+                "PCC": "d6tpd1qtnsts73ercm5g",
+                "CPC": "d6tpd4qtnsts73ercm90",
+                "CCP": "d6tpd7if84ks73ddfqp0"
+            },
+            "VIPER_or_LOTUS_M3.30_run1": {
+                "PPP": "d6tp8h0v5rlc73f35a5g",
+                "PCC": "d6tp8jov5rlc73f35a8g",
+                "CPC": "d6tp8mif84ks73ddfltg",
+                "CCP": "d6tp8paf84ks73ddfm0g"
+            },
+            "VIPER_or_LOTUS_M3.30_run2": {
+                "PPP": "d6tp8u469uic73chf1qg",
+                "PCC": "d6tp90ov5rlc73f35aq0",
+                "CPC": "d6tp94af84ks73ddfmf0",
+                "CCP": "d6tp96ov5rlc73f35b3g"
+            },
+            "preliminary_M2.87": {
+                "PPP": "d6tp80qtnsts73ercgl0",
+                "circuit2": "d6tp868v5rlc73f359pg",
+                "circuit3": "d6tp89c69uic73chf110",
+                "circuit4": "d6tp8caf84ks73ddflhg"
+            },
+            "preliminary_M2.82": {
+                "PPP": "d6tpc32tnsts73ercl40",
+                "circuit2": "d6tpc5qf84ks73ddfpl0",
+                "circuit3": "d6tpc8k69uic73chf58g",
+                "circuit4": "d6tpcbk69uic73chf5bg"
+            }
+        },
+        "shots": 10000,
+        "notes": "Clusters B and C both yield |M|=3.30 \u2014 one is VIPER (p=13), one is LOTUS (p=17); circuit labeling not preserved in job metadata. Cluster E confirmed VAULT M=3.33 (45/135 optimal triplet). Clusters A and D are preliminary runs with sub-optimal triplets."
     },
     {
         "id": "hurwitz-mermin-marrakesh",
@@ -1671,7 +1705,7 @@
         "title": "Hurwitz-Mermin GHZ \u2014 ibm_marrakesh (95.5% Quantum Max)",
         "backend": "ibm_marrakesh",
         "qubits": 3,
-        "fidelity": "95.5%",
+        "fidelity": "95.5% (unverified \u2014 may be simulator)",
         "jobId": "",
         "date": "2026-03-18",
         "executionTime": "~8s",
@@ -1690,7 +1724,8 @@
                 "text": "Research Paper",
                 "url": "https://github.com/Infin-8/STEADYWATCH-QUANTUM-DEMO/blob/main/docs/research/WARDENCLYFFE_GHZ_PROOF_PAPER.md"
             }
-        ]
+        ],
+        "notes": "WARNING: No IBM Quantum hardware job IDs found for the M=3.82 Mermin result. The 100 most recent ibm_marrakesh jobs are all seed uniformity runs (E\u22480). This result may be from an AerSimulator run with marrakesh noise model, not real hardware. The uniformity validation (252/256 bitstrings, 97.5% entropy) IS confirmed from real marrakesh hardware (see seed-144-marrakesh entry)."
     },
     {
         "id": "seed-144-marrakesh",
