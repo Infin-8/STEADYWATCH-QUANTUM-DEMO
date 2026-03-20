@@ -98,9 +98,9 @@
                 Math.round(color1.b + t * (color2.b - color1.b)) + ')';
         }
         // traceDelay: ms offset so dots appear in spiral order on load.
-        // 1.2ms per step × 336 dots ≈ 400ms total trace, each dot fades in over 120ms.
-        var traceStepMs = 1.2;
-        var traceFadeMs = 120;
+        // 8ms per step × 336 dots ≈ 2.7s total trace, each dot fades in over 200ms.
+        var traceStepMs = 8;
+        var traceFadeMs = 200;
 
         function createDot(className, leftPct, topPct, animationIndex, sizeScale, opacityScale, style, colorT) {
             var dot = document.createElement('div');
