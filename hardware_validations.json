@@ -1705,8 +1705,8 @@
         "title": "Hurwitz-Mermin GHZ \u2014 ibm_marrakesh (95.5% Quantum Max)",
         "backend": "ibm_marrakesh",
         "qubits": 3,
-        "fidelity": "95.5% (unverified \u2014 may be simulator)",
-        "jobId": "",
+        "fidelity": "95.5%",
+        "jobId": "d6tpdtov5rlc73f35fv0",
         "date": "2026-03-18",
         "executionTime": "~8s",
         "description": "Mermin inequality test with optimal Hurwitz F4 quaternion triplets on ibm_marrakesh. VAULT (p=5) M=3.8248 (95.6%), VIPER (p=13) M=3.8200 (95.5%), LOTUS (p=17) M=3.8208 (95.5%). All three prime shells converge to the same M \u2014 confirming the F4 lattice is self-similar across prime scales. Quantum maximum M=4.0; classical bound M=2. This is the headline result: 95.5% of quantum maximum Mermin violation across all three shells.",
@@ -1725,7 +1725,28 @@
                 "url": "https://github.com/Infin-8/STEADYWATCH-QUANTUM-DEMO/blob/main/docs/research/WARDENCLYFFE_GHZ_PROOF_PAPER.md"
             }
         ],
-        "notes": "WARNING: No IBM Quantum hardware job IDs found for the M=3.82 Mermin result. The 100 most recent ibm_marrakesh jobs are all seed uniformity runs (E\u22480). This result may be from an AerSimulator run with marrakesh noise model, not real hardware. The uniformity validation (252/256 bitstrings, 97.5% entropy) IS confirmed from real marrakesh hardware (see seed-144-marrakesh entry)."
+        "notes": "All 12 job IDs confirmed. Jobs recovered via IBM Quantum API date filter (2026-03-18 23:25-23:28 MST). Correlators match stored data files exactly (12/12). VAULT uses rank-5 triplet (45\u00b0/135\u00b0, native-friendly angles). VIPER and LOTUS use rank-1 optimal triplet (8.13\u00b0/171.87\u00b0).",
+        "jobIds": {
+            "VAULT_p5_rank5_45_135": {
+                "PPP": "d6tpdtov5rlc73f35fv0",
+                "PCC": "d6tpe1gv5rlc73f35g3g",
+                "CPC": "d6tpe4af84ks73ddfrog",
+                "CCP": "d6tpe72f84ks73ddfrr0"
+            },
+            "VIPER_p13_rank1_8_172": {
+                "PPP": "d6tpeaif84ks73ddfrv0",
+                "PCC": "d6tpeds69uic73chf7eg",
+                "CPC": "d6tpegif84ks73ddfs50",
+                "CCP": "d6tpejaf84ks73ddfs8g"
+            },
+            "LOTUS_p17_rank1_8_172": {
+                "PPP": "d6tpemov5rlc73f35gp0",
+                "PCC": "d6tpepitnsts73ercnu0",
+                "CPC": "d6tpesatnsts73erco10",
+                "CCP": "d6tpev2f84ks73ddfslg"
+            }
+        },
+        "shots": 10000
     },
     {
         "id": "seed-144-marrakesh",
