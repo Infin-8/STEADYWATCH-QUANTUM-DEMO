@@ -10,7 +10,7 @@
             padding: 0;
             box-sizing: border-box;
         }
-        
+
         body {
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
             line-height: 1.6;
@@ -18,7 +18,7 @@
             background: #f5f5f7;
             padding: 20px;
         }
-        
+
         .container {
             max-width: 800px;
             margin: 0 auto;
@@ -27,20 +27,20 @@
             border-radius: 12px;
             box-shadow: 0 2px 10px rgba(0,0,0,0.1);
         }
-        
+
         h1 {
             color: #1d1d1f;
             font-size: 2.5em;
             margin-bottom: 10px;
             font-weight: 600;
         }
-        
+
         .subtitle {
             color: #86868b;
             font-size: 1.1em;
             margin-bottom: 30px;
         }
-        
+
         h2 {
             color: #1d1d1f;
             font-size: 1.8em;
@@ -50,7 +50,7 @@
             border-bottom: 2px solid #f5f5f7;
             padding-bottom: 10px;
         }
-        
+
         h3 {
             color: #1d1d1f;
             font-size: 1.4em;
@@ -58,22 +58,22 @@
             margin-bottom: 15px;
             font-weight: 600;
         }
-        
+
         p {
             margin-bottom: 15px;
             color: #1d1d1f;
         }
-        
+
         ul, ol {
             margin-left: 30px;
             margin-bottom: 15px;
         }
-        
+
         li {
             margin-bottom: 10px;
             color: #1d1d1f;
         }
-        
+
         .highlight {
             background: #f5f5f7;
             padding: 20px;
@@ -81,17 +81,17 @@
             margin: 20px 0;
             border-left: 4px solid #007aff;
         }
-        
+
         .check {
             color: #34c759;
             font-weight: bold;
         }
-        
+
         .cross {
             color: #ff3b30;
             font-weight: bold;
         }
-        
+
         .meta {
             color: #86868b;
             font-size: 0.9em;
@@ -99,16 +99,16 @@
             padding-top: 20px;
             border-top: 1px solid #f5f5f7;
         }
-        
+
         a {
             color: #007aff;
             text-decoration: none;
         }
-        
+
         a:hover {
             text-decoration: underline;
         }
-        
+
         .summary {
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             color: white;
@@ -116,39 +116,39 @@
             border-radius: 12px;
             margin: 30px 0;
         }
-        
+
         .summary h3 {
             color: white;
             margin-top: 0;
         }
-        
+
         .summary ul {
             list-style: none;
             margin-left: 0;
         }
-        
+
         .summary li {
             margin-bottom: 10px;
             padding-left: 25px;
             position: relative;
         }
-        
+
         .summary li:before {
             content: "✓";
             position: absolute;
             left: 0;
             font-weight: bold;
         }
-        
+
         @media (max-width: 768px) {
             .container {
                 padding: 20px;
             }
-            
+
             h1 {
                 font-size: 2em;
             }
-            
+
             h2 {
                 font-size: 1.5em;
             }
@@ -158,93 +158,99 @@
 <body>
     <div class="container">
         <h1>Privacy Policy</h1>
-        <p class="subtitle">SteadyWatch - Precision Hand Stability Monitor</p>
-        
+        <p class="subtitle">SteadyWatch — Atomic Biometric Identity</p>
+
         <div class="meta">
-            <p><strong>Effective Date:</strong> December 12, 2025</p>
-            <p><strong>Last Updated:</strong> December 12, 2025</p>
+            <p><strong>Effective Date:</strong> March 21, 2026</p>
+            <p><strong>Last Updated:</strong> March 21, 2026</p>
             <p><strong>Publisher:</strong> Quantum V^ LLC</p>
+            <p><strong>App Version:</strong> 1.0.3</p>
         </div>
 
         <h2>Introduction</h2>
-        <p>SteadyWatch ("we," "our," or "us") is committed to protecting your privacy. This Privacy Policy explains how we collect, use, disclose, and safeguard your information when you use our mobile application SteadyWatch (the "App") on Apple Watch and iPhone.</p>
+        <p>SteadyWatch ("we," "our," or "us") is committed to protecting your privacy. This Privacy Policy explains how we collect, use, and safeguard your information when you use the SteadyWatch app (the "App") on Apple Watch and iPhone.</p>
+        <p>SteadyWatch captures your biological oscillation frequency via Apple Watch motion sensors, combines it with pre-computed IBM quantum hardware entropy, and generates a cryptographic identity key authorized by Face ID and signed by the Secure Enclave — all on your device.</p>
         <p><strong>By using our App, you agree to the collection and use of information in accordance with this policy.</strong></p>
 
         <h2>Information We Collect</h2>
-        
-        <h3>1. Motion and Sensor Data</h3>
+
+        <h3>1. Motion and Biometric Frequency Data</h3>
         <p><strong>What We Collect:</strong></p>
         <ul>
-            <li>Hand stability measurements from Apple Watch motion sensors</li>
-            <li>Acceleration data (x, y, z axes)</li>
-            <li>Gyroscope data</li>
-            <li>Wrist angle measurements (extension and deviation)</li>
-            <li>Tremor detection data</li>
-            <li>Precision session metrics</li>
+            <li>Biological oscillation frequency measured from Apple Watch IMU (inertial measurement unit)</li>
+            <li>Tremor frequency and amplitude derived from acceleration and gyroscope data</li>
+            <li>Atomic clock ratio: your oscillation frequency relative to the Cesium-133 standard (9,192,631,770 Hz)</li>
         </ul>
         <p><strong>How We Use It:</strong></p>
         <ul>
-            <li>To measure and display your hand stability in real-time</li>
-            <li>To provide precision scores and feedback</li>
-            <li>To track your progress over time</li>
-            <li>To enable procedure-specific monitoring (surgery, dental, engineering, etc.)</li>
+            <li>To derive a unique biometric frequency signature specific to you</li>
+            <li>To generate a post-quantum biometric identity key seeded by your oscillation ratio</li>
+            <li>To produce the quantum circuit confidence score associated with your key capture</li>
         </ul>
         <div class="highlight">
-            <p><strong>Storage:</strong> All motion data is stored <strong>locally on your device</strong>. We do not transmit motion data to our servers.</p>
+            <p><strong>Storage:</strong> Raw motion sensor data is <strong>not stored</strong>. Only the derived biometric key (a cryptographic output) is saved locally on your device. No raw IMU data is transmitted or retained.</p>
         </div>
 
-        <h3>2. Health Data (Optional)</h3>
-        <p><strong>What We Collect (if you grant permission):</strong></p>
+        <h3>2. Biometric Key and Cryptographic Identity</h3>
+        <p><strong>What We Generate and Store:</strong></p>
         <ul>
-            <li>Heart rate data (from Apple Watch)</li>
-            <li>Heart rate variability (HRV)</li>
-            <li>Workout session data</li>
+            <li>A biometric identity key (hex string) derived from your oscillation frequency and quantum entropy</li>
+            <li>A quantum circuit confidence score (percentage) reflecting capture quality — never modified after generation</li>
+            <li>A session identifier, timestamp, and entropy slot reference</li>
+            <li>If authorized: a P256 ECDSA signature produced by the Secure Enclave, a reference to the signing public key, and the authorization timestamp</li>
         </ul>
         <p><strong>How We Use It:</strong></p>
         <ul>
-            <li>To provide stress indicators</li>
-            <li>To assess autonomic nervous system state</li>
-            <li>To enhance precision monitoring with physiological context</li>
+            <li>To maintain your Biometric Key Vault — a local record of your generated identity keys</li>
+            <li>To provide non-repudiable proof that a key was generated by you and authorized by your device at a specific moment</li>
+            <li>To optionally sync keys between Apple Watch and iPhone via your local network</li>
         </ul>
         <div class="highlight">
-            <p><strong>Storage:</strong> Health data is managed through Apple's HealthKit framework. Health data remains on your device and in your iCloud account (if enabled). <strong>We do not access or store health data on our servers.</strong></p>
-        </div>
-        <p><strong>Your Control:</strong> You can revoke HealthKit permissions at any time in iOS Settings. You can delete health data through the Health app.</p>
-
-        <h3>3. App Usage Data</h3>
-        <p><strong>What We Collect:</strong></p>
-        <ul>
-            <li>Procedure type selections (surgery, dental, engineering, etc.)</li>
-            <li>Session history and timestamps</li>
-            <li>User preferences and settings</li>
-            <li>App configuration choices</li>
-        </ul>
-        <p><strong>How We Use It:</strong></p>
-        <ul>
-            <li>To personalize your experience</li>
-            <li>To maintain your settings across app launches</li>
-            <li>To provide historical data and trends</li>
-        </ul>
-        <div class="highlight">
-            <p><strong>Storage:</strong> All usage data is stored <strong>locally on your device</strong>. We do not transmit usage data to our servers.</p>
+            <p><strong>Storage:</strong> Biometric keys are stored <strong>locally on your device</strong>. Keys may optionally sync to a local network server you configure (e.g., on your home network). <strong>Keys are never transmitted to Quantum V^ LLC servers or any third-party cloud service.</strong></p>
         </div>
 
-        <h3>4. Network Communication</h3>
-        <p><strong>What We Collect:</strong></p>
+        <h3>3. Face ID Authorization</h3>
+        <p><strong>What We Use:</strong></p>
         <ul>
-            <li>API requests to backend services (if configured)</li>
-            <li>Connection status and error logs</li>
+            <li>Apple's LocalAuthentication framework to authenticate your identity via Face ID before authorizing a biometric key</li>
         </ul>
-        <p><strong>How We Use It:</strong></p>
+        <p><strong>What We Do NOT Use:</strong></p>
         <ul>
-            <li>To enable quantum visualization features (optional)</li>
-            <li>To sync with backend services (if you configure a backend URL)</li>
-            <li>To provide real-time quantum computing features</li>
+            <li><span class="cross">❌</span> No facial images are accessed or stored by SteadyWatch</li>
+            <li><span class="cross">❌</span> No facial geometry or biometric templates are read by the App</li>
+            <li><span class="cross">❌</span> Face ID data never leaves the Secure Enclave on your device</li>
         </ul>
         <div class="highlight">
-            <p><strong>Storage:</strong> Network logs are stored <strong>locally on your device</strong> only. API requests are made to servers you configure (localhost or your own server). <strong>We do not collect or store network data on our servers.</strong></p>
+            <p><strong>How It Works:</strong> Face ID is used exclusively as an authorization gate. When you authorize a key, the Secure Enclave's P256 private key signs the biometric key hex string. The signing key never leaves the Secure Enclave chip. The resulting ECDSA signature is what is stored — not any facial data.</p>
         </div>
-        <p><strong>Your Control:</strong> Backend connection is <strong>optional</strong> and <strong>user-configured</strong>. You can disable backend features in app settings. Default configuration uses localhost (no external communication).</p>
+
+        <h3>4. IBM Quantum Hardware Entropy</h3>
+        <p><strong>What We Use:</strong></p>
+        <ul>
+            <li>Pre-computed quantum entropy generated on IBM Quantum hardware (ibm_marrakesh), embedded in the App at build time as THE VAULT™ — 81 entropy slots mapped to real hardware job IDs</li>
+        </ul>
+        <p><strong>What We Do NOT Do:</strong></p>
+        <ul>
+            <li><span class="cross">❌</span> The App does <strong>not</strong> connect to IBM Quantum systems at runtime</li>
+            <li><span class="cross">❌</span> No user data is transmitted to IBM or any quantum cloud provider</li>
+            <li><span class="cross">❌</span> The entropy is static, embedded at compile time — it is not fetched dynamically</li>
+        </ul>
+
+        <h3>5. Local Network Communication</h3>
+        <p><strong>What We Use:</strong></p>
+        <ul>
+            <li>Optional vault synchronization between Apple Watch and iPhone over your local network</li>
+            <li>Keys generated on Apple Watch are pushed to your iPhone vault via a local network API (if you have a local server configured)</li>
+        </ul>
+        <p><strong>What We Do NOT Do:</strong></p>
+        <ul>
+            <li><span class="cross">❌</span> No data is sent to external servers operated by Quantum V^ LLC</li>
+            <li><span class="cross">❌</span> Local network sync is <strong>optional</strong> and operates only within your own network</li>
+            <li><span class="cross">❌</span> Default configuration uses localhost — no data leaves your device unless you configure a local server</li>
+        </ul>
+        <div class="highlight">
+            <p><strong>Your Control:</strong> Local network sync is user-configured. If you do not configure a backend URL, all data remains on-device only.</p>
+        </div>
 
         <h2>What We Do NOT Collect</h2>
         <p>We do <span class="cross">NOT</span> collect:</p>
@@ -253,152 +259,112 @@
             <li><span class="cross">❌</span> Payment information</li>
             <li><span class="cross">❌</span> Location data</li>
             <li><span class="cross">❌</span> Contacts or address book information</li>
-            <li><span class="cross">❌</span> Photos or media files</li>
-            <li><span class="cross">❌</span> Biometric data (beyond motion sensors)</li>
-            <li><span class="cross">❌</span> Any data that identifies you personally</li>
+            <li><span class="cross">❌</span> Photos, camera images, or video</li>
+            <li><span class="cross">❌</span> Facial images or facial geometry</li>
+            <li><span class="cross">❌</span> Raw motion or IMU sensor data (only derived cryptographic output is stored)</li>
+            <li><span class="cross">❌</span> Health data (HealthKit is not used)</li>
+            <li><span class="cross">❌</span> Analytics, advertising identifiers, or crash reporting data</li>
+            <li><span class="cross">❌</span> Any data that identifies you to Quantum V^ LLC</li>
         </ul>
 
         <h2>Data Storage and Security</h2>
-        
-        <h3>Local Storage</h3>
-        <p><strong>All data is stored locally on your device:</strong></p>
+
+        <h3>On-Device Storage</h3>
+        <p><strong>All biometric key data is stored locally on your device:</strong></p>
         <ul>
-            <li>Motion data: Stored in UserDefaults and Core Data</li>
-            <li>Health data: Managed by Apple's HealthKit (stored in Health app)</li>
-            <li>Session history: Stored locally on your device</li>
-            <li>Settings: Stored in UserDefaults</li>
-        </ul>
-        <p><strong>Data Security:</strong></p>
-        <ul>
-            <li>All local data is protected by iOS/watchOS security features</li>
-            <li>HealthKit data is encrypted by Apple</li>
-            <li>We use Apple's standard security frameworks</li>
+            <li>Biometric keys and vault records: stored in UserDefaults, protected by iOS data protection</li>
+            <li>Secure Enclave signing key: stored in the Secure Enclave — never extractable from the chip</li>
+            <li>Settings and configuration: stored in UserDefaults</li>
         </ul>
 
-        <h3>Cloud Storage (Optional)</h3>
-        <p><strong>If you enable iCloud:</strong></p>
+        <h3>Cryptographic Security</h3>
         <ul>
-            <li>Health data may sync to your iCloud account (Apple's service)</li>
-            <li>This is controlled by your iCloud settings, not by our app</li>
-            <li>We do not have access to your iCloud data</li>
+            <li>All signing operations use Apple CryptoKit P256 ECDSA via the Secure Enclave</li>
+            <li>Biometric key material is derived using SHA-256</li>
+            <li>No proprietary encryption algorithms are used — all cryptographic operations route through Apple CryptoKit and the Secure Enclave</li>
+            <li>The App does not use non-exempt encryption — encryption compliance: <code>ITSAppUsesNonExemptEncryption = false</code></li>
+        </ul>
+
+        <h3>Local Network Server (Optional)</h3>
+        <p>If you configure a local network backend:</p>
+        <ul>
+            <li>Biometric keys may be stored on a server you control within your local network</li>
+            <li>This server is your responsibility — review its security practices</li>
+            <li>Quantum V^ LLC does not operate, monitor, or have access to your local server</li>
         </ul>
 
         <h2>Data Sharing and Disclosure</h2>
-        
+
         <h3>We Do NOT Share Your Data</h3>
         <p>We do <span class="cross">not</span>:</p>
         <ul>
             <li><span class="cross">❌</span> Sell your data to third parties</li>
             <li><span class="cross">❌</span> Share your data with advertisers</li>
             <li><span class="cross">❌</span> Share your data with analytics companies</li>
-            <li><span class="cross">❌</span> Share your data with other apps or services</li>
-            <li><span class="cross">❌</span> Transmit your data to our servers</li>
+            <li><span class="cross">❌</span> Transmit your data to Quantum V^ LLC servers</li>
+            <li><span class="cross">❌</span> Access your Secure Enclave signing key or any biometric key material</li>
         </ul>
         <div class="highlight">
-            <p><strong>All data remains on your device.</strong></p>
+            <p><strong>All biometric key data remains on your device and your local network.</strong></p>
         </div>
 
-        <h3>Backend Services (User-Configured)</h3>
-        <p><strong>If you configure a backend URL:</strong></p>
-        <ul>
-            <li>The app may send API requests to servers you specify</li>
-            <li>This is <strong>your choice</strong> and <strong>your responsibility</strong></li>
-            <li>We do not control or access these servers</li>
-            <li>Data sent to your configured backend is subject to that server's privacy policy</li>
-        </ul>
-        <p><strong>Default Configuration:</strong> Default backend URL is <code>localhost</code> (no external communication). No data leaves your device unless you configure a custom backend.</p>
-
         <h2>Your Rights and Choices</h2>
-        
+
         <h3>Access Your Data</h3>
-        <p><strong>You can:</strong></p>
         <ul>
-            <li>View all session history within the app</li>
-            <li>Export data to CSV or PDF formats</li>
-            <li>Access HealthKit data through Apple's Health app</li>
+            <li>View all generated biometric keys in the Biometric Key Vault within the App</li>
+            <li>Inspect key metadata: session ID, confidence score, vault slot, authorization state, and signing timestamp</li>
         </ul>
 
         <h3>Delete Your Data</h3>
-        <p><strong>You can:</strong></p>
         <ul>
-            <li>Delete individual sessions from within the app</li>
-            <li>Clear all app data by deleting and reinstalling the app</li>
-            <li>Delete HealthKit data through the Health app</li>
-            <li>Revoke HealthKit permissions in iOS Settings</li>
+            <li>Delete individual keys from the vault within the App</li>
+            <li>Delete all App data by deleting and reinstalling the App</li>
+            <li>The Secure Enclave signing key is removed when the App is deleted</li>
         </ul>
 
         <h3>Control Data Collection</h3>
-        <p><strong>You can:</strong></p>
         <ul>
-            <li>Disable HealthKit permissions (app will work without health data)</li>
-            <li>Disable backend features (use app in offline mode)</li>
-            <li>Adjust motion sensor permissions in iOS Settings</li>
-        </ul>
-
-        <h2>Children's Privacy</h2>
-        <p>Our App is not intended for children under the age of 13. We do not knowingly collect personal information from children under 13. If you are a parent or guardian and believe your child has provided us with personal information, please contact us so we can delete such information.</p>
-
-        <h2>Medical Disclaimer</h2>
-        <div class="highlight">
-            <p><strong>Important:</strong> SteadyWatch is for <strong>informational purposes only</strong>. It is not intended to:</p>
-            <ul>
-                <li>Diagnose, treat, cure, or prevent any disease</li>
-                <li>Replace professional medical advice</li>
-                <li>Be used as a medical device</li>
-            </ul>
-            <p><strong>Always consult with qualified healthcare professionals for medical decisions.</strong></p>
-        </div>
-
-        <h2>Changes to This Privacy Policy</h2>
-        <p>We may update our Privacy Policy from time to time. We will notify you of any changes by:</p>
-        <ul>
-            <li>Posting the new Privacy Policy on this page</li>
-            <li>Updating the "Last Updated" date at the top of this policy</li>
-            <li>Notifying you through the App Store (for significant changes)</li>
-        </ul>
-        <p><strong>You are advised to review this Privacy Policy periodically for any changes.</strong></p>
-
-        <h2>Data Retention</h2>
-        <p><strong>Local Data:</strong></p>
-        <ul>
-            <li>Session data is retained until you delete it</li>
-            <li>Historical data is stored locally with no automatic deletion</li>
-            <li>You can delete data at any time through the app</li>
-        </ul>
-        <p><strong>HealthKit Data:</strong></p>
-        <ul>
-            <li>Managed by Apple's HealthKit framework</li>
-            <li>Retention is controlled by your Health app settings</li>
-            <li>We do not control HealthKit data retention</li>
-        </ul>
-
-        <h2>International Users</h2>
-        <p>If you are using our App from outside the United States, please be aware that:</p>
-        <ul>
-            <li>Data is stored locally on your device (in your country)</li>
-            <li>We do not transfer data across international borders</li>
-            <li>Your data is subject to the laws of your jurisdiction</li>
+            <li>Revoke Motion &amp; Fitness permissions in iOS Settings — the App will not be able to capture biometric frequency without this permission</li>
+            <li>Disable Face ID for the App in iOS Settings — keys can still be generated but cannot be authorized</li>
+            <li>Disable local network access in iOS Settings — vault sync will not function</li>
         </ul>
 
         <h2>Third-Party Services</h2>
-        
-        <h3>Apple Services</h3>
-        <p>Our App uses Apple services:</p>
+
+        <h3>Apple Services Used</h3>
         <ul>
-            <li><strong>HealthKit:</strong> For health data (if you grant permission)</li>
-            <li><strong>CoreMotion:</strong> For motion sensor data</li>
-            <li><strong>UserDefaults:</strong> For local data storage</li>
-            <li><strong>iCloud:</strong> For health data sync (if you enable it)</li>
+            <li><strong>CoreMotion:</strong> IMU data for biometric frequency capture on Apple Watch</li>
+            <li><strong>LocalAuthentication / Face ID:</strong> Authorization gate for Secure Enclave key signing</li>
+            <li><strong>CryptoKit / Secure Enclave:</strong> P256 ECDSA key generation and signing</li>
+            <li><strong>WatchConnectivity:</strong> Watch-to-iPhone communication</li>
+            <li><strong>UserDefaults:</strong> Local data persistence</li>
         </ul>
         <p><strong>These services are subject to Apple's Privacy Policy:</strong> <a href="https://www.apple.com/privacy/" target="_blank">Apple Privacy Policy</a></p>
 
-        <h3>Backend Services (Optional)</h3>
-        <p>If you configure a custom backend URL:</p>
+        <h3>IBM Quantum (Pre-Computed Entropy Only)</h3>
+        <p>THE VAULT™ entropy was generated on IBM Quantum hardware (ibm_marrakesh) in a one-time seed run. This entropy is embedded in the App at build time. The App does not connect to IBM at runtime. IBM's privacy practices are not applicable to App users.</p>
+
+        <h2>Children's Privacy</h2>
+        <p>Our App is not intended for children under the age of 13. We do not knowingly collect personal information from children under 13. If you are a parent or guardian and believe your child has provided us with personal information, please contact us.</p>
+
+        <h2>Medical Disclaimer</h2>
+        <div class="highlight">
+            <p><strong>Important:</strong> SteadyWatch is for cryptographic identity and informational purposes only. It is not a medical device and is not intended to diagnose, treat, cure, or prevent any disease or medical condition. Always consult qualified healthcare professionals for medical decisions.</p>
+        </div>
+
+        <h2>Changes to This Privacy Policy</h2>
+        <p>We may update this Privacy Policy from time to time. Changes will be reflected by updating the "Last Updated" date at the top of this page. Significant changes will be noted in the App Store release notes. You are advised to review this policy periodically.</p>
+
+        <h2>Data Retention</h2>
         <ul>
-            <li>You are responsible for that server's privacy practices</li>
-            <li>We do not control or monitor third-party backend servers</li>
-            <li>Review the privacy policy of any backend service you configure</li>
+            <li>Biometric keys are retained locally until you delete them</li>
+            <li>The Secure Enclave signing key persists until the App is deleted</li>
+            <li>No data is held by Quantum V^ LLC — there is nothing to retain on our end</li>
         </ul>
+
+        <h2>International Users</h2>
+        <p>Data is stored locally on your device in your jurisdiction. We do not transfer data across international borders. Your data is subject to the laws of your jurisdiction.</p>
 
         <h2>Contact Us</h2>
         <p>If you have any questions about this Privacy Policy, please contact us:</p>
@@ -410,33 +376,34 @@
         <p><strong>App Store Requirements:</strong></p>
         <ul>
             <li><span class="check">✅</span> Apple App Store Privacy Requirements</li>
-            <li><span class="check">✅</span> HealthKit Privacy Guidelines</li>
             <li><span class="check">✅</span> iOS/watchOS Data Protection Guidelines</li>
+            <li><span class="check">✅</span> Face ID / LocalAuthentication Privacy Guidelines</li>
+            <li><span class="check">✅</span> Secure Enclave usage guidelines</li>
         </ul>
         <p><strong>Legal Compliance:</strong></p>
         <ul>
-            <li><span class="check">✅</span> General Data Protection Regulation (GDPR) - European users</li>
-            <li><span class="check">✅</span> California Consumer Privacy Act (CCPA) - California users</li>
-            <li><span class="check">✅</span> Health Insurance Portability and Accountability Act (HIPAA) considerations</li>
+            <li><span class="check">✅</span> General Data Protection Regulation (GDPR) — European users</li>
+            <li><span class="check">✅</span> California Consumer Privacy Act (CCPA) — California users</li>
         </ul>
 
         <div class="summary">
             <h3>Summary</h3>
             <p><strong>In Simple Terms:</strong></p>
             <ul>
-                <li>All your data stays on your device</li>
-                <li>We don't collect personal information</li>
-                <li>We don't share your data with anyone</li>
-                <li>You control what data is collected</li>
-                <li>You can delete your data anytime</li>
+                <li>Your biometric key is generated and stored on your device only</li>
+                <li>Face ID is used to authorize keys — no facial data is accessed or stored by SteadyWatch</li>
+                <li>The Secure Enclave signing key never leaves your device's chip</li>
+                <li>IBM quantum entropy is pre-computed and embedded — no runtime connection to IBM</li>
+                <li>Local network sync is optional and stays on your network</li>
+                <li>We collect no personal information and have no access to your data</li>
             </ul>
-            <p><strong>Your privacy is our priority.</strong></p>
+            <p><strong>Your identity. Your device. Your key.</strong></p>
         </div>
 
         <div class="meta">
-            <p><strong>Privacy Policy Version:</strong> 1.0</p>
-            <p><strong>Effective Date:</strong> December 12, 2025</p>
-            <p><strong>Last Updated:</strong> December 12, 2025</p>
+            <p><strong>Privacy Policy Version:</strong> 1.0.3</p>
+            <p><strong>Effective Date:</strong> March 21, 2026</p>
+            <p><strong>Last Updated:</strong> March 21, 2026</p>
         </div>
     </div>
 </body>
