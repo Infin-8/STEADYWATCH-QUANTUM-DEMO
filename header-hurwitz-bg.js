@@ -125,10 +125,17 @@
             }
 
             // Spiral trace: each dot starts invisible and fades in at its index-based delay.
+            // After the trace completes, swap to the pulse (twinkle) animation.
             var targetOpacity = opacityScale != null ? opacityScale : 0.85;
             var delay = animationIndex != null ? animationIndex * traceStepMs : 0;
             dot.style.setProperty('--hurwitz-opacity', String(targetOpacity));
             dot.style.animation = 'hurwitz-dot-appear ' + traceFadeMs + 'ms ease-out ' + delay + 'ms both';
+            dot.addEventListener('animationend', function onTraceEnd() {
+                dot.removeEventListener('animationend', onTraceEnd);
+                var pulseDuration = className === 'center' ? '3s' : '2s';
+                var pulseDelay = animationIndex != null ? (animationIndex * 0.04) + 's' : '0s';
+                dot.style.animation = 'header-hurwitz-pulse ' + pulseDuration + ' ease-in-out ' + pulseDelay + ' infinite';
+            });
 
             if (style) {
                 var g = style.glowIntensity;
